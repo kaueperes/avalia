@@ -22,7 +22,7 @@ const CheckIcon    = () => <Icon d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 1
 const ArrowRight   = () => <Icon d="M5 12h14M12 5l7 7-7 7" size={16} />;
 
 // ── Check mark small ─────────────────────────────────────────────────────────
-const CheckMark = ({ color = '#2a7fd4' }) => (
+const CheckMark = ({ color = '#0081f0' }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color}
     strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 6L9 17l-5-5" />
@@ -74,13 +74,13 @@ export default function Home() {
 
         .btn-primary {
           display: inline-flex; align-items: center; gap: 8px;
-          background: #2a7fd4; color: white; border: none;
+          background: #0081f0; color: white; border: none;
           padding: 14px 28px; border-radius: 10px;
           font-weight: 600; font-size: 15px; cursor: pointer;
           transition: background .2s, transform .2s, box-shadow .2s;
         }
         .btn-primary:hover {
-          background: #1d6bbf;
+          background: #0033ad;
           transform: translateY(-1px);
           box-shadow: 0 8px 24px rgba(42,127,212,0.35);
         }
@@ -107,7 +107,7 @@ export default function Home() {
         .benefit-card { transition: transform .25s; }
         .benefit-card:hover { transform: translateY(-4px); }
         .benefit-card:hover .icon-box {
-          background: #2a7fd4 !important;
+          background: #0081f0 !important;
           color: white !important;
         }
         .icon-box { transition: background .2s, color .2s; }
@@ -120,7 +120,7 @@ export default function Home() {
         .feature-card:hover {
           transform: translateY(-3px);
           box-shadow: 0 12px 36px rgba(42,127,212,0.09);
-          border-color: #DBEAFE;
+          border-color: #cad0dd;
         }
 
         .testimonial-card {
@@ -162,8 +162,8 @@ export default function Home() {
           transition: 'background .3s, border-color .3s, backdrop-filter .3s',
         }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.5px', cursor: 'pointer' }} onClick={() => router.push('/')}>
-              Avali<span style={{ color: '#2a7fd4' }}>A</span>
+            <div style={{ fontSize: 20, fontWeight: 700, color: '#00173f', letterSpacing: '-0.5px', cursor: 'pointer' }} onClick={() => router.push('/')}>
+              Avali<span style={{ color: '#0081f0' }}>A</span>
             </div>
             <div className="nav-links" style={{ display: 'flex', gap: 36 }}>
               <a href="#funcionalidades" className="nav-link">Funcionalidades</a>
@@ -187,14 +187,14 @@ export default function Home() {
         <section style={{ padding: '110px 32px 80px', background: 'white', textAlign: 'center', overflow: 'hidden' }}>
           <div style={{ maxWidth: 820, margin: '0 auto' }}>
 
-            <div className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#EFF6FF', color: '#2a7fd4', padding: '6px 14px', borderRadius: 100, fontSize: 13, fontWeight: 500, marginBottom: 36, border: '1px solid #DBEAFE' }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#2a7fd4', display: 'inline-block', animation: 'subtlePulse 2.4s ease infinite' }} />
+            <div className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#E6F3FF', color: '#0081f0', padding: '6px 14px', borderRadius: 100, fontSize: 13, fontWeight: 500, marginBottom: 36, border: '1px solid #cad0dd' }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#0081f0', display: 'inline-block', animation: 'subtlePulse 2.4s ease infinite' }} />
               Avaliação inteligente para educadores
             </div>
 
-            <h1 className="hero-headline hero-h1" style={{ fontSize: 70, fontWeight: 800, color: '#0A0A0A', lineHeight: 1.05, letterSpacing: '-2.5px', marginBottom: 24 }}>
+            <h1 className="hero-headline hero-h1" style={{ fontSize: 70, fontWeight: 800, color: '#00173f', lineHeight: 1.05, letterSpacing: '-2.5px', marginBottom: 24 }}>
               Avalie trabalhos com<br />
-              <span style={{ color: '#2a7fd4' }}>precisão e velocidade</span>
+              <span style={{ color: '#0081f0' }}>precisão e velocidade</span>
             </h1>
 
             <p className="hero-sub" style={{ fontSize: 20, color: '#6B7280', lineHeight: 1.65, maxWidth: 540, margin: '0 auto 44px', fontWeight: 400 }}>
@@ -245,8 +245,8 @@ export default function Home() {
               {/* Right panel */}
               <div style={{ background: 'white', borderRadius: 12, padding: 24, border: '1px solid #F0F0F0' }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 16 }}>Resultado da avaliação</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, padding: '14px 16px', background: '#EFF6FF', borderRadius: 10, border: '1px solid #DBEAFE' }}>
-                  <div style={{ fontSize: 28, fontWeight: 800, color: '#2a7fd4', lineHeight: 1 }}>8.5</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, padding: '14px 16px', background: '#E6F3FF', borderRadius: 10, border: '1px solid #cad0dd' }}>
+                  <div style={{ fontSize: 28, fontWeight: 800, color: '#0081f0', lineHeight: 1 }}>8.5</div>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>Nota final</div>
                     <div style={{ fontSize: 12, color: '#10B981', fontWeight: 500, marginTop: 2 }}>Bom desempenho</div>
@@ -258,7 +258,7 @@ export default function Home() {
                       <span>{label}</span><span style={{ fontWeight: 600, color: '#374151' }}>{val}%</span>
                     </div>
                     <div style={{ height: 5, background: '#F3F4F6', borderRadius: 3 }}>
-                      <div style={{ height: '100%', width: `${val}%`, background: 'linear-gradient(90deg, #2a7fd4, #5da0e8)', borderRadius: 3, transition: 'width 1s ease' }} />
+                      <div style={{ height: '100%', width: `${val}%`, background: 'linear-gradient(90deg, #0081f0, #66b3ff)', borderRadius: 3, transition: 'width 1s ease' }} />
                     </div>
                   </div>
                 ))}
@@ -271,8 +271,8 @@ export default function Home() {
         <section id="funcionalidades" style={{ padding: '96px 32px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 64 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#2a7fd4', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Por que AvaliA</p>
-              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#0A0A0A', letterSpacing: '-1px', marginBottom: 16 }}>Avaliação que faz sentido</h2>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Por que AvaliA</p>
+              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', marginBottom: 16 }}>Avaliação que faz sentido</h2>
               <p style={{ fontSize: 18, color: '#6B7280', maxWidth: 440, margin: '0 auto' }}>Desenvolvido com foco em pedagogia, não apenas em tecnologia.</p>
             </div>
             <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
@@ -283,7 +283,7 @@ export default function Home() {
                 { Icon: ShieldIcon, title: 'Consistente', desc: 'Critérios padronizados em todas as avaliações. Sem variações involuntárias.' },
               ].map(({ Icon: Ic, title, desc }) => (
                 <div key={title} className="benefit-card" style={{ padding: '36px 24px', textAlign: 'center', borderRadius: 16 }}>
-                  <div className="icon-box" style={{ width: 52, height: 52, borderRadius: 14, background: '#EFF6FF', color: '#2a7fd4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                  <div className="icon-box" style={{ width: 52, height: 52, borderRadius: 14, background: '#E6F3FF', color: '#0081f0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                     <Ic />
                   </div>
                   <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 8 }}>{title}</h3>
@@ -322,13 +322,13 @@ export default function Home() {
             ].map((item, i) => (
               <div key={i} className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, alignItems: 'center', direction: item.right ? 'rtl' : 'ltr' }}>
                 <div style={{ direction: 'ltr' }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: '#2a7fd4', letterSpacing: 1, marginBottom: 16, textTransform: 'uppercase' }}>{item.tag}</p>
-                  <h3 style={{ fontSize: 38, fontWeight: 800, color: '#0A0A0A', lineHeight: 1.15, letterSpacing: '-1px', marginBottom: 20, whiteSpace: 'pre-line' }}>{item.title}</h3>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: '#0081f0', letterSpacing: 1, marginBottom: 16, textTransform: 'uppercase' }}>{item.tag}</p>
+                  <h3 style={{ fontSize: 38, fontWeight: 800, color: '#00173f', lineHeight: 1.15, letterSpacing: '-1px', marginBottom: 20, whiteSpace: 'pre-line' }}>{item.title}</h3>
                   <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, marginBottom: 32 }}>{item.desc}</p>
                   <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {item.points.map(p => (
                       <li key={p} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, color: '#374151', fontWeight: 500 }}>
-                        <span style={{ width: 22, height: 22, borderRadius: '50%', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <span style={{ width: 22, height: 22, borderRadius: '50%', background: '#E6F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                           <CheckMark />
                         </span>
                         {p}
@@ -343,11 +343,11 @@ export default function Home() {
                   <div style={{ height: 10, background: '#F3F4F6', borderRadius: 5, marginBottom: 8, width: '65%' }} />
                   <div style={{ height: 10, background: '#F3F4F6', borderRadius: 5, marginBottom: 28, width: '45%' }} />
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-                    <div style={{ height: 60, background: '#EFF6FF', borderRadius: 10, border: '1px solid #DBEAFE' }} />
+                    <div style={{ height: 60, background: '#E6F3FF', borderRadius: 10, border: '1px solid #cad0dd' }} />
                     <div style={{ height: 60, background: '#F0FDF4', borderRadius: 10, border: '1px solid #D1FAE5' }} />
                   </div>
                   <div style={{ display: 'flex', gap: 10 }}>
-                    <div style={{ flex: 1, height: 38, background: '#2a7fd4', borderRadius: 8, opacity: 0.85 }} />
+                    <div style={{ flex: 1, height: 38, background: '#0081f0', borderRadius: 8, opacity: 0.85 }} />
                     <div style={{ width: 80, height: 38, background: '#E5E7EB', borderRadius: 8 }} />
                   </div>
                 </div>
@@ -360,8 +360,8 @@ export default function Home() {
         <section style={{ padding: '96px 32px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 64 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#2a7fd4', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Depoimentos</p>
-              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#0A0A0A', letterSpacing: '-1px' }}>Professores que transformaram sua rotina</h2>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Depoimentos</p>
+              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px' }}>Professores que transformaram sua rotina</h2>
             </div>
             <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
               {[
@@ -375,7 +375,7 @@ export default function Home() {
                   </div>
                   <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.75, marginBottom: 24, fontStyle: 'italic' }}>"{t.quote}"</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#2a7fd4', flexShrink: 0 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#E6F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#0081f0', flexShrink: 0 }}>
                       {t.name.charAt(0)}
                     </div>
                     <div>
@@ -393,8 +393,8 @@ export default function Home() {
         <section style={{ padding: '96px 32px', background: 'white' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 64 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#2a7fd4', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Funcionalidades</p>
-              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#0A0A0A', letterSpacing: '-1px' }}>Cada detalhe pensado para o professor</h2>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Funcionalidades</p>
+              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px' }}>Cada detalhe pensado para o professor</h2>
             </div>
             <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
               {[
@@ -406,7 +406,7 @@ export default function Home() {
                 { Ic: CheckIcon,    title: 'Critérios customizados', desc: 'Defina e salve seus próprios critérios de avaliação reutilizáveis por exercício.' },
               ].map(({ Ic, title, desc }) => (
                 <div key={title} className="feature-card">
-                  <div style={{ width: 44, height: 44, borderRadius: 12, background: '#EFF6FF', color: '#2a7fd4', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: '#E6F3FF', color: '#0081f0', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
                     <Ic />
                   </div>
                   <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 8 }}>{title}</h3>
@@ -421,8 +421,8 @@ export default function Home() {
         <section id="planos" style={{ padding: '96px 32px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
           <div style={{ maxWidth: 1060, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 64 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#2a7fd4', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Planos</p>
-              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#0A0A0A', letterSpacing: '-1px', marginBottom: 14 }}>Simples e transparente</h2>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Planos</p>
+              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', marginBottom: 14 }}>Simples e transparente</h2>
               <p style={{ fontSize: 17, color: '#6B7280' }}>Comece grátis. Faça upgrade quando precisar.</p>
             </div>
             <div className="grid-plans" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, alignItems: 'start' }}>
@@ -431,7 +431,7 @@ export default function Home() {
               <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Gratuito</p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
-                  <span style={{ fontSize: 44, fontWeight: 800, color: '#0A0A0A', letterSpacing: '-1px', lineHeight: 1 }}>R$ 0</span>
+                  <span style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 0</span>
                 </div>
                 <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para experimentar a plataforma</p>
                 <button onClick={() => router.push('/signup')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px' }}>
@@ -447,8 +447,8 @@ export default function Home() {
               </div>
 
               {/* ESSENCIAL */}
-              <div className="plan-card" style={{ background: '#0A0A0A', border: '1px solid #0A0A0A', position: 'relative', transform: 'scale(1.03)' }}>
-                <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#2a7fd4', color: 'white', padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: 0.5 }}>
+              <div className="plan-card" style={{ background: '#00173f', border: '1px solid #00173f', position: 'relative', transform: 'scale(1.03)' }}>
+                <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#0081f0', color: 'white', padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: 0.5 }}>
                   MAIS POPULAR
                 </div>
                 <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Essencial</p>
@@ -457,13 +457,13 @@ export default function Home() {
                   <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)' }}>/mês</span>
                 </div>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 28 }}>Para professores ativos</p>
-                <button onClick={() => router.push('/signup')} className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px', background: '#2a7fd4' }}>
+                <button onClick={() => router.push('/signup')} className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px', background: '#0081f0' }}>
                   Assinar Essencial
                 </button>
                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {['100 avaliações por mês', 'Exercícios ilimitados', '3 perfis de professor', 'Feedback detalhado por critério', 'Painel da turma', 'Exportação PDF e CSV'].map(item => (
                     <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
-                      <CheckMark color="#5da0e8" /> {item}
+                      <CheckMark color="#66b3ff" /> {item}
                     </div>
                   ))}
                 </div>
@@ -473,7 +473,7 @@ export default function Home() {
               <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Pro</p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontSize: 44, fontWeight: 800, color: '#0A0A0A', letterSpacing: '-1px', lineHeight: 1 }}>R$ 59</span>
+                  <span style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 59</span>
                   <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
                 </div>
                 <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para coordenadores e instituições</p>
@@ -493,7 +493,7 @@ export default function Home() {
         </section>
 
         {/* ── FINAL CTA ──────────────────────────────────────────────────────── */}
-        <section style={{ padding: '96px 32px', background: 'linear-gradient(135deg, #1558a8 0%, #2a7fd4 55%, #4a9de8 100%)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <section style={{ padding: '96px 32px', background: 'linear-gradient(135deg, #0033ad 0%, #0081f0 55%, #0081f0 100%)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.06) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 50%)' }} />
           <div style={{ maxWidth: 620, margin: '0 auto', position: 'relative' }}>
             <h2 style={{ fontSize: 48, fontWeight: 800, color: 'white', lineHeight: 1.1, letterSpacing: '-1.5px', marginBottom: 20 }}>
@@ -504,7 +504,7 @@ export default function Home() {
             </p>
             <button onClick={() => router.push('/signup')} style={{
               display: 'inline-flex', alignItems: 'center', gap: 10,
-              padding: '18px 48px', background: 'white', color: '#1558a8',
+              padding: '18px 48px', background: 'white', color: '#0033ad',
               border: 'none', borderRadius: 12, fontWeight: 700, fontSize: 17,
               cursor: 'pointer', transition: 'transform .2s, box-shadow .2s',
               boxShadow: '0 8px 32px rgba(0,0,0,0.15)'
@@ -521,12 +521,12 @@ export default function Home() {
         </section>
 
         {/* ── FOOTER ─────────────────────────────────────────────────────────── */}
-        <footer style={{ background: '#0A0A0A', padding: '56px 32px 32px' }}>
+        <footer style={{ background: '#00173f', padding: '56px 32px 32px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
               <div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: 'white', letterSpacing: '-0.5px', marginBottom: 14 }}>
-                  Avali<span style={{ color: '#2a7fd4' }}>A</span>
+                  Avali<span style={{ color: '#0081f0' }}>A</span>
                 </div>
                 <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.75, maxWidth: 260 }}>
                   Avaliação inteligente para educadores. Economize tempo e ofereça feedback de qualidade com IA.
@@ -549,7 +549,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <div style={{ borderTop: '1px solid #1F2937', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+            <div style={{ borderTop: '1px solid #001025', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
               <span style={{ fontSize: 13, color: '#4B5563' }}>© 2025 AvaliA · avalia.education</span>
               <span style={{ fontSize: 13, color: '#4B5563' }}>Todos os direitos reservados</span>
             </div>
