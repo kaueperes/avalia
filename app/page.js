@@ -322,7 +322,7 @@ export default function Home() {
             ].map((item, i) => (
               <div key={i} className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, alignItems: 'center', direction: item.right ? 'rtl' : 'ltr' }}>
                 <div style={{ direction: 'ltr' }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: '#0081f0', letterSpacing: 1, marginBottom: 16, textTransform: 'uppercase' }}>{item.tag}</p>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: '#810cfa', letterSpacing: 1, marginBottom: 16, textTransform: 'uppercase' }}>{item.tag}</p>
                   <h3 style={{ fontSize: 38, fontWeight: 800, color: '#00173f', lineHeight: 1.15, letterSpacing: '-1px', marginBottom: 20, whiteSpace: 'pre-line' }}>{item.title}</h3>
                   <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, marginBottom: 32 }}>{item.desc}</p>
                   <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -448,7 +448,7 @@ export default function Home() {
 
               {/* ESSENCIAL */}
               <div className="plan-card" style={{ background: '#00173f', border: '1px solid #00173f', position: 'relative', transform: 'scale(1.03)' }}>
-                <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#0081f0', color: 'white', padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: 0.5 }}>
+                <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#810cfa', color: 'white', padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: 0.5 }}>
                   MAIS POPULAR
                 </div>
                 <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Essencial</p>
@@ -471,7 +471,7 @@ export default function Home() {
 
               {/* PRO */}
               <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Pro</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Pro</p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
                   <span style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 59</span>
                   <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>

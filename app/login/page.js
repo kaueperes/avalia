@@ -24,7 +24,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.error);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      router.push('/dashboard');
+      router.push('/inicio');
     } catch (err) {
       setError(err.message || 'Erro ao fazer login');
     } finally {

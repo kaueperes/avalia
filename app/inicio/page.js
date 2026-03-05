@@ -59,7 +59,7 @@ function greeting() {
   return 'Boa noite';
 }
 
-export default function DashboardPage() {
+export default function InicioPage() {
   const router = useRouter();
   const [evaluations, setEvaluations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -88,7 +88,6 @@ export default function DashboardPage() {
 
   return (
     <AppLayout userName={userName}>
-      {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Início</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
@@ -99,34 +98,24 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        <StatCard label="Total de avaliações"  value={loading ? '—' : evaluations.length} sub="desde o início"           color="var(--text-main)" />
-        <StatCard label="Média geral"           value={loading ? '—' : avg}               sub="de todas as avaliações"   color="#0081f0" />
-        <StatCard label="Exercícios criados"    value="—"                                  sub="em breve"                 color="#0033ad" />
-        <StatCard label="Alunos avaliados"      value={loading ? '—' : uniqueStudents}    sub="alunos únicos"            color="#810cfa" />
+        <StatCard label="Total de avaliações" value={loading ? '—' : evaluations.length} sub="desde o início"         color="var(--text-main)" />
+        <StatCard label="Média geral"          value={loading ? '—' : avg}               sub="de todas as avaliações" color="#0081f0" />
+        <StatCard label="Exercícios criados"   value="—"                                  sub="em breve"               color="#0033ad" />
+        <StatCard label="Alunos avaliados"     value={loading ? '—' : uniqueStudents}    sub="alunos únicos"          color="#810cfa" />
       </div>
 
-      {/* Recent evaluations */}
       {!loading && recent.length > 0 ? (
         <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '24px 28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>Avaliações recentes</h2>
-            <button
-              onClick={() => router.push('/painel')}
-              style={{ fontSize: 13, fontWeight: 600, color: '#0081f0', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>
+            <button onClick={() => router.push('/painel')} style={{ fontSize: 13, fontWeight: 600, color: '#0081f0', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>
               Ver todas →
             </button>
           </div>
           <p style={{ fontSize: 13, color: 'var(--text-sub)', marginBottom: 20 }}>Últimas avaliações realizadas</p>
           {recent.map(e => (
-            <AvaliacaoRow
-              key={e.id}
-              aluno={e.studentName}
-              tipo={e.type}
-              nota={e.score}
-              data={new Date(e.createdAt).toLocaleDateString('pt-BR')}
-            />
+            <AvaliacaoRow key={e.id} aluno={e.studentName} tipo={e.type} nota={e.score} data={new Date(e.createdAt).toLocaleDateString('pt-BR')} />
           ))}
         </div>
       ) : !loading && (
@@ -134,9 +123,7 @@ export default function DashboardPage() {
           <p style={{ fontSize: 36, marginBottom: 12 }}>🎯</p>
           <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Nenhuma avaliação ainda</p>
           <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24 }}>Faça sua primeira avaliação e os resultados aparecerão aqui.</p>
-          <button
-            onClick={() => router.push('/avaliar')}
-            style={{ padding: '11px 28px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={() => router.push('/avaliar')} style={{ padding: '11px 28px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
             Fazer primeira avaliação
           </button>
         </div>

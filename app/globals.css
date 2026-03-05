@@ -20,3 +20,9 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #c8c5be; border-radius: 99px; }
+
+/* AppLayout responsive */
+@media (max-width: 768px) {
+  .sidebar { display: none !important; }
+  .main-area { margin-left: 0 !important; }
+}
