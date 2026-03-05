@@ -162,8 +162,8 @@ export default function Home() {
           transition: 'background .3s, border-color .3s, backdrop-filter .3s',
         }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: '#00173f', letterSpacing: '-0.5px', cursor: 'pointer' }} onClick={() => router.push('/')}>
-              Avali<span style={{ color: '#0081f0' }}>A</span>
+            <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => router.push('/')}>
+              <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 36, width: 'auto' }} />
             </div>
             <div className="nav-links" style={{ display: 'flex', gap: 36 }}>
               <a href="#funcionalidades" className="nav-link">Funcionalidades</a>
@@ -525,8 +525,8 @@ export default function Home() {
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
               <div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: 'white', letterSpacing: '-0.5px', marginBottom: 14 }}>
-                  Avali<span style={{ color: '#0081f0' }}>A</span>
+                <div style={{ marginBottom: 14 }}>
+                  <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 30, width: 'auto', filter: 'brightness(0) invert(1)' }} />
                 </div>
                 <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.75, maxWidth: 260 }}>
                   Avaliação inteligente para educadores. Economize tempo e ofereça feedback de qualidade com IA.
