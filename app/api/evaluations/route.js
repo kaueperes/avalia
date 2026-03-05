@@ -1,38 +1,32 @@
 import { NextResponse } from 'next/server';
-import { evaluations } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/auth';
+
+function fmt(e) {
+  return { id: e.id, userId: e.user_id, studentName: e.student_name, type: e.type, score: e.score, feedback: e.feedback, criteria: e.criteria, profileName: e.profile_name, createdAt: e.created_at };
+}
 
 export async function GET(request) {
   const user = getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  const result = evaluations
-    .filter(e => e.userId === user.userId)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-  return NextResponse.json(result);
+  const { data } = await supabase.from('evaluations').select('*').eq('user_id', user.userId).order('created_at', { ascending: false });
+  return NextResponse.json((data || []).map(fmt));
 }
 
 export async function POST(request) {
   const user = getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  const body = await request.json();
-  const { studentName, type, score, feedback, criteria, profileName } = body;
-
+  const { studentName, type, score, feedback, criteria, profileName } = await request.json();
   if (!studentName || !type || score === undefined) {
     return NextResponse.json({ error: 'Campos obrigatórios faltando' }, { status: 400 });
   }
 
-  const evaluation = {
-    id: Date.now().toString(),
-    userId: user.userId,
-    studentName, type, score,
-    feedback: feedback || '',
-    criteria: criteria || [],
-    profileName: profileName || '',
-    createdAt: new Date(),
-  };
-  evaluations.push(evaluation);
-  return NextResponse.json(evaluation, { status: 201 });
+  const { data: e, error } = await supabase.from('evaluations')
+    .insert({ user_id: user.userId, student_name: studentName, type, score, feedback: feedback || '', criteria: criteria || [], profile_name: profileName || '' })
+    .select().single();
+
+  if (error) return NextResponse.json({ error: 'Erro ao salvar' }, { status: 500 });
+  return NextResponse.json(fmt(e), { status: 201 });
 }

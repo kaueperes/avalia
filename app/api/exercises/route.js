@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
-import { exercises } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/auth';
+
+function fmt(e) {
+  return { id: e.id, userId: e.user_id, name: e.name, type: e.type, context: e.context, criteria: e.criteria, createdAt: e.created_at };
+}
 
 export async function GET(request) {
   const user = getUserFromRequest(request);
@@ -9,11 +13,11 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type');
 
-  let result = exercises.filter(e => e.userId === user.userId);
-  if (type) result = result.filter(e => e.type === type);
-  result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  let query = supabase.from('exercises').select('*').eq('user_id', user.userId).order('created_at', { ascending: false });
+  if (type) query = query.eq('type', type);
 
-  return NextResponse.json(result);
+  const { data } = await query;
+  return NextResponse.json((data || []).map(fmt));
 }
 
 export async function POST(request) {
@@ -25,14 +29,10 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Nome e tipo são obrigatórios' }, { status: 400 });
   }
 
-  const exercise = {
-    id: Date.now().toString(),
-    userId: user.userId,
-    name, type,
-    context: context || '',
-    criteria: criteria || [],
-    createdAt: new Date(),
-  };
-  exercises.push(exercise);
-  return NextResponse.json(exercise, { status: 201 });
+  const { data: e, error } = await supabase.from('exercises')
+    .insert({ user_id: user.userId, name, type, context: context || '', criteria: criteria || [] })
+    .select().single();
+
+  if (error) return NextResponse.json({ error: 'Erro ao salvar' }, { status: 500 });
+  return NextResponse.json(fmt(e), { status: 201 });
 }

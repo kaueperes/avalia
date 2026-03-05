@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { users } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { signToken } from '@/lib/auth';
 
 export async function POST(request) {
@@ -11,16 +11,19 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Nome, email e senha são obrigatórios' }, { status: 400 });
     }
 
-    if (users.find(u => u.email === email)) {
+    const { data: existing } = await supabase.from('users').select('id').eq('email', email).single();
+    if (existing) {
       return NextResponse.json({ error: 'Email já cadastrado' }, { status: 409 });
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = { id: Date.now().toString(), name, email, password: hashed, plan: 'free', createdAt: new Date() };
-    users.push(user);
+    const { data: user, error } = await supabase.from('users')
+      .insert({ name, email, password: hashed, plan: 'free' })
+      .select().single();
+
+    if (error) throw error;
 
     const token = signToken({ userId: user.id, email: user.email });
-
     return NextResponse.json({
       token,
       user: { id: user.id, name: user.name, email: user.email, plan: user.plan }

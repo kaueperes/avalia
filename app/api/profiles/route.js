@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
-import { profiles } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/auth';
+
+function fmt(p) {
+  return { id: p.id, userId: p.user_id, name: p.name, discipline: p.discipline, turma: p.turma, tone: p.tone, writingSample: p.writing_sample, createdAt: p.created_at };
+}
 
 export async function GET(request) {
   const user = getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  return NextResponse.json(profiles.filter(p => p.userId === user.userId));
+  const { data } = await supabase.from('profiles').select('*').eq('user_id', user.userId).order('created_at', { ascending: false });
+  return NextResponse.json((data || []).map(fmt));
 }
 
 export async function POST(request) {
@@ -18,15 +23,10 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Nome e disciplina são obrigatórios' }, { status: 400 });
   }
 
-  const profile = {
-    id: Date.now().toString(),
-    userId: user.userId,
-    name, discipline,
-    turma: turma || '',
-    tone: tone || 'neutro',
-    writingSample: writingSample || '',
-    createdAt: new Date(),
-  };
-  profiles.push(profile);
-  return NextResponse.json(profile, { status: 201 });
+  const { data: p, error } = await supabase.from('profiles')
+    .insert({ user_id: user.userId, name, discipline, turma: turma || '', tone: tone || 'neutro', writing_sample: writingSample || '' })
+    .select().single();
+
+  if (error) return NextResponse.json({ error: 'Erro ao salvar' }, { status: 500 });
+  return NextResponse.json(fmt(p), { status: 201 });
 }

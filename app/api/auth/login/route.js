@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { users } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { signToken } from '@/lib/auth';
 
 export async function POST(request) {
@@ -11,7 +11,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Email e senha são obrigatórios' }, { status: 400 });
     }
 
-    const user = users.find(u => u.email === email);
+    const { data: user } = await supabase.from('users').select('*').eq('email', email).single();
     if (!user) {
       return NextResponse.json({ error: 'Email ou senha inválidos' }, { status: 401 });
     }
@@ -22,7 +22,6 @@ export async function POST(request) {
     }
 
     const token = signToken({ userId: user.id, email: user.email });
-
     return NextResponse.json({
       token,
       user: { id: user.id, name: user.name, email: user.email, plan: user.plan }

@@ -1,26 +1,30 @@
 import { NextResponse } from 'next/server';
-import { exercises } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/auth';
+
+function fmt(e) {
+  return { id: e.id, userId: e.user_id, name: e.name, type: e.type, context: e.context, criteria: e.criteria, createdAt: e.created_at };
+}
 
 export async function PUT(request, { params }) {
   const user = getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  const idx = exercises.findIndex(e => e.id === params.id && e.userId === user.userId);
-  if (idx === -1) return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
+  const { name, type, context, criteria } = await request.json();
+  const { data: e, error } = await supabase.from('exercises')
+    .update({ name, type, context: context || '', criteria: criteria || [] })
+    .eq('id', params.id).eq('user_id', user.userId)
+    .select().single();
 
-  const body = await request.json();
-  exercises[idx] = { ...exercises[idx], ...body };
-  return NextResponse.json(exercises[idx]);
+  if (error || !e) return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
+  return NextResponse.json(fmt(e));
 }
 
 export async function DELETE(request, { params }) {
   const user = getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  const idx = exercises.findIndex(e => e.id === params.id && e.userId === user.userId);
-  if (idx === -1) return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
-
-  exercises.splice(idx, 1);
+  const { error } = await supabase.from('exercises').delete().eq('id', params.id).eq('user_id', user.userId);
+  if (error) return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
   return NextResponse.json({ ok: true });
 }
