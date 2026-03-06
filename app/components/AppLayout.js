@@ -129,6 +129,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
   const [toggleHover, setToggleHover] = useState(false);
   const [quotaCiclo, setQuotaCiclo] = useState(null);
   const [quotaExtra, setQuotaExtra] = useState(null);
+  const [planFromStorage, setPlanFromStorage] = useState(null);
 
   useEffect(() => {
     try {
@@ -137,6 +138,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
         const u = JSON.parse(stored);
         if (u.quota_ciclo !== undefined) setQuotaCiclo(u.quota_ciclo);
         if (u.quota_extra !== undefined) setQuotaExtra(u.quota_extra);
+        if (u.plan) setPlanFromStorage(u.plan);
       }
     } catch {}
   }, []);
@@ -277,7 +279,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
                       background: userPlan === 'pro' ? 'linear-gradient(135deg, #0081f0, #810cfa)' : (darkMode ? '#1e2330' : '#EBF4FF'),
                       color: userPlan === 'pro' ? 'white' : '#0081f0',
                     }}>
-                      {userPlan === 'pro' ? '★ Plano Pro' : userPlan === 'essencial' ? 'Plano Essencial' : 'Plano Gratuito'}
+                      {(() => { const p = planFromStorage || userPlan; return p === 'pro' ? '★ Plano Pro' : p === 'premium' ? 'Plano Premium' : p === 'essencial' ? 'Plano Essencial' : 'Plano Gratuito'; })()}
 
                     </div>
                   </div>
