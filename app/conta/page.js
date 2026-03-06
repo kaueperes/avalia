@@ -149,43 +149,8 @@ function ContaPageInner() {
       }
     } catch {}
 
-    // Always fetch fresh data from DB
-    fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json())
-      .then(({ user: fresh }) => {
-        if (!fresh) return;
-        const stored = JSON.parse(localStorage.getItem('user') || '{}');
-        localStorage.setItem('user', JSON.stringify({ ...stored, ...fresh }));
-        setUserName(fresh.name || 'Professor');
-        setUserEmail(fresh.email || '');
-        setUserPlan(fresh.plan || 'gratuito');
-        setName(fresh.name || '');
-        setEmail(fresh.email || '');
-        if (fresh.quota_ciclo !== undefined) setQuotaCiclo(fresh.quota_ciclo);
-        if (fresh.quota_extra !== undefined) setQuotaExtra(fresh.quota_extra);
-        if (fresh.quota_reset_date) setQuotaResetDate(fresh.quota_reset_date);
-      })
-      .catch(() => {});
-
     if (searchParams.get('success')) {
-      // Busca dados atualizados do banco após o pagamento
-      const token = localStorage.getItem('token');
-      if (token) {
-        fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
-          .then(r => r.json())
-          .then(({ user: fresh }) => {
-            if (fresh) {
-              const stored = JSON.parse(localStorage.getItem('user') || '{}');
-              const updated = { ...stored, ...fresh };
-              localStorage.setItem('user', JSON.stringify(updated));
-              setUserPlan(fresh.plan || 'gratuito');
-              if (fresh.quota_ciclo !== undefined) setQuotaCiclo(fresh.quota_ciclo);
-              if (fresh.quota_extra !== undefined) setQuotaExtra(fresh.quota_extra);
-            }
-          })
-          .catch(() => {});
-      }
-      showMsg(setPlanMsg, 'success', 'Pagamento confirmado! Seu plano foi atualizado.');
+      showMsg(setPlanMsg, 'success', 'Pagamento confirmado! Seu plano será atualizado ao fazer login novamente.');
     }
     if (searchParams.get('canceled')) showMsg(setPlanMsg, 'error', 'Pagamento cancelado. Nenhuma cobrança foi feita.');
   }, [router, searchParams]);
