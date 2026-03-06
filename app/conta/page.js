@@ -133,6 +133,7 @@ function ContaPageInner() {
     const token = localStorage.getItem('token');
     if (!token) { router.push('/login'); return; }
 
+    // Seed from localStorage first for instant render
     try {
       const stored = localStorage.getItem('user');
       if (stored) {
@@ -145,12 +146,26 @@ function ContaPageInner() {
         if (u.quota_ciclo !== undefined) setQuotaCiclo(u.quota_ciclo);
         if (u.quota_extra !== undefined) setQuotaExtra(u.quota_extra);
         if (u.quota_reset_date) setQuotaResetDate(u.quota_reset_date);
-      } else {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setUserEmail(payload.email || '');
-        setEmail(payload.email || '');
       }
     } catch {}
+
+    // Always fetch fresh data from DB
+    fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(({ user: fresh }) => {
+        if (!fresh) return;
+        const stored = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({ ...stored, ...fresh }));
+        setUserName(fresh.name || 'Professor');
+        setUserEmail(fresh.email || '');
+        setUserPlan(fresh.plan || 'gratuito');
+        setName(fresh.name || '');
+        setEmail(fresh.email || '');
+        if (fresh.quota_ciclo !== undefined) setQuotaCiclo(fresh.quota_ciclo);
+        if (fresh.quota_extra !== undefined) setQuotaExtra(fresh.quota_extra);
+        if (fresh.quota_reset_date) setQuotaResetDate(fresh.quota_reset_date);
+      })
+      .catch(() => {});
 
     if (searchParams.get('success')) {
       // Busca dados atualizados do banco após o pagamento
