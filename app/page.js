@@ -1,5 +1,4 @@
 'use client';
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 // ── Lucide-style SVG icons ────────────────────────────────────────────────────
@@ -39,13 +38,6 @@ const Star = () => (
 // ═════════════════════════════════════════════════════════════════════════════
 export default function Home() {
   const router = useRouter();
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   return (
     <>
@@ -159,28 +151,27 @@ export default function Home() {
         {/* ── NAVBAR ─────────────────────────────────────────────────────────── */}
         <nav style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-          background: scrolled ? 'rgba(255,255,255,0.9)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(14px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(0,0,0,0.07)' : '1px solid rgba(255,255,255,0.06)',
+          background: 'rgba(255,255,255,0.95)',
+          backdropFilter: 'blur(14px)',
+          borderBottom: '1px solid rgba(0,0,0,0.07)',
           padding: '0 32px',
-          transition: 'background .3s, border-color .3s, backdrop-filter .3s',
         }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => router.push('/')}>
-              <img src={scrolled ? '/imagens/logo.svg' : '/imagens/logo_branco100.svg'} alt="AvaliA" style={{ height: 36, width: 'auto', transition: 'opacity .3s' }} />
+              <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 36, width: 'auto' }} />
             </div>
             <div className="nav-links" style={{ display: 'flex', gap: 36 }}>
-              <a href="#funcionalidades" className={`nav-link ${scrolled ? 'nav-link-light' : 'nav-link-dark'}`}>Funcionalidades</a>
-              <a href="#como-funciona" className={`nav-link ${scrolled ? 'nav-link-light' : 'nav-link-dark'}`}>Como funciona</a>
-              <a href="#planos" className={`nav-link ${scrolled ? 'nav-link-light' : 'nav-link-dark'}`}>Planos</a>
+              <a href="#funcionalidades" className="nav-link nav-link-light">Funcionalidades</a>
+              <a href="#como-funciona" className="nav-link nav-link-light">Como funciona</a>
+              <a href="#planos" className="nav-link nav-link-light">Planos</a>
             </div>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: scrolled ? '#374151' : 'rgba(255,255,255,0.85)', fontWeight: 500, fontSize: 15, cursor: 'pointer', padding: '8px 14px', borderRadius: 8, transition: 'color .3s, background .15s' }}
-                onMouseEnter={e => e.currentTarget.style.background = scrolled ? '#F9FAFB' : 'rgba(255,255,255,0.08)'}
+              <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: '#374151', fontWeight: 500, fontSize: 15, cursor: 'pointer', padding: '8px 14px', borderRadius: 8 }}
+                onMouseEnter={e => e.currentTarget.style.background = '#F9FAFB'}
                 onMouseLeave={e => e.currentTarget.style.background = 'none'}>
                 Entrar
               </button>
-              <button onClick={() => router.push('/signup')} className="btn-primary" style={{ padding: '9px 20px', fontSize: 14, background: scrolled ? '#0081f0' : 'rgba(255,255,255,0.15)', border: scrolled ? 'none' : '1px solid rgba(255,255,255,0.3)', backdropFilter: scrolled ? 'none' : 'blur(8px)' }}>
+              <button onClick={() => router.push('/signup')} className="btn-primary" style={{ padding: '9px 20px', fontSize: 14 }}>
                 Começar grátis
               </button>
             </div>
