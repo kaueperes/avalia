@@ -51,6 +51,7 @@ export default function Home() {
     <>
       {/* ── Global styles ─────────────────────────────────────────────────── */}
       <style>{`
+        html { scroll-behavior: smooth; }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         @keyframes fadeUp {
@@ -144,7 +145,7 @@ export default function Home() {
           .grid-4  { grid-template-columns: repeat(2,1fr) !important; }
           .grid-3  { grid-template-columns: 1fr !important; }
           .grid-2  { grid-template-columns: 1fr !important; }
-          .grid-plans { grid-template-columns: 1fr !important; }
+          .grid-plans { grid-template-columns: 1fr 1fr !important; }
           .nav-links { display: none !important; }
           .footer-grid { grid-template-columns: 1fr !important; }
         }
@@ -189,16 +190,16 @@ export default function Home() {
 
             <div className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#E6F3FF', color: '#0081f0', padding: '6px 14px', borderRadius: 100, fontSize: 13, fontWeight: 500, marginBottom: 36, border: '1px solid #cad0dd' }}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#0081f0', display: 'inline-block', animation: 'subtlePulse 2.4s ease infinite' }} />
-              Avaliação inteligente para educadores
+              Professores economizam até 8h por semana
             </div>
 
             <h1 className="hero-headline hero-h1" style={{ fontSize: 70, fontWeight: 800, color: '#00173f', lineHeight: 1.05, letterSpacing: '-2.5px', marginBottom: 24 }}>
-              Avalie trabalhos com<br />
-              <span style={{ color: '#0081f0' }}>precisão e velocidade</span>
+              Chega de perder horas<br />
+              <span style={{ color: '#0081f0' }}>corrigindo trabalho por trabalho</span>
             </h1>
 
             <p className="hero-sub" style={{ fontSize: 20, color: '#6B7280', lineHeight: 1.65, maxWidth: 540, margin: '0 auto 44px', fontWeight: 400 }}>
-              IA que entende pedagogia. Feedback personalizado, critérios da sua disciplina, resultados em segundos.
+              Você gasta horas avaliando pilhas de trabalhos e ainda se pergunta se está sendo consistente. O AvaliA avalia com seus critérios, no seu estilo — do 1º ao 30º trabalho.
             </p>
 
             <div className="hero-ctas" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
@@ -272,15 +273,15 @@ export default function Home() {
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 64 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Por que AvaliA</p>
-              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', marginBottom: 16 }}>Avaliação que faz sentido</h2>
-              <p style={{ fontSize: 18, color: '#6B7280', maxWidth: 440, margin: '0 auto' }}>Desenvolvido com foco em pedagogia, não apenas em tecnologia.</p>
+              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', marginBottom: 16 }}>O que muda na sua rotina</h2>
+              <p style={{ fontSize: 18, color: '#6B7280', maxWidth: 440, margin: '0 auto' }}>Menos tempo corrigindo. Mais tempo ensinando.</p>
             </div>
             <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
               {[
-                { Icon: ZapIcon, title: 'Instantâneo', desc: 'Avaliação completa em segundos. Sem esperas, sem configurações complexas.' },
-                { Icon: UserIcon, title: 'Personalizado', desc: 'Adapta-se ao seu estilo de ensino, disciplina e critérios específicos.' },
-                { Icon: BarChartIcon, title: 'Analítico', desc: 'Visualize padrões de desempenho e a evolução individual de cada aluno.' },
-                { Icon: ShieldIcon, title: 'Consistente', desc: 'Critérios padronizados em todas as avaliações. Sem variações involuntárias.' },
+                { Icon: ZapIcon, title: 'Horas de volta', desc: 'Professores relatam economizar de 4 a 8 horas por semana. Tempo que volta para você ensinar, planejar e descansar.' },
+                { Icon: UserIcon, title: 'Seu estilo, sempre', desc: 'Configure uma vez como você avalia. A IA replica seu padrão, seu tom e seus critérios em todas as avaliações.' },
+                { Icon: BarChartIcon, title: 'Veja quem precisa de você', desc: 'Identifique rapidamente quais alunos estão lutando e quais critérios a turma toda está errando.' },
+                { Icon: ShieldIcon, title: 'Justo para todos', desc: 'Sem mais a dúvida "fui mais rigoroso nesse aluno?" O padrão é o mesmo do 1º ao último trabalho.' },
               ].map(({ Icon: Ic, title, desc }) => (
                 <div key={title} className="benefit-card" style={{ padding: '36px 24px', textAlign: 'center', borderRadius: 16 }}>
                   <div className="icon-box" style={{ width: 52, height: 52, borderRadius: 14, background: '#E6F3FF', color: '#0081f0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
@@ -301,21 +302,21 @@ export default function Home() {
               {
                 tag: '01 — Perfil',
                 title: 'Configure uma vez,\nuse para sempre',
-                desc: 'Defina sua disciplina, critérios de avaliação e tom de voz. O AvaliA aprende como você avalia e mantém esse padrão em todos os trabalhos.',
+                desc: 'Defina sua disciplina, critérios e tom de voz. O AvaliA mantém exatamente esse padrão — mesmo quando você estiver avaliando o 40º trabalho da semana.',
                 points: ['Perfil personalizado por disciplina', 'Tom de voz configurável', 'Critérios salvos e reutilizáveis'],
                 right: false,
               },
               {
                 tag: '02 — Avaliação',
                 title: 'Cole o texto,\nreceba o feedback',
-                desc: 'Sem processos complicados. Cole o trabalho, escolha o exercício e a IA gera uma avaliação pedagógica completa com nota e comentários detalhados.',
+                desc: 'Sem processos complicados. Cole o trabalho do aluno, selecione o exercício e em segundos você tem nota por critério e feedback personalizado — pronto para compartilhar.',
                 points: ['25+ tipos de trabalho suportados', 'Feedback por critério com nota', 'Comentários pedagógicos precisos'],
                 right: true,
               },
               {
                 tag: '03 — Resultados',
                 title: 'Painel completo\nda turma',
-                desc: 'Acompanhe o desempenho individual e coletivo, identifique padrões e exporte relatórios para reuniões pedagógicas com um clique.',
+                desc: 'Veja de imediato quem está ficando para trás, quais critérios a turma toda erra e como cada aluno evoluiu. Dados reais para decisões pedagógicas mais assertivas.',
                 points: ['Visão analítica da turma', 'Exportação em PDF e CSV', 'Histórico completo de avaliações'],
                 right: false,
               },
@@ -365,9 +366,9 @@ export default function Home() {
             </div>
             <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
               {[
-                { name: 'Ana Lima', role: 'Professora de Português · UFMG', quote: 'A qualidade do feedback transformou minha relação com as correções. Economizo horas toda semana e os comentários ficaram mais precisos.' },
-                { name: 'Carlos Santos', role: 'Professor de Biologia · UNIP', quote: 'O nível de personalização é impressionante. A IA mantém exatamente o padrão que configurei para minha disciplina, consistentemente.' },
-                { name: 'Maria Oliveira', role: 'Coordenadora Pedagógica · Colégio São Paulo', quote: 'Recomendei para toda a equipe. A padronização das avaliações e os relatórios detalhados facilitaram muito nossas reuniões pedagógicas.' },
+                { name: 'Ana Lima', role: 'Professora de Português · UFMG', quote: 'Eu corrigia 30 redações todo fim de semana. Hoje faço o mesmo em menos de 1 hora — e o feedback ficou ainda mais preciso. Não consigo mais imaginar minha rotina sem o AvaliA.' },
+                { name: 'Carlos Santos', role: 'Professor de Programação · UNIP', quote: 'O que mais me surpreendeu foi a consistência. Antes eu era claramente mais rigoroso nas últimas avaliações do que nas primeiras. Agora o padrão é sempre o mesmo.' },
+                { name: 'Maria Oliveira', role: 'Coordenadora Pedagógica · Colégio São Paulo', quote: 'Toda a equipe aderiu em menos de uma semana. O tempo que economizávamos em correções virou tempo real de planejamento pedagógico.' },
               ].map(t => (
                 <div key={t.name} className="testimonial-card">
                   <div style={{ display: 'flex', gap: 3, marginBottom: 20 }}>
@@ -425,21 +426,21 @@ export default function Home() {
               <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', marginBottom: 14 }}>Simples e transparente</h2>
               <p style={{ fontSize: 17, color: '#6B7280' }}>Comece grátis. Faça upgrade quando precisar.</p>
             </div>
-            <div className="grid-plans" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, alignItems: 'start' }}>
+            <div className="grid-plans" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, alignItems: 'start' }}>
 
               {/* GRATUITO */}
               <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Gratuito</p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
-                  <span style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 0</span>
+                  <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 0</span>
                 </div>
                 <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para experimentar a plataforma</p>
                 <button onClick={() => router.push('/signup')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px' }}>
                   Criar conta grátis
                 </button>
                 <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {['5 avaliações por mês', '1 exercício salvo', '1 perfil de professor', 'Feedback básico com IA'].map(item => (
-                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: '#374151' }}>
+                  {['5 avaliações/mês', '3 exercícios salvos', '1 perfil de professor', 'Avaliação individual', 'PDF individual', 'Histórico de avaliações'].map(item => (
+                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                       <CheckMark /> {item}
                     </div>
                   ))}
@@ -453,7 +454,7 @@ export default function Home() {
                 </div>
                 <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Essencial</p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontSize: 44, fontWeight: 800, color: 'white', letterSpacing: '-1px', lineHeight: 1 }}>R$ 29</span>
+                  <span style={{ fontSize: 40, fontWeight: 800, color: 'white', letterSpacing: '-1px', lineHeight: 1 }}>R$ 29</span>
                   <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)' }}>/mês</span>
                 </div>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 28 }}>Para professores ativos</p>
@@ -461,8 +462,8 @@ export default function Home() {
                   Assinar Essencial
                 </button>
                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {['100 avaliações por mês', 'Exercícios ilimitados', '3 perfis de professor', 'Feedback detalhado por critério', 'Painel da turma', 'Exportação PDF e CSV'].map(item => (
-                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
+                  {['120 avaliações/mês', 'Exercícios ilimitados', '3 perfis de professor', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot de suporte (50 msg)', 'Histórico completo'].map(item => (
+                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
                       <CheckMark color="#66b3ff" /> {item}
                     </div>
                   ))}
@@ -473,17 +474,37 @@ export default function Home() {
               <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Pro</p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 59</span>
+                  <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 59</span>
                   <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
                 </div>
-                <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para coordenadores e instituições</p>
+                <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para quem avalia turmas inteiras</p>
                 <button onClick={() => router.push('/signup')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px' }}>
                   Assinar Pro
                 </button>
                 <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {['Avaliações ilimitadas', 'Perfis ilimitados', 'Feedback avançado com IA', 'Analytics completo da turma', 'Exportação completa', 'Suporte prioritário'].map(item => (
-                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: '#374151' }}>
+                  {['300 avaliações/mês', 'Perfis ilimitados', 'Exercícios ilimitados', 'Avaliação em lote', '10 relatórios/mês (IA)', 'Chatbot (150 msg)', 'Filtros avançados', 'PDF + CSV'].map(item => (
+                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                       <CheckMark /> {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* PREMIUM */}
+              <div className="plan-card" style={{ background: 'white', border: '2px solid #d97706' }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Premium</p>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
+                  <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 119</span>
+                  <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
+                </div>
+                <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para coordenadores e instituições</p>
+                <button onClick={() => router.push('/signup')} style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px', display: 'flex', alignItems: 'center', background: '#d97706', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
+                  Assinar Premium
+                </button>
+                <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {['600 avaliações/mês', 'Perfis ilimitados', 'Exercícios ilimitados', 'Avaliação em lote', '30 relatórios/mês (IA)', 'Chatbot (300 msg)', 'Filtros avançados', 'Suporte prioritário'].map(item => (
+                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
+                      <CheckMark color="#d97706" /> {item}
                     </div>
                   ))}
                 </div>
@@ -497,10 +518,10 @@ export default function Home() {
           <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.06) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 50%)' }} />
           <div style={{ maxWidth: 620, margin: '0 auto', position: 'relative' }}>
             <h2 style={{ fontSize: 48, fontWeight: 800, color: 'white', lineHeight: 1.1, letterSpacing: '-1.5px', marginBottom: 20 }}>
-              Comece a avaliar de forma inteligente hoje
+              Seu próximo fim de semana pode ser seu de volta
             </h2>
             <p style={{ fontSize: 19, color: 'rgba(255,255,255,0.8)', lineHeight: 1.65, marginBottom: 44 }}>
-              Crie sua conta gratuita agora e descubra como o AvaliA pode transformar sua rotina de avaliações.
+              Crie sua conta grátis agora. Sem cartão de crédito. Em 5 minutos você já consegue avaliar seu primeiro trabalho com IA.
             </p>
             <button onClick={() => router.push('/signup')} style={{
               display: 'inline-flex', alignItems: 'center', gap: 10,
@@ -512,7 +533,7 @@ export default function Home() {
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 40px rgba(0,0,0,0.2)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.15)'; }}
             >
-              Criar conta gratuita <ArrowRight />
+              Começar agora, de graça <ArrowRight />
             </button>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 18 }}>
               Sem cartão de crédito · Cancela quando quiser
