@@ -99,11 +99,14 @@ export default function Home() {
         }
 
         .nav-link {
-          color: #6B7280; text-decoration: none;
+          text-decoration: none;
           font-size: 15px; font-weight: 450;
           transition: color .15s;
         }
-        .nav-link:hover { color: #111827; }
+        .nav-link-dark  { color: rgba(255,255,255,0.75); }
+        .nav-link-dark:hover  { color: white; }
+        .nav-link-light { color: #6B7280; }
+        .nav-link-light:hover { color: #111827; }
 
         .benefit-card { transition: transform .25s; }
         .benefit-card:hover { transform: translateY(-4px); }
@@ -164,20 +167,20 @@ export default function Home() {
         }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => router.push('/')}>
-              <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 36, width: 'auto' }} />
+              <img src={scrolled ? '/imagens/logo.svg' : '/imagens/logo_branco100.svg'} alt="AvaliA" style={{ height: 36, width: 'auto', transition: 'opacity .3s' }} />
             </div>
             <div className="nav-links" style={{ display: 'flex', gap: 36 }}>
-              <a href="#funcionalidades" className="nav-link">Funcionalidades</a>
-              <a href="#como-funciona" className="nav-link">Como funciona</a>
-              <a href="#planos" className="nav-link">Planos</a>
+              <a href="#funcionalidades" className={`nav-link ${scrolled ? 'nav-link-light' : 'nav-link-dark'}`}>Funcionalidades</a>
+              <a href="#como-funciona" className={`nav-link ${scrolled ? 'nav-link-light' : 'nav-link-dark'}`}>Como funciona</a>
+              <a href="#planos" className={`nav-link ${scrolled ? 'nav-link-light' : 'nav-link-dark'}`}>Planos</a>
             </div>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: '#374151', fontWeight: 500, fontSize: 15, cursor: 'pointer', padding: '8px 14px', borderRadius: 8, transition: 'background .15s' }}
-                onMouseEnter={e => e.target.style.background = '#F9FAFB'}
-                onMouseLeave={e => e.target.style.background = 'none'}>
+              <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: scrolled ? '#374151' : 'rgba(255,255,255,0.85)', fontWeight: 500, fontSize: 15, cursor: 'pointer', padding: '8px 14px', borderRadius: 8, transition: 'color .3s, background .15s' }}
+                onMouseEnter={e => e.currentTarget.style.background = scrolled ? '#F9FAFB' : 'rgba(255,255,255,0.08)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'none'}>
                 Entrar
               </button>
-              <button onClick={() => router.push('/signup')} className="btn-primary" style={{ padding: '9px 20px', fontSize: 14 }}>
+              <button onClick={() => router.push('/signup')} className="btn-primary" style={{ padding: '9px 20px', fontSize: 14, background: scrolled ? '#0081f0' : 'rgba(255,255,255,0.15)', border: scrolled ? 'none' : '1px solid rgba(255,255,255,0.3)', backdropFilter: scrolled ? 'none' : 'blur(8px)' }}>
                 Começar grátis
               </button>
             </div>
@@ -185,33 +188,37 @@ export default function Home() {
         </nav>
 
         {/* ── HERO ───────────────────────────────────────────────────────────── */}
-        <section style={{ padding: '110px 32px 80px', background: 'white', textAlign: 'center', overflow: 'hidden' }}>
-          <div style={{ maxWidth: 820, margin: '0 auto' }}>
+        <section style={{ padding: '110px 32px 80px', background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 55%, #1a0530 100%)', textAlign: 'center', overflow: 'hidden', position: 'relative' }}>
+          {/* Glow effects */}
+          <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: 800, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,129,240,0.14) 0%, rgba(129,12,250,0.08) 45%, transparent 70%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: '0', right: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,12,250,0.1) 0%, transparent 65%)', pointerEvents: 'none' }} />
 
-            <div className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#E6F3FF', color: '#0081f0', padding: '6px 14px', borderRadius: 100, fontSize: 13, fontWeight: 500, marginBottom: 36, border: '1px solid #cad0dd' }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#0081f0', display: 'inline-block', animation: 'subtlePulse 2.4s ease infinite' }} />
+          <div style={{ maxWidth: 820, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+
+            <div className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(0,129,240,0.12)', color: '#60a5fa', padding: '6px 14px', borderRadius: 100, fontSize: 13, fontWeight: 500, marginBottom: 36, border: '1px solid rgba(0,129,240,0.25)' }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#60a5fa', display: 'inline-block', animation: 'subtlePulse 2.4s ease infinite' }} />
               Professores economizam até 8h por semana
             </div>
 
-            <h1 className="hero-headline hero-h1" style={{ fontSize: 70, fontWeight: 800, color: '#00173f', lineHeight: 1.05, letterSpacing: '-2.5px', marginBottom: 24 }}>
+            <h1 className="hero-headline hero-h1" style={{ fontSize: 70, fontWeight: 800, color: 'white', lineHeight: 1.05, letterSpacing: '-2.5px', marginBottom: 24 }}>
               Chega de perder horas<br />
-              <span style={{ color: '#0081f0' }}>corrigindo trabalho por trabalho</span>
+              <span style={{ background: 'linear-gradient(135deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>corrigindo trabalho por trabalho</span>
             </h1>
 
-            <p className="hero-sub" style={{ fontSize: 20, color: '#6B7280', lineHeight: 1.65, maxWidth: 540, margin: '0 auto 44px', fontWeight: 400 }}>
+            <p className="hero-sub" style={{ fontSize: 20, color: '#94A3B8', lineHeight: 1.65, maxWidth: 540, margin: '0 auto 44px', fontWeight: 400 }}>
               Você gasta horas avaliando pilhas de trabalhos e ainda se pergunta se está sendo consistente. O AvaliA avalia com seus critérios, no seu estilo — do 1º ao 30º trabalho.
             </p>
 
             <div className="hero-ctas" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
-              <button onClick={() => router.push('/signup')} className="btn-primary" style={{ fontSize: 16, padding: '15px 32px' }}>
+              <button onClick={() => router.push('/signup')} className="btn-primary" style={{ fontSize: 16, padding: '15px 32px', background: 'linear-gradient(135deg, #0081f0, #810cfa)', boxShadow: '0 4px 24px rgba(0,129,240,0.3)' }}>
                 Começar gratuitamente <ArrowRight />
               </button>
-              <button onClick={() => router.push('/login')} className="btn-secondary" style={{ fontSize: 16, padding: '15px 32px' }}>
+              <button onClick={() => router.push('/login')} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 16, padding: '15px 32px', background: 'rgba(255,255,255,0.08)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10, fontWeight: 500, cursor: 'pointer', backdropFilter: 'blur(8px)' }}>
                 Já tenho conta
               </button>
             </div>
 
-            <p style={{ fontSize: 13, color: '#9CA3AF', animation: 'fadeIn .7s .35s ease both' }}>
+            <p style={{ fontSize: 13, color: '#64748B', animation: 'fadeIn .7s .35s ease both' }}>
               Sem cartão de crédito · Grátis para começar
             </p>
           </div>
