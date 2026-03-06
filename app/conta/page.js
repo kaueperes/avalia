@@ -152,7 +152,26 @@ function ContaPageInner() {
       }
     } catch {}
 
-    if (searchParams.get('success')) showMsg(setPlanMsg, 'success', 'Pagamento confirmado! Seu plano será atualizado em instantes.');
+    if (searchParams.get('success')) {
+      // Busca dados atualizados do banco após o pagamento
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
+          .then(r => r.json())
+          .then(({ user: fresh }) => {
+            if (fresh) {
+              const stored = JSON.parse(localStorage.getItem('user') || '{}');
+              const updated = { ...stored, ...fresh };
+              localStorage.setItem('user', JSON.stringify(updated));
+              setUserPlan(fresh.plan || 'gratuito');
+              if (fresh.quota_ciclo !== undefined) setQuotaCiclo(fresh.quota_ciclo);
+              if (fresh.quota_extra !== undefined) setQuotaExtra(fresh.quota_extra);
+            }
+          })
+          .catch(() => {});
+      }
+      showMsg(setPlanMsg, 'success', 'Pagamento confirmado! Seu plano foi atualizado.');
+    }
     if (searchParams.get('canceled')) showMsg(setPlanMsg, 'error', 'Pagamento cancelado. Nenhuma cobrança foi feita.');
   }, [router, searchParams]);
 
