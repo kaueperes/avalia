@@ -156,12 +156,9 @@ export default function Home() {
 
       <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: 'white', color: '#111827' }}>
 
-        {/* ── HERO WRAPPER (navbar + hero compartilham o fundo escuro) ─────────── */}
-        <div style={{ background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 55%, #1a0530 100%)' }}>
-
         {/* ── NAVBAR ─────────────────────────────────────────────────────────── */}
         <nav style={{
-          position: 'sticky', top: 0, zIndex: 100,
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
           background: scrolled ? 'rgba(255,255,255,0.9)' : 'transparent',
           backdropFilter: scrolled ? 'blur(14px)' : 'none',
           borderBottom: scrolled ? '1px solid rgba(0,0,0,0.07)' : '1px solid rgba(255,255,255,0.06)',
@@ -191,7 +188,7 @@ export default function Home() {
         </nav>
 
         {/* ── HERO ───────────────────────────────────────────────────────────── */}
-        <section style={{ padding: '110px 32px 80px', textAlign: 'center', overflow: 'hidden', position: 'relative' }}>
+        <section style={{ padding: '174px 32px 80px', background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 55%, #1a0530 100%)', textAlign: 'center', overflow: 'hidden', position: 'relative' }}>
           {/* Glow effects */}
           <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: 800, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,129,240,0.14) 0%, rgba(129,12,250,0.08) 45%, transparent 70%)', pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', bottom: '0', right: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,12,250,0.1) 0%, transparent 65%)', pointerEvents: 'none' }} />
@@ -277,7 +274,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-        </div>{/* end hero wrapper */}
 
         {/* ── BENEFITS ───────────────────────────────────────────────────────── */}
         <section id="funcionalidades" style={{ padding: '96px 32px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
