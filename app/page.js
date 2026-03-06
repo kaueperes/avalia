@@ -157,7 +157,7 @@ export default function Home() {
           padding: '0 32px',
         }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
-            <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => router.push('/')}>
+            <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 36, width: 'auto' }} />
             </div>
             <div className="nav-links" style={{ display: 'flex', gap: 36 }}>
