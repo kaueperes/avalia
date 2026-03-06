@@ -6,6 +6,21 @@
 
 :root {
   --font: 'Inter', sans-serif;
+  --field-gap: 20px;
+}
+
+/* Grid de formulário 2 colunas — responsivo */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--field-gap);
+  margin-bottom: var(--field-gap);
+}
+.form-grid > * {
+  margin-bottom: 0 !important;
+}
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

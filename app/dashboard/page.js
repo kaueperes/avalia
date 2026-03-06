@@ -70,8 +70,11 @@ export default function DashboardPage() {
     if (!token) { router.push('/login'); return; }
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.name) setUserName(payload.name);
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (u.name) setUserName(u.name);
+      }
     } catch {}
 
     fetch('/api/evaluations', { headers: { Authorization: `Bearer ${token}` } })

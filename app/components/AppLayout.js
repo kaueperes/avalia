@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import ChatBot from './ChatBot';
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 
@@ -84,6 +85,19 @@ const MoonIcon = () => (
   </svg>
 );
 
+const ChevronDownIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 12 15 18 9"/>
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+  </svg>
+);
+
 // ── Nav Items ────────────────────────────────────────────────────────────────
 
 const navItems = [
@@ -91,16 +105,41 @@ const navItems = [
   { Icon: PlusIcon,      label: 'Nova Avaliação',         href: '/avaliar',   highlight: true },
   { Icon: ClipboardIcon, label: 'Gerenciar Avaliações',   href: '/avaliacoes' },
   { Icon: BookIcon,      label: 'Gerenciar Exercícios',   href: '/exercicios' },
-  { Icon: UserIcon,      label: 'Perfil do Professor',    href: '/perfil' },
+  { Icon: UserIcon,      label: 'Perfil do Professor',    href: '/perfis' },
   { Icon: HelpIcon,      label: 'Ajuda',                  href: '/ajuda' },
 ];
 
 // ── Layout ───────────────────────────────────────────────────────────────────
 
-export default function AppLayout({ children, userName = 'Professor' }) {
+export default function AppLayout({ children, userName = 'Professor', userEmail = '', userPlan = 'free', noPadding = false }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => typeof window !== 'undefined' && localStorage.getItem('darkMode') === 'true');
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+  const [quotaCiclo, setQuotaCiclo] = useState(null);
+  const [quotaExtra, setQuotaExtra] = useState(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (u.quota_ciclo !== undefined) setQuotaCiclo(u.quota_ciclo);
+        if (u.quota_extra !== undefined) setQuotaExtra(u.quota_extra);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const bg        = darkMode ? '#0f1117' : '#ffffff';
   const bgContent = darkMode ? '#13161c' : '#F7F8FA';
@@ -110,8 +149,9 @@ export default function AppLayout({ children, userName = 'Professor' }) {
   const textMain  = darkMode ? '#F1F5F9' : '#111827';
   const textMuted = darkMode ? '#8B95A8' : '#6B7280';
   const textSub   = darkMode ? '#5A6478' : '#9CA3AF';
-  const navHover  = darkMode ? '#1e2330' : '#F3F4F6';
-  const navActive = darkMode ? '#0d1f3c'  : '#EBF4FF';
+  const navHover   = darkMode ? '#1e2330' : '#F3F4F6';
+  const navActive  = darkMode ? '#0d1f3c'  : '#EBF4FF';
+  const selectedBg = darkMode ? '#0d1f3c' : '#EBF4FF';
 
   return (
     <>
@@ -127,6 +167,7 @@ export default function AppLayout({ children, userName = 'Professor' }) {
         '--text-main': textMain,
         '--text-muted': textMuted,
         '--text-sub': textSub,
+        '--selected-bg': selectedBg,
       }}>
 
         {/* ── TOPBAR ── */}
@@ -148,7 +189,7 @@ export default function AppLayout({ children, userName = 'Professor' }) {
 
             {/* Dark mode toggle */}
             <div
-              onClick={() => setDarkMode(!darkMode)}
+              onClick={() => { const next = !darkMode; setDarkMode(next); localStorage.setItem('darkMode', next); }}
               title={darkMode ? 'Modo claro' : 'Modo escuro'}
               onMouseEnter={e => e.currentTarget.style.background = navHover}
               onMouseLeave={e => e.currentTarget.style.background = 'none'}
@@ -161,6 +202,41 @@ export default function AppLayout({ children, userName = 'Professor' }) {
               <span style={{ color: darkMode ? '#818CF8' : textMuted, display: 'flex' }}><MoonIcon /></span>
             </div>
 
+            {/* Separator */}
+            {quotaCiclo !== null && <div style={{ width: 1, height: 20, background: border, margin: '0 4px' }} />}
+
+            {/* Quota */}
+            {quotaCiclo !== null && (
+              <div
+                onClick={() => router.push('/conta')}
+                title="Ver detalhes do seu plano"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '5px 12px', borderRadius: 8, cursor: 'pointer',
+                  border: `1px solid ${quotaCiclo === 0 && (quotaExtra ?? 0) === 0 ? '#EF4444' : border}`,
+                  background: quotaCiclo === 0 && (quotaExtra ?? 0) === 0 ? (darkMode ? '#2a1212' : '#FEF2F2') : 'none',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = navHover}
+                onMouseLeave={e => e.currentTarget.style.background = quotaCiclo === 0 && (quotaExtra ?? 0) === 0 ? (darkMode ? '#2a1212' : '#FEF2F2') : 'none'}
+              >
+                <span style={{ fontSize: 12, fontWeight: 600, color: quotaCiclo === 0 ? '#EF4444' : textMain }}>
+                  {quotaCiclo} avaliações restantes
+                </span>
+                {(quotaExtra ?? 0) > 0 && (
+                  <>
+                    <span style={{ fontSize: 12, color: textSub }}>+</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: textMain }}>{quotaExtra} extras</span>
+                  </>
+                )}
+                <span style={{
+                  fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
+                  background: 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', marginLeft: 2,
+                }}>
+                  Comprar mais
+                </span>
+              </div>
+            )}
+
             {/* Settings */}
             <button
               title="Configurações"
@@ -171,25 +247,72 @@ export default function AppLayout({ children, userName = 'Professor' }) {
               <SettingsIcon />
             </button>
 
-            {/* User */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px', borderRadius: 8, border: `1px solid ${border}`, cursor: 'pointer' }}>
-              <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'linear-gradient(135deg, #0081f0, #810cfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'white' }}>
-                {userName.charAt(0).toUpperCase()}
+            {/* User + Profile Dropdown */}
+            <div ref={profileRef} style={{ position: 'relative' }}>
+              <div
+                onClick={() => setProfileOpen(o => !o)}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px', borderRadius: 8, border: `1px solid ${profileOpen ? '#0081f0' : border}`, cursor: 'pointer', userSelect: 'none', transition: 'border-color .15s' }}
+              >
+                <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'linear-gradient(135deg, #0081f0, #810cfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'white', flexShrink: 0 }}>
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 500, color: textMain }}>{userName}</span>
+                <span style={{ color: textMuted, display: 'flex', transition: 'transform .2s', transform: profileOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}><ChevronDownIcon /></span>
               </div>
-              <span style={{ fontSize: 13, fontWeight: 500, color: textMain }}>{userName}</span>
-            </div>
 
-            {/* Logout */}
-            <button
-              title="Sair"
-              onClick={() => router.push('/login')}
-              onMouseEnter={e => { e.currentTarget.style.background = navHover; e.currentTarget.style.color = textMain; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = textMuted; }}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: 'pointer', border: 'none', background: 'none', color: textMuted, transition: 'background .15s, color .15s' }}
-            >
-              <LogoutIcon />
-              <span>Sair</span>
-            </button>
+              {profileOpen && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                  width: 240, background: bg, border: `1px solid ${border}`,
+                  borderRadius: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+                  zIndex: 200, overflow: 'hidden',
+                }}>
+                  {/* User info */}
+                  <div style={{ padding: '16px 16px 12px', borderBottom: `1px solid ${border}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                      <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg, #0081f0, #810cfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: 'white', flexShrink: 0 }}>
+                        {userName.charAt(0).toUpperCase()}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: textMain, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{userName}</div>
+                        {userEmail && <div style={{ fontSize: 12, color: textMuted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{userEmail}</div>}
+                      </div>
+                    </div>
+                    {/* Plan badge */}
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+                      background: userPlan === 'pro' ? 'linear-gradient(135deg, #0081f0, #810cfa)' : (darkMode ? '#1e2330' : '#EBF4FF'),
+                      color: userPlan === 'pro' ? 'white' : '#0081f0',
+                    }}>
+                      {userPlan === 'pro' ? '★ Plano Pro' : userPlan === 'essencial' ? 'Plano Essencial' : 'Plano Gratuito'}
+
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ padding: '8px 8px' }}>
+                    <button
+                      onClick={() => { setProfileOpen(false); router.push('/conta'); }}
+                      onMouseEnter={e => e.currentTarget.style.background = navHover}
+                      onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 10px', borderRadius: 8, border: 'none', background: 'none', cursor: 'pointer', fontSize: 13, color: textMain, textAlign: 'left' }}
+                    >
+                      <span style={{ color: textMuted, display: 'flex' }}><EditIcon /></span>
+                      Configurações da conta
+                    </button>
+                    <div style={{ height: 1, background: border, margin: '4px 0' }} />
+                    <button
+                      onClick={() => { setProfileOpen(false); router.push('/login'); }}
+                      onMouseEnter={e => { e.currentTarget.style.background = darkMode ? '#2a1a1a' : '#FEF2F2'; e.currentTarget.style.color = '#ef4444'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = textMuted; }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 10px', borderRadius: 8, border: 'none', background: 'none', cursor: 'pointer', fontSize: 13, color: textMuted, textAlign: 'left', transition: 'background .15s, color .15s' }}
+                    >
+                      <LogoutIcon />
+                      Sair da conta
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
@@ -242,11 +365,13 @@ export default function AppLayout({ children, userName = 'Professor' }) {
           </aside>
 
           {/* ── MAIN CONTENT ── */}
-          <main className="main-area" style={{ marginLeft: 230, flex: 1, minHeight: '100%', padding: '32px 36px' }}>
+          <main className="main-area" style={{ marginLeft: 230, flex: 1, minHeight: '100%', padding: noPadding ? 0 : '32px 36px', overflow: noPadding ? 'hidden' : undefined }}>
             {children}
           </main>
         </div>
       </div>
+
+      <ChatBot darkMode={darkMode} />
     </>
   );
 }

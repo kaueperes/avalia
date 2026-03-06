@@ -1,81 +1,121 @@
 'use client';
-import AppHeader from '@/components/AppHeader';
 
-const SECTIONS = [
+import { useState, useEffect } from 'react';
+import AppLayout from '../components/AppLayout';
+
+const faqs = [
   {
-    title: 'Início Rápido',
-    icon: '✦',
-    items: [
-      { q: 'Como fazer minha primeira avaliação?', a: 'Vá em "Avaliar", preencha o nome do exercício, escolha o tipo de trabalho, selecione o tom do feedback, informe o nome do aluno e clique em "Gerar Avaliação".' },
-      { q: 'Preciso de API Key para usar?', a: 'Não por enquanto. A versão atual gera feedback de exemplo para você testar o fluxo completo. A integração com IA real será habilitada em breve.' },
-      { q: 'Os dados ficam salvos?', a: 'Sim, enquanto o servidor estiver rodando. Como estamos usando armazenamento em memória, os dados são perdidos ao reiniciar o servidor. Em breve teremos banco de dados persistente.' },
-    ],
+    q: 'Como criar meu primeiro perfil de professor?',
+    a: 'Vá em "Perfil do Professor" no menu lateral. Preencha seu nome, disciplina e escolha o tom de feedback. Opcionalmente, adicione uma amostra do seu estilo de escrita — a IA vai imitar seu jeito de escrever. Se trabalhar em mais de uma instituição, crie um perfil para cada uma com o logo correspondente.',
   },
   {
-    title: 'Perfil do Professor',
-    icon: '👤',
-    items: [
-      { q: 'Para que serve o perfil?', a: 'O perfil armazena seu nome, disciplina, turma e tom de voz preferido. Ao selecionar um perfil na tela de avaliação, esses dados são preenchidos automaticamente.' },
-      { q: 'O que é a "Amostra de escrita"?', a: 'É um trecho de feedback que você mesmo escreveria. Quando integrado com IA, o sistema vai imitar seu estilo, vocabulário e forma de se expressar.' },
-      { q: 'Posso ter vários perfis?', a: 'Sim! Crie um perfil por disciplina ou turma. Ex: "Design 3D - Turma A" com tom rigoroso, e "Fotografia - Turma B" com tom encorajador.' },
-    ],
+    q: 'Como funciona a avaliação com IA?',
+    a: 'Em "Nova Avaliação", você escolhe o tipo de trabalho (3D, Design, Redação etc.), seleciona um perfil de professor e envia o arquivo do aluno. A IA analisa o trabalho com base nos critérios da disciplina e gera um feedback detalhado com notas por critério, nota final e comentários personalizados no seu estilo.',
   },
   {
-    title: 'Exercícios & Critérios',
-    icon: '📋',
-    items: [
-      { q: 'Para que serve salvar um exercício?', a: 'Para reutilizar o mesmo enunciado e critérios em turmas ou semestres diferentes. Configure uma vez e use sempre.' },
-      { q: 'O que são os pesos dos critérios (1×, 2×, 3×)?', a: 'Um critério com peso 3× vale três vezes mais na nota final do que um com peso 1×. Use pesos maiores para os critérios mais importantes da sua disciplina.' },
-      { q: 'Posso mudar os critérios na hora da avaliação?', a: 'Sim. Na tela de Avaliação, a seção "Critérios de Avaliação" permite adicionar, remover e ajustar os pesos antes de gerar o feedback.' },
-    ],
+    q: 'O que são exercícios?',
+    a: 'Exercícios são enunciados ou briefings que você cria e reutiliza em várias avaliações. Por exemplo: "Modelagem de personagem low-poly com no máximo 1.500 polígonos". Você cria uma vez em "Gerenciar Exercícios" e depois seleciona na hora de avaliar — a IA leva o enunciado em conta na análise.',
   },
   {
-    title: 'Tom do Feedback',
-    icon: '💬',
-    items: [
-      { q: 'Qual a diferença entre os tons?', a: 'Neutro: direto e equilibrado. Construtivo: equilibra crítica com sugestões. Encorajador: valoriza o esforço. Rigoroso: exigente e técnico. Didático: explica o raciocínio. Informal: descontraído. Formal: parecer acadêmico.' },
-      { q: 'Qual tom devo usar?', a: 'Depende do aluno e do contexto. Para alunos desmotivados, use Encorajador. Para trabalhos de conclusão, use Formal ou Rigoroso. Para aulas mais dinâmicas, Construtivo ou Didático.' },
-    ],
+    q: 'Posso usar o mesmo perfil para turmas diferentes?',
+    a: 'Sim. O campo "Turma" no perfil é opcional e serve só para organização. Se preferir, crie um perfil por turma (ex: "Turma A" e "Turma B") para separar melhor o histórico de avaliações.',
   },
   {
-    title: 'Painel da Turma',
-    icon: '📊',
-    items: [
-      { q: 'Como filtrar as avaliações?', a: 'Use os campos de filtro: busque por nome do aluno, filtre por tipo de trabalho, ou defina uma faixa de nota (mínima e máxima).' },
-      { q: 'Como exportar os dados?', a: 'Clique em "Exportar CSV" para baixar todas as avaliações filtradas em formato de planilha, compatível com Excel e Google Sheets.' },
-      { q: 'O "Limpar tudo" é reversível?', a: 'Não. O botão "Limpar tudo" exclui permanentemente todas as avaliações. Use com cuidado e exporte o CSV antes, se quiser guardar os dados.' },
-    ],
+    q: 'Como exportar as avaliações em PDF?',
+    a: 'Dentro de cada avaliação concluída, há um botão de exportar PDF. Se o seu perfil tiver o logo da instituição cadastrado, ele aparece no cabeçalho do documento automaticamente.',
+  },
+  {
+    q: 'Os dados ficam salvos?',
+    a: 'Sim. Todos os perfis, exercícios e avaliações ficam salvos no banco de dados e estarão disponíveis mesmo após fechar o navegador ou reiniciar o computador.',
+  },
+  {
+    q: 'Qual o limite de avaliações no plano gratuito?',
+    a: 'O plano gratuito permite até 10 avaliações por mês. Para uso ilimitado, assine o plano Pro.',
   },
 ];
 
-export default function AjudaPage() {
+const steps = [
+  { num: '01', title: 'Crie seu perfil', desc: 'Vá em "Perfil do Professor" e configure nome, disciplina, tom de feedback e logo da sua instituição.' },
+  { num: '02', title: 'Cadastre um exercício', desc: 'Em "Gerenciar Exercícios", adicione o enunciado do trabalho que os alunos devem entregar.' },
+  { num: '03', title: 'Avalie um trabalho', desc: 'Clique em "Nova Avaliação", selecione o perfil e exercício, envie o arquivo do aluno e aguarde a IA gerar o feedback.' },
+  { num: '04', title: 'Exporte e compartilhe', desc: 'Com a avaliação pronta, exporte em PDF timbrado ou copie o feedback para enviar ao aluno.' },
+];
+
+function FAQ({ q, a }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f4f0', fontFamily: 'Inter, sans-serif' }}>
-      <AppHeader active="/ajuda" />
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 12, overflow: 'hidden' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '18px 20px', background: 'none', border: 'none', cursor: 'pointer',
+          fontSize: 15, fontWeight: 600, color: 'var(--text-main)', textAlign: 'left', gap: 16,
+        }}
+      >
+        {q}
+        <span style={{ flexShrink: 0, color: 'var(--text-sub)', fontSize: 20, lineHeight: 1, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform .2s', display: 'inline-block' }}>+</span>
+      </button>
+      {open && (
+        <div style={{ padding: '0 20px 18px', fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, borderTop: '1px solid var(--border-card)' }}>
+          <div style={{ paddingTop: 14 }}>{a}</div>
+        </div>
+      )}
+    </div>
+  );
+}
 
-      <main style={{ padding: '28px 32px' }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1a1814', marginBottom: 4 }}>Central de Ajuda</h1>
-        <p style={{ fontSize: 12, color: '#8a8680', marginBottom: 28 }}>Perguntas frequentes e dicas para usar o AvalIA</p>
+export default function AjudaPage() {
+  const [userName, setUserName] = useState('Professor');
+  useEffect(() => {
+    try { const u = JSON.parse(localStorage.getItem('user') || '{}'); if (u.name) setUserName(u.name); } catch {}
+  }, []);
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {SECTIONS.map(section => (
-            <div key={section.title} style={{ background: '#fff', border: '1px solid #dddbd6', borderRadius: 12, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 24px', borderBottom: '1px solid #dddbd6', display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 18 }}>{section.icon}</span>
-                <span style={{ fontSize: 15, fontWeight: 700, color: '#1a1814' }}>{section.title}</span>
-              </div>
-              <div>
-                {section.items.map((item, i) => (
-                  <div key={i} style={{ padding: '16px 24px', borderBottom: i < section.items.length - 1 ? '1px solid #f0eeea' : 'none' }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1814', marginBottom: 6 }}>{item.q}</div>
-                    <div style={{ fontSize: 13, color: '#4a4740', lineHeight: 1.6 }}>{item.a}</div>
-                  </div>
-                ))}
-              </div>
+  return (
+    <AppLayout userName={userName}>
+      <div style={{ marginBottom: 36 }}>
+        <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Suporte</p>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Ajuda</h1>
+        <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Tudo que você precisa saber para usar o AvaliA.</p>
+      </div>
+
+      <div style={{ marginBottom: 48 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 20 }}>Como funciona</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+          {steps.map(s => (
+            <div key={s.num} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 14, padding: '22px 20px' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', letterSpacing: 2, marginBottom: 10 }}>{s.num}</p>
+              <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>{s.title}</p>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>{s.desc}</p>
             </div>
           ))}
         </div>
-      </main>
-    </div>
+      </div>
+
+      <div style={{ maxWidth: 720 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>Perguntas frequentes</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {faqs.map((f, i) => <FAQ key={i} q={f.q} a={f.a} />)}
+        </div>
+      </div>
+
+      <div style={{ marginTop: 48, background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 14, padding: '28px 28px', maxWidth: 720 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Ainda com dúvidas?</h2>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.6 }}>
+          Entre em contato pelo e-mail de suporte. Respondemos em até 1 dia útil.
+        </p>
+        <a
+          href="mailto:suporte@avalia.education"
+          style={{
+            display: 'inline-block', padding: '10px 22px',
+            background: 'linear-gradient(135deg, #0081f0, #0033ad)',
+            color: 'white', borderRadius: 10, fontSize: 14, fontWeight: 600,
+            textDecoration: 'none',
+          }}
+        >
+          suporte@avalia.education
+        </a>
+      </div>
+    </AppLayout>
   );
 }

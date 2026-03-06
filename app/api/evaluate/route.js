@@ -1,0 +1,113 @@
+import { NextResponse } from 'next/server';
+import { getUserFromRequest } from '@/lib/auth';
+import Anthropic from '@anthropic-ai/sdk';
+import { TYPES, TONES } from '@/lib/types';
+
+// Selects the model based on evaluation complexity to balance quality and cost.
+// Returns { model, maxTokens }
+function selectModel({ studentWork, criteria, writingSample, exerciseContext, tone }) {
+  let complexity = 0;
+
+  // Long student work requires more careful reading
+  const workLen = (studentWork || '').length;
+  if (workLen > 2000) complexity += 2;
+  else if (workLen > 700) complexity += 1;
+
+  // More criteria = heavier evaluation
+  const numCriteria = (criteria || []).length;
+  if (numCriteria > 5) complexity += 2;
+  else if (numCriteria > 3) complexity += 1;
+
+  // Style imitation demands higher reasoning capability
+  if (writingSample) complexity += 2;
+
+  // Detailed exercise description
+  if ((exerciseContext || '').length > 400) complexity += 1;
+
+  // Tones that require elaborate, well-structured feedback
+  if (['rigoroso', 'didatico', 'formal'].includes(tone)) complexity += 1;
+
+  return complexity >= 4
+    ? { model: 'claude-sonnet-4-6', maxTokens: 1800 }
+    : { model: 'claude-haiku-4-5-20251001', maxTokens: 1200 };
+}
+
+export async function POST(request) {
+  const user = getUserFromRequest(request);
+  if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada.' }, { status: 503 });
+  }
+
+  const { type, exerciseName, exerciseContext, criteria, studentName, studentWork, tone, profName, profDisc, writingSample } = await request.json();
+
+  if (!exerciseName || !criteria?.length) {
+    return NextResponse.json({ error: 'Exercício e critérios são obrigatórios.' }, { status: 400 });
+  }
+
+  const typeLabel = TYPES[type]?.label || type;
+  const toneObj = TONES.find(t => t.id === tone);
+  const toneDesc = toneObj ? `${toneObj.label} — ${toneObj.desc}` : 'Neutro';
+
+  const criteriaList = criteria.map(c => `- ${c.name} (peso: ${c.weight}x)`).join('\n');
+
+  const writingNote = writingSample
+    ? `\nEstilo de escrita para imitar (escreva o feedback imitando este estilo):\n"${writingSample.substring(0, 600)}"\n`
+    : '';
+
+  const prompt = `Você é ${profName ? `o professor ${profName}` : 'um professor experiente'}${profDisc ? ` de ${profDisc}` : ''}, avaliando o trabalho de um aluno.
+
+Tipo de trabalho: ${typeLabel}
+Exercício: "${exerciseName}"${exerciseContext ? `\nDescrição do exercício:\n${exerciseContext}` : ''}
+
+Aluno: ${studentName || 'Aluno'}
+${studentWork ? `Trabalho do aluno:\n${studentWork}` : '(Nenhum trabalho fornecido — avalie com base no enunciado e nos critérios)'}
+
+Critérios de avaliação (com peso):
+${criteriaList}
+${writingNote}
+Tom do feedback: ${toneDesc}
+
+Avalie o trabalho e responda APENAS com JSON válido (sem markdown, sem texto fora do JSON):
+{
+  "criteriaScores": [
+    {"name": "nome exato do critério", "score": 7.5, "weight": 2},
+    ...
+  ],
+  "feedback": "Texto completo do feedback em português, no tom especificado"
+}
+
+Regras:
+- Notas de 0.0 a 10.0 (uma casa decimal)
+- O feedback deve ser escrito em português brasileiro
+- Os nomes dos critérios devem ser exatamente iguais aos fornecidos
+- Seja específico, construtivo e alinhado ao tom solicitado
+- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada`;
+
+  try {
+    const { model, maxTokens } = selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const message = await client.messages.create({
+      model,
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const text = message.content[0]?.text || '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA. Tente novamente.' }, { status: 500 });
+
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    // Calculate weighted score
+    const totalWeight = (parsed.criteriaScores || []).reduce((s, c) => s + (c.weight || 1), 0);
+    const weightedSum = (parsed.criteriaScores || []).reduce((s, c) => s + (c.score || 0) * (c.weight || 1), 0);
+    const score = totalWeight > 0 ? Math.round((weightedSum / totalWeight) * 10) / 10 : 0;
+
+    return NextResponse.json({ score, criteriaScores: parsed.criteriaScores, feedback: parsed.feedback });
+  } catch (err) {
+    console.error('evaluate error:', err);
+    return NextResponse.json({ error: 'Erro ao chamar a IA. Verifique sua chave ANTHROPIC_API_KEY.' }, { status: 500 });
+  }
+}
