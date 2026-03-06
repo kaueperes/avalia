@@ -33,100 +33,76 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#0a0c12',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 20,
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      {/* Background glow */}
+    <div style={{ minHeight: '100vh', display: 'flex' }}>
+      {/* Left — branding */}
       <div style={{
-        position: 'absolute', top: '-20%', left: '50%', transform: 'translateX(-50%)',
-        width: 600, height: 600, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(0,129,240,0.12) 0%, rgba(129,12,250,0.08) 50%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
+        flex: 1, background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 50%, #1a0530 100%)',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '60px 56px',
+        position: 'relative', overflow: 'hidden',
+      }}>
+        <div style={{ position: 'absolute', top: '30%', left: '20%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,129,240,0.18) 0%, transparent 65%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '20%', right: '10%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,12,250,0.14) 0%, transparent 65%)', pointerEvents: 'none' }} />
 
-      <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <img src="/imagens/logo_branco.svg" alt="AvaliA" style={{ height: 36, width: 'auto', marginBottom: 16 }} />
-          <p style={{ color: '#6B7280', fontSize: 14, margin: 0 }}>Entre na sua conta</p>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <img src="/imagens/logo_branco100.svg" alt="AvaliA" style={{ height: 32, marginBottom: 48 }} />
+          <h2 style={{ fontSize: 32, fontWeight: 800, color: 'white', lineHeight: 1.2, marginBottom: 20, letterSpacing: '-0.5px' }}>
+            Avalie trabalhos com<br />
+            <span style={{ background: 'linear-gradient(135deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              inteligência artificial
+            </span>
+          </h2>
+          <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.6, marginBottom: 40, maxWidth: 360 }}>
+            Poupe horas de trabalho com correções detalhadas, feedback personalizado e relatórios automáticos.
+          </p>
+          {['Correção automática com IA', 'Feedback individualizado por aluno', 'Relatórios de turma e desempenho'].map(f => (
+            <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'linear-gradient(135deg, #0081f0, #810cfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ color: 'white', fontSize: 11, fontWeight: 700 }}>✓</span>
+              </div>
+              <span style={{ fontSize: 14, color: '#CBD5E1' }}>{f}</span>
+            </div>
+          ))}
         </div>
+      </div>
 
-        {/* Card */}
-        <div style={{
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: 16,
-          padding: '32px 32px 28px',
-          backdropFilter: 'blur(12px)',
-        }}>
+      {/* Right — form */}
+      <div style={{ width: 440, background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 48px' }}>
+        <div style={{ width: '100%' }}>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#111827', marginBottom: 6, letterSpacing: '-0.3px' }}>Bem-vindo de volta</h2>
+          <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 28 }}>Entre com suas credenciais para acessar</p>
+
           {error && (
-            <div style={{
-              background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)',
-              color: '#f87171', borderRadius: 10, padding: '10px 14px', fontSize: 13, marginBottom: 20,
-            }}>
+            <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', color: '#DC2626', borderRadius: 10, padding: '10px 14px', fontSize: 13, marginBottom: 20 }}>
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#9CA3AF', marginBottom: 7, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Email
-              </label>
-              <input
-                type="email" value={email} onChange={e => setEmail(e.target.value)} required
-                placeholder="seu@email.com"
-                style={{
-                  width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14,
-                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-                  color: '#F1F5F9', outline: 'none', boxSizing: 'border-box',
-                }}
-                onFocus={e => e.target.style.borderColor = '#0081f0'}
-                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-              />
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="seu@email.com"
+                style={{ width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14, border: '1.5px solid #E5E7EB', background: '#F9FAFB', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
+                onFocus={e => e.target.style.borderColor = '#0081f0'} onBlur={e => e.target.style.borderColor = '#E5E7EB'} />
             </div>
-            <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#9CA3AF', marginBottom: 7, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Senha
-              </label>
-              <input
-                type="password" value={password} onChange={e => setPassword(e.target.value)} required
-                placeholder="••••••••"
-                style={{
-                  width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14,
-                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-                  color: '#F1F5F9', outline: 'none', boxSizing: 'border-box',
-                }}
-                onFocus={e => e.target.style.borderColor = '#0081f0'}
-                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-              />
+            <div style={{ marginBottom: 28 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Senha</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••"
+                style={{ width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14, border: '1.5px solid #E5E7EB', background: '#F9FAFB', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
+                onFocus={e => e.target.style.borderColor = '#0081f0'} onBlur={e => e.target.style.borderColor = '#E5E7EB'} />
             </div>
-            <button
-              type="submit" disabled={loading}
-              style={{
-                width: '100%', padding: '12px', borderRadius: 10, fontSize: 15, fontWeight: 600,
-                background: loading ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #0081f0, #810cfa)',
-                color: loading ? '#6B7280' : 'white', border: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'opacity 0.15s',
-              }}
-            >
+            <button type="submit" disabled={loading} style={{
+              width: '100%', padding: 12, borderRadius: 10, fontSize: 15, fontWeight: 600,
+              background: loading ? '#E5E7EB' : 'linear-gradient(135deg, #0081f0, #810cfa)',
+              color: loading ? '#9CA3AF' : 'white', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+              boxShadow: loading ? 'none' : '0 4px 16px rgba(0,129,240,0.25)',
+            }}>
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
 
-          <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#6B7280' }}>
+          <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#9CA3AF' }}>
             Não tem conta?{' '}
-            <Link href="/signup" style={{ color: '#60a5fa', fontWeight: 600, textDecoration: 'none' }}>
-              Criar conta
-            </Link>
+            <Link href="/signup" style={{ color: '#0081f0', fontWeight: 600, textDecoration: 'none' }}>Criar conta grátis</Link>
           </p>
         </div>
       </div>
