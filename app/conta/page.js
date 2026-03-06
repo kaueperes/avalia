@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AppLayout from '../components/AppLayout';
 
@@ -94,6 +94,14 @@ const SaveBtn = ({ onClick, loading, children = 'Salvar alterações' }) => (
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ContaPage() {
+  return (
+    <Suspense>
+      <ContaPageInner />
+    </Suspense>
+  );
+}
+
+function ContaPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [userName, setUserName] = useState('Professor');
