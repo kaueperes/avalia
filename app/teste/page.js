@@ -1,97 +1,152 @@
 'use client';
 
-import AppLayout from '../components/AppLayout';
+// ── Opção A: Light limpo ──────────────────────────────────────────────────────
 
-const StatCard = ({ label, value, sub, color }) => (
-  <div style={{
-    background: 'var(--bg-card)',
-    borderRadius: 14,
-    padding: '24px 28px',
-    border: '1px solid var(--border-card)',
-    display: 'flex', flexDirection: 'column', gap: 6,
-  }}>
-    <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1 }}>{label}</p>
-    <p style={{ fontSize: 36, fontWeight: 800, color: color || '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>{value}</p>
-    <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{sub}</p>
-  </div>
-);
+function LoginA() {
+  return (
+    <div style={{
+      minHeight: '100vh', background: '#F8FAFC',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+    }}>
+      <div style={{ width: '100%', maxWidth: 400 }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 34, width: 'auto', marginBottom: 14 }} />
+          <p style={{ color: '#6B7280', fontSize: 14, margin: 0 }}>Entre na sua conta</p>
+        </div>
+        <div style={{
+          background: 'white', borderRadius: 16, padding: '32px 32px 28px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 8px 32px rgba(0,129,240,0.06)',
+          border: '1px solid #E5E7EB',
+        }}>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Email</label>
+            <input type="email" placeholder="seu@email.com" defaultValue="kaue.peres@hotmail.com"
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14, border: '1.5px solid #E5E7EB', background: '#F9FAFB', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+          </div>
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Senha</label>
+            <input type="password" placeholder="••••••••" defaultValue="password"
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14, border: '1.5px solid #E5E7EB', background: '#F9FAFB', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+          </div>
+          <button style={{
+            width: '100%', padding: 12, borderRadius: 10, fontSize: 15, fontWeight: 600,
+            background: 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', border: 'none', cursor: 'pointer',
+          }}>
+            Entrar
+          </button>
+          <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#9CA3AF' }}>
+            Não tem conta? <span style={{ color: '#0081f0', fontWeight: 600, cursor: 'pointer' }}>Criar conta</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-const AvaliacaoRow = ({ aluno, exercicio, nota, data }) => (
-  <div style={{
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '14px 0', borderBottom: '1px solid var(--border)',
-  }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+// ── Opção B: Split screen ─────────────────────────────────────────────────────
+
+function LoginB() {
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex' }}>
+      {/* Left — branding */}
       <div style={{
-        width: 34, height: 34, borderRadius: '50%',
-        background: 'linear-gradient(135deg, #0033ad22, #810cfa22)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 13, fontWeight: 700, color: '#0033ad',
+        flex: 1, background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 50%, #1a0530 100%)',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '60px 56px',
+        position: 'relative', overflow: 'hidden',
       }}>
-        {aluno.charAt(0)}
+        {/* Glow */}
+        <div style={{
+          position: 'absolute', top: '30%', left: '20%',
+          width: 400, height: 400, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(0,129,240,0.18) 0%, transparent 65%)',
+          pointerEvents: 'none',
+        }} />
+        <div style={{
+          position: 'absolute', bottom: '20%', right: '10%',
+          width: 300, height: 300, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(129,12,250,0.14) 0%, transparent 65%)',
+          pointerEvents: 'none',
+        }} />
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <img src="/imagens/logo_branco.svg" alt="AvaliA" style={{ height: 32, marginBottom: 48 }} />
+          <h2 style={{ fontSize: 32, fontWeight: 800, color: 'white', lineHeight: 1.2, marginBottom: 20, letterSpacing: '-0.5px' }}>
+            Avalie trabalhos com<br />
+            <span style={{ background: 'linear-gradient(135deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              inteligência artificial
+            </span>
+          </h2>
+          <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.6, marginBottom: 40, maxWidth: 360 }}>
+            Poupe horas de trabalho com correções detalhadas, feedback personalizado e relatórios automáticos.
+          </p>
+          {[
+            'Correção automática com IA',
+            'Feedback individualizado por aluno',
+            'Relatórios de turma e desempenho',
+          ].map(f => (
+            <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'linear-gradient(135deg, #0081f0, #810cfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ color: 'white', fontSize: 11, fontWeight: 700 }}>✓</span>
+              </div>
+              <span style={{ fontSize: 14, color: '#CBD5E1' }}>{f}</span>
+            </div>
+          ))}
+        </div>
       </div>
-      <div>
-        <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{aluno}</p>
-        <p style={{ fontSize: 12, color: 'var(--text-sub)' }}>{exercicio}</p>
+
+      {/* Right — form */}
+      <div style={{
+        width: 440, background: 'white',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 48px',
+      }}>
+        <div style={{ width: '100%' }}>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#111827', marginBottom: 6, letterSpacing: '-0.3px' }}>Bem-vindo de volta</h2>
+          <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 28 }}>Entre com suas credenciais para acessar</p>
+
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Email</label>
+            <input type="email" placeholder="seu@email.com" defaultValue="kaue.peres@hotmail.com"
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14, border: '1.5px solid #E5E7EB', background: '#F9FAFB', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+          </div>
+          <div style={{ marginBottom: 28 }}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Senha</label>
+            <input type="password" placeholder="••••••••" defaultValue="password"
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14, border: '1.5px solid #E5E7EB', background: '#F9FAFB', color: '#111827', outline: 'none', boxSizing: 'border-box' }} />
+          </div>
+          <button style={{
+            width: '100%', padding: 12, borderRadius: 10, fontSize: 15, fontWeight: 600,
+            background: 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', border: 'none', cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(0,129,240,0.25)',
+          }}>
+            Entrar
+          </button>
+          <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#9CA3AF' }}>
+            Não tem conta? <span style={{ color: '#0081f0', fontWeight: 600, cursor: 'pointer' }}>Criar conta grátis</span>
+          </p>
+        </div>
       </div>
     </div>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{data}</span>
-      <span style={{
-        fontSize: 13, fontWeight: 700,
-        color: nota >= 8 ? '#10B981' : nota >= 6 ? '#F59E0B' : '#EF4444',
-        background: nota >= 8 ? '#ECFDF522' : nota >= 6 ? '#FFFBEB22' : '#FEF2F222',
-        padding: '3px 10px', borderRadius: 20,
-        border: `1px solid ${nota >= 8 ? '#10B98133' : nota >= 6 ? '#F59E0B33' : '#EF444433'}`,
-      }}>
-        {nota.toFixed(1)}
-      </span>
-    </div>
-  </div>
-);
+  );
+}
+
+// ── Página de comparação ──────────────────────────────────────────────────────
 
 export default function TestePage() {
   return (
-    <AppLayout userName="Kaue Peres">
-      {/* Header */}
-      <div style={{ marginBottom: 32 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Dashboard</p>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Bom dia, Kaue 👋</h1>
-        <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Aqui está um resumo das suas avaliações recentes.</p>
+    <div>
+      {/* Label A */}
+      <div style={{ background: '#1e293b', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <span style={{ background: '#0081f0', color: 'white', fontSize: 12, fontWeight: 700, padding: '2px 10px', borderRadius: 20 }}>OPÇÃO A</span>
+        <span style={{ color: '#94A3B8', fontSize: 13 }}>Light limpo — fundo claro, card branco</span>
       </div>
+      <LoginA />
 
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        <StatCard label="Avaliações este mês" value="24" sub="↑ 6 em relação ao mês anterior" color="var(--text-main)" />
-        <StatCard label="Média da turma"       value="7.8" sub="Turma de Redação — 2025"       color="#0081f0" />
-        <StatCard label="Exercícios criados"   value="8"   sub="3 usados esta semana"           color="#0033ad" />
-        <StatCard label="Alunos avaliados"     value="31"  sub="de 35 na turma"                 color="#810cfa" />
+      {/* Divider + Label B */}
+      <div style={{ background: '#1e293b', padding: '10px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <span style={{ background: '#810cfa', color: 'white', fontSize: 12, fontWeight: 700, padding: '2px 10px', borderRadius: 20 }}>OPÇÃO B</span>
+        <span style={{ color: '#94A3B8', fontSize: 13 }}>Split screen — esquerda escura com branding, direita clara com formulário</span>
       </div>
-
-      {/* Recent evaluations */}
-      <div style={{
-        background: 'var(--bg-card)',
-        borderRadius: 14,
-        border: '1px solid var(--border-card)',
-        padding: '24px 28px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>Avaliações recentes</h2>
-          <button style={{
-            fontSize: 13, fontWeight: 600, color: '#0081f0',
-            background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: 6,
-          }}>
-            Ver todas →
-          </button>
-        </div>
-        <p style={{ fontSize: 13, color: 'var(--text-sub)', marginBottom: 20 }}>Últimas avaliações realizadas</p>
-
-        <AvaliacaoRow aluno="Ana Clara"     exercicio="Redação dissertativa — Tema livre" nota={9.2} data="Hoje"  />
-        <AvaliacaoRow aluno="Bruno Lima"    exercicio="Redação dissertativa — Tema livre" nota={7.4} data="Hoje"  />
-        <AvaliacaoRow aluno="Carla Mendes"  exercicio="Relatório de pesquisa"             nota={8.8} data="Ontem" />
-        <AvaliacaoRow aluno="Diego Santos"  exercicio="Relatório de pesquisa"             nota={5.5} data="Ontem" />
-        <AvaliacaoRow aluno="Eduarda Faria" exercicio="Resumo de texto"                  nota={8.1} data="02/03" />
-      </div>
-    </AppLayout>
+      <LoginB />
+    </div>
   );
 }
