@@ -33,47 +33,89 @@ export default function SignupPage() {
     }
   }
 
-  const input = { width: '100%', padding: '10px 12px', border: '1px solid #dddbd6', borderRadius: 8, fontSize: 14, outline: 'none', background: '#f5f4f0' };
+  const inputStyle = {
+    width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14,
+    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+    color: '#F1F5F9', outline: 'none', boxSizing: 'border-box',
+  };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f4f0', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-      <div style={{ width: '100%', maxWidth: 400 }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#1a1814' }}>AvalIA</h1>
-          <p style={{ color: '#8a8680', marginTop: 6, fontSize: 14 }}>Crie sua conta gratuitamente</p>
+    <div style={{
+      minHeight: '100vh',
+      background: '#0a0c12',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Background glow */}
+      <div style={{
+        position: 'absolute', top: '-20%', left: '50%', transform: 'translateX(-50%)',
+        width: 600, height: 600, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(0,129,240,0.12) 0%, rgba(129,12,250,0.08) 50%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+
+      <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <img src="/imagens/logo_branco.svg" alt="AvaliA" style={{ height: 36, width: 'auto', marginBottom: 16 }} />
+          <p style={{ color: '#6B7280', fontSize: 14, margin: 0 }}>Crie sua conta gratuitamente</p>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #dddbd6', borderRadius: 12, padding: 32 }}>
+        {/* Card */}
+        <div style={{
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: 16,
+          padding: '32px 32px 28px',
+          backdropFilter: 'blur(12px)',
+        }}>
           {error && (
-            <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#dc2626', borderRadius: 8, padding: '10px 14px', fontSize: 14, marginBottom: 20 }}>
+            <div style={{
+              background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)',
+              color: '#f87171', borderRadius: 10, padding: '10px 14px', fontSize: 13, marginBottom: 20,
+            }}>
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#4a4740', marginBottom: 6 }}>Nome</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="Seu nome" style={input} />
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#9CA3AF', marginBottom: 7, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Nome</label>
+              <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="Seu nome" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = '#0081f0'} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
             </div>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#4a4740', marginBottom: 6 }}>Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="seu@email.com" style={input} />
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#9CA3AF', marginBottom: 7, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="seu@email.com" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = '#0081f0'} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
             </div>
             <div style={{ marginBottom: 24 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#4a4740', marginBottom: 6 }}>Senha</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="Mínimo 6 caracteres" style={input} />
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#9CA3AF', marginBottom: 7, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Senha</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="Mínimo 6 caracteres" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = '#0081f0'} onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
             </div>
             <button
               type="submit" disabled={loading}
-              style={{ width: '100%', padding: 12, background: loading ? '#93c5fd' : '#2a7fd4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}
+              style={{
+                width: '100%', padding: '12px', borderRadius: 10, fontSize: 15, fontWeight: 600,
+                background: loading ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #0081f0, #810cfa)',
+                color: loading ? '#6B7280' : 'white', border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+              }}
             >
-              {loading ? 'Criando conta...' : 'Criar conta'}
+              {loading ? 'Criando conta...' : 'Criar conta grátis'}
             </button>
           </form>
 
-          <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#8a8680' }}>
+          <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#6B7280' }}>
             Já tem conta?{' '}
-            <Link href="/login" style={{ color: '#2a7fd4', fontWeight: 600, textDecoration: 'none' }}>Entrar</Link>
+            <Link href="/login" style={{ color: '#60a5fa', fontWeight: 600, textDecoration: 'none' }}>
+              Entrar
+            </Link>
           </p>
         </div>
       </div>
