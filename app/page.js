@@ -159,9 +159,9 @@ export default function Home() {
         {/* ── NAVBAR ─────────────────────────────────────────────────────────── */}
         <nav style={{
           position: 'sticky', top: 0, zIndex: 100,
-          background: scrolled ? 'rgba(255,255,255,0.9)' : 'transparent',
+          background: scrolled ? 'rgba(255,255,255,0.9)' : '#0a0c18',
           backdropFilter: scrolled ? 'blur(14px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(0,0,0,0.07)' : '1px solid transparent',
+          borderBottom: scrolled ? '1px solid rgba(0,0,0,0.07)' : '1px solid rgba(255,255,255,0.06)',
           padding: '0 32px',
           transition: 'background .3s, border-color .3s, backdrop-filter .3s',
         }}>
