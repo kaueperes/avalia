@@ -50,13 +50,6 @@ const HelpIcon = () => (
   </svg>
 );
 
-const SettingsIcon = () => (
-  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="3"/>
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-  </svg>
-);
-
 const LogoutIcon = () => (
   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -82,6 +75,21 @@ const SunIcon = () => (
 const MoonIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+);
+
+const HamburgerIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <line x1="3" y1="12" x2="21" y2="12"/>
+    <line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/>
+    <line x1="6" y1="6" x2="18" y2="18"/>
   </svg>
 );
 
@@ -117,6 +125,8 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
   const [darkMode, setDarkMode] = useState(() => typeof window !== 'undefined' && localStorage.getItem('darkMode') === 'true');
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [toggleHover, setToggleHover] = useState(false);
   const [quotaCiclo, setQuotaCiclo] = useState(null);
   const [quotaExtra, setQuotaExtra] = useState(null);
 
@@ -179,6 +189,15 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 24px',
         }}>
+          {/* Hamburger (mobile only) */}
+          <button
+            className="hamburger"
+            onClick={() => setMenuOpen(o => !o)}
+            style={{ display: 'none', alignItems: 'center', justifyContent: 'center', padding: '6px', borderRadius: 8, border: 'none', background: 'none', cursor: 'pointer', color: textMain, marginRight: 8 }}
+          >
+            {menuOpen ? <CloseIcon /> : <HamburgerIcon />}
+          </button>
+
           {/* Logo */}
           <div style={{ cursor: 'pointer' }} onClick={() => router.push('/inicio')}>
             <img src={darkMode ? '/imagens/logo_branco.svg' : '/imagens/logo.svg'} alt="AvaliA" style={{ height: 30, width: 'auto', display: 'block' }} />
@@ -186,21 +205,6 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
 
           {/* Right side */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-
-            {/* Dark mode toggle */}
-            <div
-              onClick={() => { const next = !darkMode; setDarkMode(next); localStorage.setItem('darkMode', next); }}
-              title={darkMode ? 'Modo claro' : 'Modo escuro'}
-              onMouseEnter={e => e.currentTarget.style.background = navHover}
-              onMouseLeave={e => e.currentTarget.style.background = 'none'}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', borderRadius: 8, cursor: 'pointer', border: `1px solid ${border}` }}
-            >
-              <span style={{ color: darkMode ? textMuted : '#F59E0B', display: 'flex' }}><SunIcon /></span>
-              <div style={{ width: 32, height: 18, borderRadius: 9, background: darkMode ? '#0081f0' : '#D1D5DB', position: 'relative', transition: 'background .2s' }}>
-                <div style={{ position: 'absolute', top: 2, left: darkMode ? 14 : 2, width: 14, height: 14, borderRadius: '50%', background: 'white', transition: 'left .2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
-              </div>
-              <span style={{ color: darkMode ? '#818CF8' : textMuted, display: 'flex' }}><MoonIcon /></span>
-            </div>
 
             {/* Separator */}
             {quotaCiclo !== null && <div style={{ width: 1, height: 20, background: border, margin: '0 4px' }} />}
@@ -236,16 +240,6 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
                 </span>
               </div>
             )}
-
-            {/* Settings */}
-            <button
-              title="Configurações"
-              onMouseEnter={e => { e.currentTarget.style.background = navHover; e.currentTarget.style.color = textMain; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = textMuted; }}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: 'pointer', border: 'none', background: 'none', color: textMuted, transition: 'background .15s, color .15s' }}
-            >
-              <SettingsIcon />
-            </button>
 
             {/* User + Profile Dropdown */}
             <div ref={profileRef} style={{ position: 'relative' }}>
@@ -290,6 +284,22 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
 
                   {/* Actions */}
                   <div style={{ padding: '8px 8px' }}>
+                    {/* Dark mode toggle */}
+                    <div
+                      onClick={() => { const next = !darkMode; setDarkMode(next); localStorage.setItem('darkMode', next); }}
+                      onMouseEnter={() => setToggleHover(true)}
+                      onMouseLeave={() => setToggleHover(false)}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 10px', borderRadius: 8, cursor: 'pointer', background: toggleHover ? navHover : 'none' }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: textMain }}>
+                        <span style={{ color: darkMode ? '#818CF8' : '#F59E0B', display: 'flex' }}>{darkMode ? <MoonIcon /> : <SunIcon />}</span>
+                        {darkMode ? 'Modo escuro' : 'Modo claro'}
+                      </span>
+                      <div style={{ width: 28, height: 16, borderRadius: 8, background: darkMode ? '#0081f0' : '#D1D5DB', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
+                        <div style={{ position: 'absolute', top: 2, left: darkMode ? 12 : 2, width: 12, height: 12, borderRadius: '50%', background: 'white', transition: 'left .2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+                      </div>
+                    </div>
+                    <div style={{ height: 1, background: border, margin: '4px 0' }} />
                     <button
                       onClick={() => { setProfileOpen(false); router.push('/conta'); }}
                       onMouseEnter={e => e.currentTarget.style.background = navHover}
@@ -301,7 +311,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
                     </button>
                     <div style={{ height: 1, background: border, margin: '4px 0' }} />
                     <button
-                      onClick={() => { setProfileOpen(false); router.push('/login'); }}
+                      onClick={() => { localStorage.clear(); router.push('/login'); }}
                       onMouseEnter={e => { e.currentTarget.style.background = darkMode ? '#2a1a1a' : '#FEF2F2'; e.currentTarget.style.color = '#ef4444'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = textMuted; }}
                       style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 10px', borderRadius: 8, border: 'none', background: 'none', cursor: 'pointer', fontSize: 13, color: textMuted, textAlign: 'left', transition: 'background .15s, color .15s' }}
@@ -318,8 +328,17 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
 
         <div style={{ display: 'flex', flex: 1, paddingTop: 58 }}>
 
+          {/* Backdrop (mobile only) */}
+          {menuOpen && (
+            <div
+              className="sidebar-backdrop"
+              onClick={() => setMenuOpen(false)}
+              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 140 }}
+            />
+          )}
+
           {/* ── SIDEBAR ── */}
-          <aside className="sidebar" style={{
+          <aside className={`sidebar${menuOpen ? ' sidebar-open' : ''}`} style={{
             position: 'fixed', top: 58, left: 0, bottom: 0,
             width: 230,
             background: bg,
@@ -335,7 +354,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
                 return (
                   <button
                     key={href}
-                    onClick={() => router.push(href)}
+                    onClick={() => { router.push(href); setMenuOpen(false); }}
                     onMouseEnter={e => { if (!isActive && !highlight) e.currentTarget.style.background = navHover; }}
                     onMouseLeave={e => { if (!isActive && !highlight) e.currentTarget.style.background = 'none'; }}
                     style={{

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
 import Anthropic from '@anthropic-ai/sdk';
 import { TYPES, TONES } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
 
 // Selects the model based on evaluation complexity to balance quality and cost.
 // Returns { model, maxTokens }
@@ -38,6 +39,22 @@ export async function POST(request) {
 
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada.' }, { status: 503 });
+  }
+
+  // Quota enforcement: check and decrement before calling AI
+  const { data: dbUser, error: dbErr } = await supabase
+    .from('users')
+    .select('quota_ciclo, quota_extra')
+    .eq('id', user.userId)
+    .single();
+
+  if (!dbErr && dbUser) {
+    const ciclo = typeof dbUser.quota_ciclo === 'number' ? dbUser.quota_ciclo : null;
+    const extra = typeof dbUser.quota_extra === 'number' ? dbUser.quota_extra : null;
+    // Only block if quota fields exist and both are zero
+    if (ciclo !== null && ciclo <= 0 && (extra === null || extra <= 0)) {
+      return NextResponse.json({ error: 'Você não tem avaliações disponíveis. Adquira mais para continuar.' }, { status: 402 });
+    }
   }
 
   const { type, exerciseName, exerciseContext, criteria, studentName, studentWork, tone, profName, profDisc, writingSample } = await request.json();
@@ -104,6 +121,17 @@ Regras:
     const totalWeight = (parsed.criteriaScores || []).reduce((s, c) => s + (c.weight || 1), 0);
     const weightedSum = (parsed.criteriaScores || []).reduce((s, c) => s + (c.score || 0) * (c.weight || 1), 0);
     const score = totalWeight > 0 ? Math.round((weightedSum / totalWeight) * 10) / 10 : 0;
+
+    // Decrement quota in Supabase
+    if (!dbErr && dbUser) {
+      const ciclo = typeof dbUser.quota_ciclo === 'number' ? dbUser.quota_ciclo : null;
+      const extra = typeof dbUser.quota_extra === 'number' ? dbUser.quota_extra : null;
+      if (ciclo !== null && ciclo > 0) {
+        await supabase.from('users').update({ quota_ciclo: ciclo - 1 }).eq('id', user.userId);
+      } else if (extra !== null && extra > 0) {
+        await supabase.from('users').update({ quota_extra: extra - 1 }).eq('id', user.userId);
+      }
+    }
 
     return NextResponse.json({ score, criteriaScores: parsed.criteriaScores, feedback: parsed.feedback });
   } catch (err) {

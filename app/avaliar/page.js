@@ -81,9 +81,18 @@ export default function AvaliarPage() {
   const [evalError, setEvalError] = useState('');
   const [saved, setSaved] = useState(false);
 
+  // Cota
+  const [quotaCiclo, setQuotaCiclo] = useState(null);
+  const [quotaExtra, setQuotaExtra] = useState(null);
+
   useEffect(() => {
     if (!token()) { router.push('/login'); return; }
-    try { const u = JSON.parse(localStorage.getItem('user') || '{}'); if (u.name) setUserName(u.name); } catch {}
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      if (u.name) setUserName(u.name);
+      setQuotaCiclo(typeof u.quota_ciclo === 'number' ? u.quota_ciclo : null);
+      setQuotaExtra(typeof u.quota_extra === 'number' ? u.quota_extra : null);
+    } catch {}
     setCriteria((TYPES['modelagem']?.criteria || []).map(c => ({ name: c.name, weight: c.w })));
     Promise.all([
       fetch('/api/profiles', { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
@@ -149,6 +158,19 @@ export default function AvaliarPage() {
       const data = await r.json();
       if (!r.ok) { setEvalError(data.error || 'Erro ao gerar avaliação.'); return; }
       setResult(data);
+      // Decrement quota in localStorage
+      try {
+        const u = JSON.parse(localStorage.getItem('user') || '{}');
+        if (typeof u.quota_ciclo === 'number' && u.quota_ciclo > 0) {
+          u.quota_ciclo = u.quota_ciclo - 1;
+          setQuotaCiclo(u.quota_ciclo);
+        } else if (typeof u.quota_extra === 'number' && u.quota_extra > 0) {
+          u.quota_extra = u.quota_extra - 1;
+          setQuotaExtra(u.quota_extra);
+        }
+        localStorage.setItem('user', JSON.stringify(u));
+        window.dispatchEvent(new Event('storage'));
+      } catch {}
     } catch { setEvalError('Erro de conexão. Tente novamente.'); }
     finally { setGenerating(false); }
   }
@@ -178,7 +200,8 @@ export default function AvaliarPage() {
     setStudentMatricula(''); setStudentFile(null); setReferenceFiles([]); setBatchFiles([]);
   }
 
-  const canEval = exerciseName.trim().length > 0;
+  const hasQuota = quotaCiclo === null || quotaCiclo > 0 || (quotaExtra !== null && quotaExtra > 0);
+  const canEval = exerciseName.trim().length > 0 && hasQuota;
   const sc = result ? scoreColor(result.score) : null;
 
   const inp = {
@@ -563,7 +586,12 @@ export default function AvaliarPage() {
                 </>
               )}
             </button>
-            {!canEval && <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-sub)', marginTop: 8 }}>Preencha o nome do exercício para continuar</p>}
+            {!hasQuota && (
+              <div style={{ background: '#FEF2F2', border: '1px solid #EF444433', color: '#EF4444', borderRadius: 8, padding: '10px 12px', marginTop: 10, fontSize: 13, textAlign: 'center' }}>
+                Você não tem avaliações disponíveis. <a href="/conta" style={{ color: '#EF4444', fontWeight: 700, textDecoration: 'underline' }}>Comprar mais</a>
+              </div>
+            )}
+            {!canEval && hasQuota && <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-sub)', marginTop: 8 }}>Preencha o nome do exercício para continuar</p>}
           </div>
         </div>
 

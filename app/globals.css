@@ -37,7 +37,17 @@ body {
 ::-webkit-scrollbar-thumb { background: #c8c5be; border-radius: 99px; }
 
 /* AppLayout responsive */
+.hamburger { display: none !important; }
+
 @media (max-width: 768px) {
-  .sidebar { display: none !important; }
+  .hamburger { display: flex !important; }
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    z-index: 150 !important;
+  }
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
   .main-area { margin-left: 0 !important; }
 }
