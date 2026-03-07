@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/auth';
+import { PLANS } from '@/lib/types';
 
 function fmt(e) {
   return { id: e.id, userId: e.user_id, name: e.name, type: e.type, context: e.context, criteria: e.criteria, createdAt: e.created_at };
@@ -27,6 +28,16 @@ export async function POST(request) {
   const { name, type, context, criteria } = await request.json();
   if (!name || !type) {
     return NextResponse.json({ error: 'Nome e tipo são obrigatórios' }, { status: 400 });
+  }
+
+  const { data: dbUser } = await supabase.from('users').select('plan').eq('id', user.userId).single();
+  const plan = PLANS[dbUser?.plan] || PLANS.gratuito;
+  const maxExercicios = plan.limits.exercicios;
+  if (maxExercicios !== null) {
+    const { count } = await supabase.from('exercises').select('*', { count: 'exact', head: true }).eq('user_id', user.userId);
+    if (count >= maxExercicios) {
+      return NextResponse.json({ error: `Seu plano permite no máximo ${maxExercicios} exercício(s). Faça upgrade para adicionar mais.` }, { status: 402 });
+    }
   }
 
   const { data: e, error } = await supabase.from('exercises')

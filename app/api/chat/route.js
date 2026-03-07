@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
+import { PLANS } from '@/lib/types';
 import Anthropic from '@anthropic-ai/sdk';
 
 const SYSTEM_PROMPT = `Você é o assistente virtual da AvaliA, uma plataforma educacional para avaliação de trabalhos de alunos com inteligência artificial.
@@ -31,6 +33,12 @@ export async function POST(request) {
 
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada.' }, { status: 503 });
+  }
+
+  const { data: dbUser } = await supabase.from('users').select('plan').eq('id', user.userId).single();
+  const plan = PLANS[dbUser?.plan] || PLANS.gratuito;
+  if (!plan.features.chatbot) {
+    return NextResponse.json({ error: 'O assistente virtual não está disponível no seu plano. Faça upgrade para acessar.' }, { status: 402 });
   }
 
   const { messages } = await request.json();

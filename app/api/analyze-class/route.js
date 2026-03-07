@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
+import { PLANS } from '@/lib/types';
 import Anthropic from '@anthropic-ai/sdk';
 
 export async function POST(request) {
@@ -8,6 +10,12 @@ export async function POST(request) {
 
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada. Adicione sua chave no arquivo .env.local.' }, { status: 503 });
+  }
+
+  const { data: dbUser } = await supabase.from('users').select('plan').eq('id', user.userId).single();
+  const plan = PLANS[dbUser?.plan] || PLANS.gratuito;
+  if (!plan.features.relatorioTurma) {
+    return NextResponse.json({ error: 'Relatórios de turma não estão disponíveis no seu plano. Faça upgrade para acessar.' }, { status: 402 });
   }
 
   const { evaluations, turma, exerciseName } = await request.json();
