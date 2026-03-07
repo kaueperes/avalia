@@ -6,7 +6,13 @@ import { TONES } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
 
-const BLANK = { name: '', discipline: '', turma: '', tone: 'neutro', writingSample: '', institutionLogo: '' };
+const BLANK = { name: '', discipline: '', turma: '', tone: 'neutro', teachingLevel: '', writingSample: '', institutionLogo: '' };
+
+const TEACHING_LEVELS = [
+  { value: 'fundamental', label: '📚 Fundamental' },
+  { value: 'medio',       label: '🎓 Médio' },
+  { value: 'superior',    label: '🏛️ Superior' },
+];
 
 const Field = ({ label, hint, tooltip, children }) => (
   <div style={{ marginBottom: 20 }}>
@@ -72,7 +78,7 @@ export default function PerfisPage() {
   }
 
   function startEdit(p) {
-    setForm({ name: p.name, discipline: p.discipline, turma: p.turma || '', tone: p.tone || 'neutro', writingSample: p.writingSample || '', institutionLogo: p.institutionLogo || '' });
+    setForm({ name: p.name, discipline: p.discipline, turma: p.turma || '', tone: p.tone || 'neutro', teachingLevel: p.teachingLevel || '', writingSample: p.writingSample || '', institutionLogo: p.institutionLogo || '' });
     setEditingId(p.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -116,7 +122,7 @@ export default function PerfisPage() {
                     <div>
                       <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', marginBottom: 4 }}>{p.name}</p>
                       <p style={{ fontSize: 12, color: 'var(--text-sub)' }}>
-                        {p.discipline}{p.turma ? ` · ${p.turma}` : ''} · {TONES.find(t => t.id === p.tone)?.label || p.tone}
+                        {p.discipline}{p.turma ? ` · ${p.turma}` : ''} · {TONES.find(t => t.id === p.tone)?.label || p.tone}{p.teachingLevel ? ` · ${TEACHING_LEVELS.find(l => l.value === p.teachingLevel)?.label}` : ''}
                       </p>
                     </div>
                     <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
@@ -163,6 +169,28 @@ export default function PerfisPage() {
               </select>
             </Field>
           </div>
+
+          <Field label="Nível de ensino" hint="(opcional)" tooltip="Informa à IA o nível dos alunos para adaptar o tom e a complexidade do feedback.">
+            <div style={{ display: 'flex', gap: 8 }}>
+              {TEACHING_LEVELS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, teachingLevel: f.teachingLevel === value ? '' : value }))}
+                  style={{
+                    flex: 1, padding: '9px 10px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                    cursor: 'pointer', border: '1.5px solid',
+                    borderColor: form.teachingLevel === value ? '#0081f0' : 'var(--border)',
+                    background: form.teachingLevel === value ? 'rgba(0,129,240,0.08)' : 'var(--bg-content)',
+                    color: form.teachingLevel === value ? '#0081f0' : 'var(--text-muted)',
+                    transition: 'all .15s',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </Field>
 
           <div className="form-grid">
             <Field label="Amostra de escrita" hint="(opcional)" tooltip="Cole um trecho do seu jeito de escrever feedback. A IA vai imitar seu estilo e vocabulário.">
