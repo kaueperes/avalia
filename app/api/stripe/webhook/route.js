@@ -42,6 +42,20 @@ export async function POST(request) {
     }
   }
 
+  if (event.type === 'invoice.paid') {
+    const invoice = event.data.object;
+    // Only reset quota on renewal (not on first payment, which is handled by checkout.session.completed)
+    if (invoice.billing_reason === 'subscription_cycle') {
+      const { data: user } = await supabase.from('users').select('id, plan').eq('stripe_subscription_id', invoice.subscription).single();
+      if (user) {
+        const plan = PLANS[user.plan];
+        if (plan) {
+          await supabase.from('users').update({ quota_ciclo: plan.limits.avaliacoes ?? 9999 }).eq('id', user.id);
+        }
+      }
+    }
+  }
+
   if (event.type === 'customer.subscription.deleted') {
     const subscription = event.data.object;
     const { data: user } = await supabase.from('users').select('id').eq('stripe_subscription_id', subscription.id).single();
