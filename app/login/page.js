@@ -85,13 +85,13 @@ export default function LoginPage() {
                 onFocus={e => e.target.style.borderColor = '#0081f0'} onBlur={e => e.target.style.borderColor = '#E5E7EB'} />
             </div>
             <div style={{ marginBottom: 28 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Senha</label>
-                <Link href="/esqueci-senha" style={{ fontSize: 12, color: '#0081f0', textDecoration: 'none', fontWeight: 500 }}>Esqueci minha senha</Link>
-              </div>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Senha</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••"
                 style={{ width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14, border: '1.5px solid #E5E7EB', background: '#F9FAFB', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
                 onFocus={e => e.target.style.borderColor = '#0081f0'} onBlur={e => e.target.style.borderColor = '#E5E7EB'} />
+              <div style={{ textAlign: 'right', marginTop: 8 }}>
+                <Link href="/esqueci-senha" style={{ fontSize: 12, color: '#0081f0', textDecoration: 'none', fontWeight: 500 }}>Esqueci minha senha</Link>
+              </div>
             </div>
             <button type="submit" disabled={loading} style={{
               width: '100%', padding: 12, borderRadius: 10, fontSize: 15, fontWeight: 600,
