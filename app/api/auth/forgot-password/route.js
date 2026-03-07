@@ -30,7 +30,7 @@ export async function POST(request) {
       subject: 'Redefinição de senha — AvaliA',
       html: `
         <div style="font-family: 'Inter', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px; background: #ffffff;">
-          <img src="${appUrl}/imagens/logo_escuro100.svg" alt="AvaliA" style="height: 28px; margin-bottom: 32px;" />
+          <p style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 32px; letter-spacing: -0.5px;">Avali<span style="color: #0081f0;">A</span></p>
           <h2 style="font-size: 22px; font-weight: 800; color: #111827; margin-bottom: 12px;">Redefinir sua senha</h2>
           <p style="font-size: 15px; color: #4B5563; line-height: 1.6; margin-bottom: 28px;">
             Olá, ${firstName}! Recebemos uma solicitação para redefinir a senha da sua conta no AvaliA.
@@ -40,7 +40,7 @@ export async function POST(request) {
             <tr>
               <td>
                 <a href="${resetLink}" style="display: inline-block; padding: 13px 28px; background-color: #0081f0; color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; border-radius: 10px; font-family: Arial, sans-serif;">
-                  Redefinir senha →
+                  Redefinir senha
                 </a>
               </td>
             </tr>
