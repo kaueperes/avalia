@@ -184,7 +184,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
 
         {/* ── TOPBAR ── */}
         <header style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
           height: 58,
           background: bg,
           borderBottom: `1px solid ${border}`,
