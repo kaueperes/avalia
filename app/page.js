@@ -140,7 +140,7 @@ export default function Home() {
           .grid-4  { grid-template-columns: repeat(2,1fr) !important; }
           .grid-3  { grid-template-columns: 1fr !important; }
           .grid-2  { grid-template-columns: 1fr !important; }
-          .grid-plans { grid-template-columns: 1fr 1fr !important; }
+          .grid-plans { grid-template-columns: 1fr !important; }
           .nav-links { display: none !important; }
           .footer-grid { grid-template-columns: 1fr !important; }
         }
