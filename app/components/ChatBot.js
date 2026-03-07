@@ -128,6 +128,7 @@ export default function ChatBot({ darkMode }) {
                 width: 32, height: 32, borderRadius: '50%',
                 background: 'linear-gradient(135deg, #0081f0, #810cfa)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'white',
               }}>
                 <ChatIcon />
               </div>
