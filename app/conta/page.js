@@ -111,6 +111,7 @@ function ContaPageInner() {
   // Form states
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [teachingLevel, setTeachingLevel] = useState('');
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
@@ -143,6 +144,7 @@ function ContaPageInner() {
         setUserPlan(u.plan || 'gratuito');
         setName(u.name || '');
         setEmail(u.email || '');
+        setTeachingLevel(u.teaching_level || '');
         if (u.quota_ciclo !== undefined) setQuotaCiclo(u.quota_ciclo);
         if (u.quota_extra !== undefined) setQuotaExtra(u.quota_extra);
         if (u.quota_reset_date) setQuotaResetDate(u.quota_reset_date);
@@ -184,7 +186,7 @@ function ContaPageInner() {
     setInfoLoading(true);
     await new Promise(r => setTimeout(r, 600)); // placeholder — connect to API when ready
     const stored = JSON.parse(localStorage.getItem('user') || '{}');
-    const updated = { ...stored, name: name.trim(), email: email.trim() };
+    const updated = { ...stored, name: name.trim(), email: email.trim(), teaching_level: teachingLevel };
     localStorage.setItem('user', JSON.stringify(updated));
     setUserName(name.trim());
     setUserEmail(email.trim());
@@ -217,12 +219,38 @@ function ContaPageInner() {
 
       {/* ── Informações pessoais ── */}
       <Section title="Informações pessoais" subtitle="Seu nome e e-mail de acesso à plataforma.">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
           <Field label="Nome completo">
             <Input value={name} onChange={e => setName(e.target.value)} placeholder="Seu nome" />
           </Field>
           <Field label="E-mail">
             <Input value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" type="email" />
+          </Field>
+        </div>
+        <div style={{ marginBottom: 20 }}>
+          <Field label="Nível de ensino">
+            <div style={{ display: 'flex', gap: 10 }}>
+              {[
+                { value: 'fundamental', label: '📚 Fundamental' },
+                { value: 'medio',       label: '🎓 Médio' },
+                { value: 'superior',    label: '🏛️ Superior' },
+              ].map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => setTeachingLevel(value)}
+                  style={{
+                    flex: 1, padding: '10px 12px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                    cursor: 'pointer', border: '1.5px solid',
+                    borderColor: teachingLevel === value ? '#0081f0' : 'var(--border)',
+                    background: teachingLevel === value ? 'rgba(0,129,240,0.08)' : 'var(--bg-card)',
+                    color: teachingLevel === value ? '#0081f0' : 'var(--text-muted)',
+                    transition: 'all .15s',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </Field>
         </div>
         {infoMsg && (
