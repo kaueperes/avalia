@@ -32,6 +32,8 @@ const TrashIcon = () => (
   </svg>
 );
 
+const BOT_NAMES = ['Murilo', 'Luca'];
+
 export default function ChatBot({ darkMode }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -39,6 +41,18 @@ export default function ChatBot({ darkMode }) {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+  const [botName] = useState(() => BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)]);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (u.name) setUserName(u.name.split(' ')[0]);
+      }
+    } catch {}
+  }, []);
 
   const bg      = darkMode ? '#1a1e28' : '#ffffff';
   const bgHeader= darkMode ? '#0f1117' : '#f3f4f6';
@@ -118,8 +132,8 @@ export default function ChatBot({ darkMode }) {
                 <ChatIcon />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: textMain }}>Assistente AvaliA</div>
-                <div style={{ fontSize: 11, color: textMuted }}>Powered by Claude</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: textMain }}>{botName} · AvaliA</div>
+                <div style={{ fontSize: 11, color: textMuted }}>Assistente virtual</div>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 4 }}>
@@ -150,8 +164,12 @@ export default function ChatBot({ darkMode }) {
             {messages.length === 0 && (
               <div style={{ textAlign: 'center', marginTop: 40 }}>
                 <div style={{ fontSize: 32, marginBottom: 12 }}>👋</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: textMain, marginBottom: 6 }}>Olá! Como posso ajudar?</div>
-                <div style={{ fontSize: 13, color: textMuted, lineHeight: 1.5 }}>Tire dúvidas sobre a plataforma, avaliações, exercícios e muito mais.</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: textMain, marginBottom: 6 }}>
+                  {userName ? `Olá, ${userName}!` : 'Olá!'}
+                </div>
+                <div style={{ fontSize: 13, color: textMuted, lineHeight: 1.5 }}>
+                  Eu sou o {botName}, assistente do AvaliA. O que deseja perguntar?
+                </div>
               </div>
             )}
             {messages.map((msg, i) => (
@@ -220,7 +238,7 @@ export default function ChatBot({ darkMode }) {
       {/* Floating button */}
       <button
         onClick={() => setOpen(o => !o)}
-        title="Assistente AvaliA"
+        title={`${botName} · Assistente AvaliA`}
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 999,
           width: 52, height: 52, borderRadius: '50%', border: 'none', cursor: 'pointer',
