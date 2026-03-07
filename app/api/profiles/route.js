@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/auth';
 
 function fmt(p) {
-  return { id: p.id, userId: p.user_id, name: p.name, discipline: p.discipline, turma: p.turma, tone: p.tone, writingSample: p.writing_sample, institutionLogo: p.institution_logo, createdAt: p.created_at };
+  return { id: p.id, userId: p.user_id, name: p.name, discipline: p.discipline, turma: p.turma, tone: p.tone, teachingLevel: p.teaching_level, writingSample: p.writing_sample, institutionLogo: p.institution_logo, createdAt: p.created_at };
 }
 
 export async function GET(request) {
@@ -18,13 +18,13 @@ export async function POST(request) {
   const user = getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  const { name, discipline, turma, tone, writingSample, institutionLogo } = await request.json();
+  const { name, discipline, turma, tone, teachingLevel, writingSample, institutionLogo } = await request.json();
   if (!name || !discipline) {
     return NextResponse.json({ error: 'Nome e disciplina são obrigatórios' }, { status: 400 });
   }
 
   const { data: p, error } = await supabase.from('profiles')
-    .insert({ user_id: user.userId, name, discipline, turma: turma || '', tone: tone || 'neutro', writing_sample: writingSample || '', institution_logo: institutionLogo || '' })
+    .insert({ user_id: user.userId, name, discipline, turma: turma || '', tone: tone || 'neutro', teaching_level: teachingLevel || '', writing_sample: writingSample || '', institution_logo: institutionLogo || '' })
     .select().single();
 
   if (error) return NextResponse.json({ error: 'Erro ao salvar' }, { status: 500 });
