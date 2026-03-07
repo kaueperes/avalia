@@ -36,9 +36,17 @@ export async function POST(request) {
             Olá, ${firstName}! Recebemos uma solicitação para redefinir a senha da sua conta no AvaliA.
             Clique no botão abaixo para criar uma nova senha. O link expira em <strong>1 hora</strong>.
           </p>
-          <a href="${resetLink}" style="display: inline-block; padding: 13px 28px; background: linear-gradient(135deg, #0081f0, #810cfa); color: white; font-size: 15px; font-weight: 700; text-decoration: none; border-radius: 10px; margin-bottom: 28px;">
-            Redefinir senha
-          </a>
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 28px;">
+            <tr>
+              <td>
+                <a href="${resetLink}" style="display: inline-block; padding: 13px 28px; background-color: #0081f0; color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; border-radius: 10px; font-family: Arial, sans-serif;">
+                  Redefinir senha →
+                </a>
+              </td>
+            </tr>
+          </table>
+          <p style="font-size: 13px; color: #6B7280; margin-bottom: 20px;">Ou copie e cole o link abaixo no seu navegador:</p>
+          <p style="font-size: 12px; color: #9CA3AF; word-break: break-all;">${resetLink}</p>
           <p style="font-size: 13px; color: #9CA3AF; line-height: 1.6;">
             Se você não solicitou isso, pode ignorar este email — sua senha permanece a mesma.
           </p>
