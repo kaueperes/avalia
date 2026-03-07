@@ -26,7 +26,7 @@ export async function POST(request) {
     const token = signToken({ userId: user.id, email: user.email });
     return NextResponse.json({
       token,
-      user: { id: user.id, name: user.name, email: user.email, plan: user.plan }
+      user: { id: user.id, name: user.name, email: user.email, plan: user.plan, onboarding_done: false }
     }, { status: 201 });
   } catch {
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });

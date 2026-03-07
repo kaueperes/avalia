@@ -24,7 +24,7 @@ export async function POST(request) {
     const token = signToken({ userId: user.id, email: user.email });
     return NextResponse.json({
       token,
-      user: { id: user.id, name: user.name, email: user.email, plan: user.plan, quota_ciclo: user.quota_ciclo ?? 0, quota_extra: user.quota_extra ?? 0 }
+      user: { id: user.id, name: user.name, email: user.email, plan: user.plan, quota_ciclo: user.quota_ciclo ?? 0, quota_extra: user.quota_extra ?? 0, onboarding_done: user.onboarding_done ?? false }
     });
   } catch {
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });

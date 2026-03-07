@@ -24,7 +24,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.error);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      router.push('/inicio');
+      router.push(data.user.onboarding_done ? '/inicio' : '/onboarding');
     } catch (err) {
       setError(err.message || 'Erro ao fazer login');
     } finally {

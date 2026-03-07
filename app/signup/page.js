@@ -25,7 +25,7 @@ export default function SignupPage() {
       if (!res.ok) throw new Error(data.error);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      router.push('/dashboard');
+      router.push('/onboarding');
     } catch (err) {
       setError(err.message || 'Erro ao criar conta');
     } finally {
