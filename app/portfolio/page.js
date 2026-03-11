@@ -73,7 +73,7 @@ export default function Portfolio() {
             <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg, #0081f0, #810cfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 20, fontWeight: 800 }}>K</div>
             <div>
               <p style={{ fontSize: 15, fontWeight: 700, color: 'white', margin: 0 }}>Kauê Rodrigues Peres</p>
-              <p style={{ fontSize: 13, color: '#64748B', margin: 0 }}>Product Designer · São Paulo, BR</p>
+              <p style={{ fontSize: 13, color: '#64748B', margin: 0 }}>UX Designer · São Paulo, BR</p>
             </div>
           </div>
 
