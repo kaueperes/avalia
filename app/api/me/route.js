@@ -8,7 +8,7 @@ export async function GET(request) {
 
   const { data } = await supabase
     .from('users')
-    .select('id, name, email, plan, quota_ciclo, quota_extra, quota_reset_date')
+    .select('id, name, email, plan, quota_ciclo, quota_extra, quota_relatorios_ciclo, quota_relatorios_extra, quota_reset_date')
     .eq('id', user.userId)
     .single();
 
