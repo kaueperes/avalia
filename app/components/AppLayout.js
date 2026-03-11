@@ -122,7 +122,17 @@ const navItems = [
 export default function AppLayout({ children, userName = 'Professor', userEmail = '', userPlan = 'free', noPadding = false }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [authChecked, setAuthChecked] = useState(false);
   const [darkMode, setDarkMode] = useState(() => typeof window !== 'undefined' && localStorage.getItem('darkMode') === 'true');
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.replace('/login');
+    } else {
+      setAuthChecked(true);
+    }
+  }, [router]);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -164,6 +174,8 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
   const navHover   = darkMode ? '#1e2330' : '#F3F4F6';
   const navActive  = darkMode ? '#0d1f3c'  : '#EBF4FF';
   const selectedBg = darkMode ? '#0d1f3c' : '#EBF4FF';
+
+  if (!authChecked) return null;
 
   return (
     <>
