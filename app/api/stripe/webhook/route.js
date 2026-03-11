@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabase } from '@/lib/supabase';
-import { PLANS, ADDONS } from '@/lib/types';
+import { PLANS, ADDONS, REPORT_ADDONS } from '@/lib/types';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -22,13 +22,20 @@ export async function POST(request) {
 
     if (!userId || !planKey) return NextResponse.json({ ok: true });
 
-    const isAddon = ['extra_50', 'extra_100'].includes(planKey);
+    const isEvalAddon = ['extra_50', 'extra_100'].includes(planKey);
+    const isReportAddon = ['extra_rel_5', 'extra_rel_10'].includes(planKey);
 
-    if (isAddon) {
+    if (isEvalAddon) {
       const addon = ADDONS.find(a => a.id === planKey);
       if (addon) {
         const { data: user } = await supabase.from('users').select('quota_extra').eq('id', userId).single();
         await supabase.from('users').update({ quota_extra: (user?.quota_extra ?? 0) + addon.qty }).eq('id', userId);
+      }
+    } else if (isReportAddon) {
+      const addon = REPORT_ADDONS.find(a => a.id === planKey);
+      if (addon) {
+        const { data: user } = await supabase.from('users').select('quota_relatorios_extra').eq('id', userId).single();
+        await supabase.from('users').update({ quota_relatorios_extra: (user?.quota_relatorios_extra ?? 0) + addon.qty }).eq('id', userId);
       }
     } else {
       const plan = PLANS[planKey];
@@ -36,6 +43,7 @@ export async function POST(request) {
         await supabase.from('users').update({
           plan: planKey,
           quota_ciclo: plan.limits.avaliacoes ?? 9999,
+          quota_relatorios_ciclo: plan.limits.relatorios ?? 0,
           stripe_subscription_id: session.subscription,
         }).eq('id', userId);
       }
@@ -50,7 +58,10 @@ export async function POST(request) {
       if (user) {
         const plan = PLANS[user.plan];
         if (plan) {
-          await supabase.from('users').update({ quota_ciclo: plan.limits.avaliacoes ?? 9999 }).eq('id', user.id);
+          await supabase.from('users').update({
+            quota_ciclo: plan.limits.avaliacoes ?? 9999,
+            quota_relatorios_ciclo: plan.limits.relatorios ?? 0,
+          }).eq('id', user.id);
         }
       }
     }
@@ -64,6 +75,7 @@ export async function POST(request) {
       await supabase.from('users').update({
         plan: 'gratuito',
         quota_ciclo: gratuito.limits.avaliacoes,
+        quota_relatorios_ciclo: 0,
         stripe_subscription_id: null,
       }).eq('id', user.id);
     }

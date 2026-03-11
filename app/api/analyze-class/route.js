@@ -12,10 +12,17 @@ export async function POST(request) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada. Adicione sua chave no arquivo .env.local.' }, { status: 503 });
   }
 
-  const { data: dbUser } = await supabase.from('users').select('plan').eq('id', user.userId).single();
+  const { data: dbUser } = await supabase.from('users').select('plan, quota_relatorios_ciclo, quota_relatorios_extra').eq('id', user.userId).single();
   const plan = PLANS[dbUser?.plan] || PLANS.gratuito;
   if (!plan.features.relatorioTurma) {
     return NextResponse.json({ error: 'Relatórios de turma não estão disponíveis no seu plano. Faça upgrade para acessar.' }, { status: 402 });
+  }
+
+  // Quota check
+  const relCiclo = typeof dbUser?.quota_relatorios_ciclo === 'number' ? dbUser.quota_relatorios_ciclo : null;
+  const relExtra = typeof dbUser?.quota_relatorios_extra === 'number' ? dbUser.quota_relatorios_extra : null;
+  if (relCiclo !== null && relCiclo <= 0 && (relExtra === null || relExtra <= 0)) {
+    return NextResponse.json({ error: 'Você não tem relatórios disponíveis. Adquira mais para continuar.' }, { status: 402 });
   }
 
   const { evaluations, turma, exerciseName } = await request.json();
@@ -93,6 +100,14 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
     if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA. Tente novamente.' }, { status: 500 });
 
     const analysis = JSON.parse(jsonMatch[0]);
+
+    // Decrement quota
+    if (relCiclo !== null && relCiclo > 0) {
+      await supabase.from('users').update({ quota_relatorios_ciclo: relCiclo - 1 }).eq('id', user.userId);
+    } else if (relExtra !== null && relExtra > 0) {
+      await supabase.from('users').update({ quota_relatorios_extra: relExtra - 1 }).eq('id', user.userId);
+    }
+
     return NextResponse.json(analysis);
   } catch (err) {
     console.error('analyze-class error:', err);

@@ -26,7 +26,7 @@ const PLANS = [
     label: 'Pro',
     price: 'R$ 59/mês',
     color: '#7c3aed',
-    features: ['300 avaliações/mês', 'Perfis ilimitados', 'Relatórios de aluno e turma', 'Chatbot (150 msgs/mês)', 'Filtros avançados'],
+    features: ['300 avaliações/mês', 'Perfis ilimitados', '10 relatórios/mês', 'Chatbot (150 msgs/mês)', 'Filtros avançados'],
   },
   {
     id: 'premium',
@@ -40,6 +40,11 @@ const PLANS = [
 const ADDONS = [
   { id: 'extra_50',  label: '50 avaliações extras',  price: 'R$ 15', desc: 'Não expiram, acumulam' },
   { id: 'extra_100', label: '100 avaliações extras', price: 'R$ 25', desc: 'Não expiram, acumulam' },
+];
+
+const REPORT_ADDONS = [
+  { id: 'extra_rel_5',  label: '5 relatórios extras',  price: 'R$ 19', desc: 'Não expiram, acumulam' },
+  { id: 'extra_rel_10', label: '10 relatórios extras', price: 'R$ 35', desc: 'Não expiram, acumulam' },
 ];
 
 // ── Section card ─────────────────────────────────────────────────────────────
@@ -119,6 +124,8 @@ function ContaPageInner() {
   const [quotaCiclo, setQuotaCiclo] = useState(null);
   const [quotaExtra, setQuotaExtra] = useState(null);
   const [quotaResetDate, setQuotaResetDate] = useState(null);
+  const [quotaRelCiclo, setQuotaRelCiclo] = useState(null);
+  const [quotaRelExtra, setQuotaRelExtra] = useState(null);
 
   // UI states
   const [infoMsg, setInfoMsg] = useState(null);
@@ -146,6 +153,8 @@ function ContaPageInner() {
         if (u.quota_ciclo !== undefined) setQuotaCiclo(u.quota_ciclo);
         if (u.quota_extra !== undefined) setQuotaExtra(u.quota_extra);
         if (u.quota_reset_date) setQuotaResetDate(u.quota_reset_date);
+        if (u.quota_relatorios_ciclo !== undefined) setQuotaRelCiclo(u.quota_relatorios_ciclo);
+        if (u.quota_relatorios_extra !== undefined) setQuotaRelExtra(u.quota_relatorios_extra);
       }
     } catch {}
 
@@ -336,11 +345,31 @@ function ContaPageInner() {
           })}
         </div>
 
-        {/* Add-ons */}
+        {/* Quota de relatórios */}
+        {quotaRelCiclo !== null && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
+            <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Relatórios do plano</p>
+              <p style={{ fontSize: 28, fontWeight: 800, color: quotaRelCiclo === 0 ? '#EF4444' : 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
+                {quotaRelCiclo}
+              </p>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Renova a cada ciclo de pagamento</p>
+            </div>
+            <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Relatórios extras</p>
+              <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
+                {quotaRelExtra ?? 0}
+              </p>
+              <p style={{ fontSize: 12, color: '#10B981', fontWeight: 500 }}>Não expiram</p>
+            </div>
+          </div>
+        )}
+
+        {/* Add-ons de avaliações */}
         {userPlan !== 'gratuito' && (
           <>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>Pacotes de avaliações extras</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 20 }}>
               {ADDONS.map(addon => (
                 <div key={addon.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
                   <div>
@@ -353,6 +382,34 @@ function ContaPageInner() {
                     style={{
                       padding: '8px 18px', borderRadius: 9, fontSize: 13, fontWeight: 700,
                       background: upgradeLoading === addon.id ? 'var(--border)' : '#10B981',
+                      color: upgradeLoading === addon.id ? 'var(--text-muted)' : 'white', border: 'none', cursor: upgradeLoading === addon.id ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {upgradeLoading === addon.id ? '...' : addon.price}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Add-ons de relatórios */}
+        {(userPlan === 'pro' || userPlan === 'premium') && (
+          <>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>Pacotes de relatórios extras</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              {REPORT_ADDONS.map(addon => (
+                <div key={addon.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+                  <div>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 2 }}>{addon.label}</p>
+                    <p style={{ fontSize: 12, color: '#10B981' }}>{addon.desc}</p>
+                  </div>
+                  <button
+                    onClick={() => handleUpgrade(addon.id)}
+                    disabled={upgradeLoading === addon.id}
+                    style={{
+                      padding: '8px 18px', borderRadius: 9, fontSize: 13, fontWeight: 700,
+                      background: upgradeLoading === addon.id ? 'var(--border)' : '#7c3aed',
                       color: upgradeLoading === addon.id ? 'var(--text-muted)' : 'white', border: 'none', cursor: upgradeLoading === addon.id ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap',
                     }}
                   >

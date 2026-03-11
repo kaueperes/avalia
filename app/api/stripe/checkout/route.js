@@ -6,14 +6,16 @@ import { supabase } from '@/lib/supabase';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const PRICE_MAP = {
-  essencial: process.env.STRIPE_PRICE_ESSENCIAL,
-  pro:       process.env.STRIPE_PRICE_PRO,
-  premium:   process.env.STRIPE_PRICE_PREMIUM,
-  extra_50:  process.env.STRIPE_PRICE_EXTRA_50,
-  extra_100: process.env.STRIPE_PRICE_EXTRA_100,
+  essencial:     process.env.STRIPE_PRICE_ESSENCIAL,
+  pro:           process.env.STRIPE_PRICE_PRO,
+  premium:       process.env.STRIPE_PRICE_PREMIUM,
+  extra_50:      process.env.STRIPE_PRICE_EXTRA_50,
+  extra_100:     process.env.STRIPE_PRICE_EXTRA_100,
+  extra_rel_5:   process.env.STRIPE_PRICE_EXTRA_REL_5,
+  extra_rel_10:  process.env.STRIPE_PRICE_EXTRA_REL_10,
 };
 
-const ADDON_IDS = ['extra_50', 'extra_100'];
+const ADDON_IDS = ['extra_50', 'extra_100', 'extra_rel_5', 'extra_rel_10'];
 
 export async function POST(request) {
   const user = getUserFromRequest(request);
