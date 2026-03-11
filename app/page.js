@@ -680,7 +680,7 @@ export default function Home() {
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 18 }}>Suporte</div>
                 {[
-                  { label: 'Central de Ajuda', href: '/ajuda' },
+                  { label: 'Central de Ajuda', href: '/central-de-ajuda' },
                   { label: 'Fale conosco', href: '/contato' },
                   { label: 'Privacidade', href: '/privacidade' },
                   { label: 'Termos de uso', href: '/termos' },

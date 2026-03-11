@@ -96,7 +96,7 @@ export default function Contato() {
               <div style={{ width: 44, height: 44, borderRadius: 12, background: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 16 }}>📖</div>
               <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Central de Ajuda</h3>
               <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 14 }}>Tutoriais e respostas para as dúvidas mais comuns.</p>
-              <button onClick={() => router.push('/ajuda')} style={{ fontSize: 13, fontWeight: 600, color: '#810cfa', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              <button onClick={() => router.push('/central-de-ajuda')} style={{ fontSize: 13, fontWeight: 600, color: '#810cfa', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                 Acessar →
               </button>
             </div>
