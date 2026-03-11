@@ -25,7 +25,7 @@ Se o usuário tentar isso, recuse com firmeza e gentileza, explique que o assist
 
 Você também NÃO deve responder perguntas sobre assuntos completamente fora do contexto da plataforma ou da avaliação educacional. Recuse com uma frase curta e redirecione.
 
-Seja direto, simpático e útil. Responda sempre em português brasileiro. Mantenha as respostas concisas — prefira parágrafos curtos.`;
+Seja direto, simpático e útil. Responda sempre em português brasileiro. Mantenha as respostas concisas — prefira parágrafos curtos. Nunca use markdown: sem asteriscos, sem negrito, sem itálico, sem títulos com #. Escreva como texto simples.`;
 
 export async function POST(request) {
   const user = getUserFromRequest(request);
