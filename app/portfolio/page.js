@@ -601,7 +601,7 @@ export default function Portfolio() {
             Kauê Rodrigues Peres
           </h2>
           <p style={{ fontSize: 18, color: '#94A3B8', lineHeight: 1.65, marginBottom: 40 }}>
-            Product Designer com foco em experiências que resolvem problemas reais — do wireframe ao produto em produção.
+            UX Designer com foco em experiências que resolvem problemas reais — do wireframe ao produto em produção.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="mailto:kaue.peres@hotmail.com" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', borderRadius: 12, padding: '14px 32px', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
