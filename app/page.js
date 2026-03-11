@@ -681,9 +681,9 @@ export default function Home() {
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 18 }}>Suporte</div>
                 {[
                   { label: 'Central de Ajuda', href: '/ajuda' },
-                  { label: 'Fale conosco', href: 'mailto:contato@avalia.education' },
-                  { label: 'Privacidade', href: '#' },
-                  { label: 'Termos de uso', href: '#' },
+                  { label: 'Fale conosco', href: '/contato' },
+                  { label: 'Privacidade', href: '/privacidade' },
+                  { label: 'Termos de uso', href: '/termos' },
                 ].map(({ label, href }) => (
                   <a key={label} href={href} style={{ display: 'block', fontSize: 14, color: '#6B7280', marginBottom: 12, cursor: 'pointer', transition: 'color .15s', textDecoration: 'none' }}
                     onMouseEnter={e => e.target.style.color = 'white'}
