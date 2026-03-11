@@ -303,6 +303,44 @@ export default function Home() {
                 desc: 'Defina sua disciplina, critérios e tom de voz. O AvaliA mantém exatamente esse padrão — mesmo quando você estiver avaliando o 40º trabalho da semana.',
                 points: ['Perfil personalizado por disciplina', 'Tom de voz configurável', 'Critérios salvos e reutilizáveis'],
                 right: false,
+                visual: (
+                  <div style={{ direction: 'ltr', background: 'white', borderRadius: 20, padding: '28px', border: '1px solid #E5E7EB', boxShadow: '0 8px 40px rgba(0,0,0,0.07)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 22, paddingBottom: 18, borderBottom: '1px solid #F3F4F6' }}>
+                      <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #0081f0, #810cfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 16, fontWeight: 700, flexShrink: 0 }}>A</div>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>Prof. Ana Lima</div>
+                        <div style={{ fontSize: 12, color: '#9CA3AF' }}>Língua Portuguesa</div>
+                      </div>
+                      <div style={{ marginLeft: 'auto', background: '#F0FDF4', color: '#16A34A', fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 100, border: '1px solid #D1FAE5', whiteSpace: 'nowrap' }}>● Ativo</div>
+                    </div>
+                    <div style={{ marginBottom: 14 }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Tom de feedback</div>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {[['Construtivo', true], ['Rigoroso', false], ['Neutro', false], ['Didático', false]].map(([t, active]) => (
+                          <span key={t} style={{ fontSize: 12, padding: '5px 12px', borderRadius: 100, background: active ? '#E6F3FF' : '#F9FAFB', color: active ? '#0081f0' : '#9CA3AF', border: `1px solid ${active ? '#cad0dd' : '#F3F4F6'}`, fontWeight: active ? 600 : 400 }}>{t}</span>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Critérios de avaliação</div>
+                      {[['Coerência textual', '40%', '#0081f0'], ['Argumentação', '35%', '#810cfa'], ['Gramática', '25%', '#10B981']].map(([name, weight, color]) => (
+                        <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 12px', background: '#F9FAFB', borderRadius: 8, marginBottom: 6, border: '1px solid #F3F4F6' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0 }} />
+                            <span style={{ fontSize: 13, color: '#374151' }}>{name}</span>
+                          </div>
+                          <span style={{ fontSize: 12, fontWeight: 700, color }}>{weight}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ marginTop: 18, padding: '10px 14px', background: '#F9FAFB', borderRadius: 10, border: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#0081f0' }} />
+                      <span style={{ fontSize: 12, color: '#6B7280' }}>Exercícios salvos: <strong style={{ color: '#111827' }}>12</strong></span>
+                      <span style={{ fontSize: 12, color: '#D1D5DB', marginLeft: 'auto' }}>·</span>
+                      <span style={{ fontSize: 12, color: '#6B7280' }}>Avaliações: <strong style={{ color: '#111827' }}>84</strong></span>
+                    </div>
+                  </div>
+                ),
               },
               {
                 tag: '02 — Avaliação',
@@ -310,6 +348,47 @@ export default function Home() {
                 desc: 'Sem processos complicados. Cole o trabalho do aluno, selecione o exercício e em segundos você tem nota por critério e feedback personalizado — pronto para compartilhar.',
                 points: ['25+ tipos de trabalho suportados', 'Feedback por critério com nota', 'Comentários pedagógicos precisos'],
                 right: true,
+                visual: (
+                  <div style={{ direction: 'ltr', background: 'white', borderRadius: 20, border: '1px solid #E5E7EB', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+                    <div style={{ padding: '18px 24px', borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>Redação argumentativa</div>
+                      <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+                        <span style={{ fontSize: 11, padding: '3px 8px', borderRadius: 6, background: '#E6F3FF', color: '#0081f0', fontWeight: 600 }}>Prof. Ana Lima</span>
+                      </div>
+                    </div>
+                    <div style={{ padding: '18px 24px', borderBottom: '1px solid #F3F4F6' }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Trabalho do aluno</div>
+                      <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.7, background: '#F9FAFB', borderRadius: 10, padding: '14px', border: '1px solid #F3F4F6' }}>
+                        A mobilidade urbana representa um dos maiores desafios das metrópoles brasileiras. A falta de investimentos em transporte público, aliada ao crescimento...
+                        <span style={{ color: '#D1D5DB' }}> [continua]</span>
+                      </div>
+                    </div>
+                    <div style={{ padding: '18px 24px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18, padding: '14px 16px', background: '#E6F3FF', borderRadius: 12, border: '1px solid #cad0dd' }}>
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: 32, fontWeight: 800, color: '#0081f0', lineHeight: 1 }}>8.5</div>
+                          <div style={{ fontSize: 11, color: '#60a5fa', marginTop: 2 }}>/ 10.0</div>
+                        </div>
+                        <div style={{ width: 1, height: 40, background: '#cad0dd' }} />
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>Bom desempenho</div>
+                          <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>Acima da média da turma</div>
+                        </div>
+                        <div style={{ marginLeft: 'auto', background: '#F0FDF4', color: '#16A34A', fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 100, border: '1px solid #D1FAE5' }}>✓ Concluído</div>
+                      </div>
+                      {[['Coerência textual', 90, '#0081f0'], ['Argumentação', 78, '#810cfa'], ['Gramática', 88, '#10B981']].map(([label, val, color]) => (
+                        <div key={label} style={{ marginBottom: 10 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6B7280', marginBottom: 5 }}>
+                            <span>{label}</span><span style={{ fontWeight: 700, color: '#374151' }}>{val}%</span>
+                          </div>
+                          <div style={{ height: 6, background: '#F3F4F6', borderRadius: 3 }}>
+                            <div style={{ height: '100%', width: `${val}%`, background: color, borderRadius: 3 }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ),
               },
               {
                 tag: '03 — Resultados',
@@ -317,6 +396,54 @@ export default function Home() {
                 desc: 'Veja de imediato quem está ficando para trás, quais critérios a turma toda erra e como cada aluno evoluiu. Dados reais para decisões pedagógicas mais assertivas.',
                 points: ['Visão analítica da turma', 'Exportação em PDF e CSV', 'Histórico completo de avaliações'],
                 right: false,
+                visual: (
+                  <div style={{ direction: 'ltr', background: 'white', borderRadius: 20, border: '1px solid #E5E7EB', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+                    <div style={{ padding: '18px 24px', borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Turma A · 5º Período</div>
+                        <div style={{ fontSize: 12, color: '#9CA3AF' }}>Redação argumentativa — 28 avaliados</div>
+                      </div>
+                      <div style={{ marginLeft: 'auto', display: 'flex', gap: 16 }}>
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: '#0081f0' }}>7.6</div>
+                          <div style={{ fontSize: 10, color: '#9CA3AF' }}>Média</div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: '#10B981' }}>82%</div>
+                          <div style={{ fontSize: 10, color: '#9CA3AF' }}>Aprovação</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ padding: '14px 24px', borderBottom: '1px solid #F3F4F6' }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Desempenho por critério</div>
+                      {[['Coerência textual', 82, '#0081f0'], ['Argumentação', 65, '#810cfa'], ['Gramática', 78, '#10B981']].map(([label, val, color]) => (
+                        <div key={label} style={{ marginBottom: 8 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6B7280', marginBottom: 4 }}>
+                            <span>{label}</span><span style={{ fontWeight: 700, color: val < 70 ? '#EF4444' : '#374151' }}>{val}%</span>
+                          </div>
+                          <div style={{ height: 5, background: '#F3F4F6', borderRadius: 3 }}>
+                            <div style={{ height: '100%', width: `${val}%`, background: val < 70 ? '#FCA5A5' : color, borderRadius: 3 }} />
+                          </div>
+                        </div>
+                      ))}
+                      <div style={{ marginTop: 8, padding: '7px 10px', background: '#FEF2F2', borderRadius: 8, border: '1px solid #FECACA', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 12, color: '#EF4444' }}>⚠</span>
+                        <span style={{ fontSize: 12, color: '#DC2626', fontWeight: 500 }}>Argumentação abaixo da média — atenção recomendada</span>
+                      </div>
+                    </div>
+                    <div style={{ padding: '14px 24px' }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Alunos</div>
+                      {[['Lucas M.', 9.2, true], ['Carla S.', 8.7, true], ['Pedro A.', 6.1, true], ['Julia R.', 4.3, false]].map(([name, score, pass]) => (
+                        <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 10px', borderRadius: 8, marginBottom: 4, background: !pass ? '#FEF2F2' : 'transparent' }}>
+                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: pass ? '#E6F3FF' : '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: pass ? '#0081f0' : '#EF4444', flexShrink: 0 }}>{name[0]}</div>
+                          <span style={{ fontSize: 13, color: '#374151', flex: 1 }}>{name}</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: pass ? '#374151' : '#EF4444' }}>{score.toFixed(1)}</span>
+                          <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 100, background: pass ? '#F0FDF4' : '#FEF2F2', color: pass ? '#16A34A' : '#EF4444', fontWeight: 600, border: `1px solid ${pass ? '#D1FAE5' : '#FECACA'}` }}>{pass ? 'Aprovado' : 'Atenção'}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ),
               },
             ].map((item, i) => (
               <div key={i} className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, alignItems: 'center', direction: item.right ? 'rtl' : 'ltr' }}>
@@ -335,21 +462,7 @@ export default function Home() {
                     ))}
                   </ul>
                 </div>
-                {/* Visual placeholder */}
-                <div style={{ direction: 'ltr', background: '#F9FAFB', borderRadius: 20, padding: '40px 36px', border: '1px solid #F0F0F0', minHeight: 280 }}>
-                  <div style={{ height: 14, background: '#E5E7EB', borderRadius: 7, marginBottom: 12, width: '75%' }} />
-                  <div style={{ height: 10, background: '#F3F4F6', borderRadius: 5, marginBottom: 8, width: '55%' }} />
-                  <div style={{ height: 10, background: '#F3F4F6', borderRadius: 5, marginBottom: 8, width: '65%' }} />
-                  <div style={{ height: 10, background: '#F3F4F6', borderRadius: 5, marginBottom: 28, width: '45%' }} />
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-                    <div style={{ height: 60, background: '#E6F3FF', borderRadius: 10, border: '1px solid #cad0dd' }} />
-                    <div style={{ height: 60, background: '#F0FDF4', borderRadius: 10, border: '1px solid #D1FAE5' }} />
-                  </div>
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <div style={{ flex: 1, height: 38, background: '#0081f0', borderRadius: 8, opacity: 0.85 }} />
-                    <div style={{ width: 80, height: 38, background: '#E5E7EB', borderRadius: 8 }} />
-                  </div>
-                </div>
+                <div style={{ direction: 'ltr' }}>{item.visual}</div>
               </div>
             ))}
           </div>
@@ -553,18 +666,28 @@ export default function Home() {
               </div>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 18 }}>Produto</div>
-                {['Funcionalidades', 'Como funciona', 'Planos', 'Entrar'].map(l => (
-                  <div key={l} style={{ fontSize: 14, color: '#6B7280', marginBottom: 12, cursor: 'pointer', transition: 'color .15s' }}
+                {[
+                  { label: 'Funcionalidades', href: '#funcionalidades' },
+                  { label: 'Como funciona', href: '#como-funciona' },
+                  { label: 'Planos', href: '#planos' },
+                  { label: 'Entrar', href: '/login' },
+                ].map(({ label, href }) => (
+                  <a key={label} href={href} style={{ display: 'block', fontSize: 14, color: '#6B7280', marginBottom: 12, cursor: 'pointer', transition: 'color .15s', textDecoration: 'none' }}
                     onMouseEnter={e => e.target.style.color = 'white'}
-                    onMouseLeave={e => e.target.style.color = '#6B7280'}>{l}</div>
+                    onMouseLeave={e => e.target.style.color = '#6B7280'}>{label}</a>
                 ))}
               </div>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 18 }}>Suporte</div>
-                {['Central de Ajuda', 'Fale conosco', 'Privacidade', 'Termos de uso'].map(l => (
-                  <div key={l} style={{ fontSize: 14, color: '#6B7280', marginBottom: 12, cursor: 'pointer', transition: 'color .15s' }}
+                {[
+                  { label: 'Central de Ajuda', href: '/ajuda' },
+                  { label: 'Fale conosco', href: 'mailto:contato@avalia.education' },
+                  { label: 'Privacidade', href: '#' },
+                  { label: 'Termos de uso', href: '#' },
+                ].map(({ label, href }) => (
+                  <a key={label} href={href} style={{ display: 'block', fontSize: 14, color: '#6B7280', marginBottom: 12, cursor: 'pointer', transition: 'color .15s', textDecoration: 'none' }}
                     onMouseEnter={e => e.target.style.color = 'white'}
-                    onMouseLeave={e => e.target.style.color = '#6B7280'}>{l}</div>
+                    onMouseLeave={e => e.target.style.color = '#6B7280'}>{label}</a>
                 ))}
               </div>
             </div>
