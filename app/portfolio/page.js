@@ -285,6 +285,62 @@ export default function Portfolio() {
             solution="Cada critério tem peso e nota individual. A nota final é calculada automaticamente pela plataforma."
             why="Granularidade certa: detalhada o suficiente para o aluno aprender, simples o suficiente para o professor publicar rápido."
           />
+
+          <DecisionCard
+            number="05"
+            title="Tema claro como padrão — com opção dark"
+            problem="O primeiro protótipo no Figma era totalmente dark (#070b14). Visualmente atraente, mas inadequado para o contexto de uso: professores trabalham em salas de aula iluminadas, em laptops, durante o dia."
+            solution="Tema claro como padrão da plataforma, mantendo a opção de dark mode para quem prefere. A landing page e páginas públicas preservam o dark como linguagem de marca."
+            why="Tema claro reduz fadiga visual em sessões longas de correção. Dark themes estão associados a ferramentas de desenvolvedores — professores esperam interfaces parecidas com as ferramentas que já usam (Google Classroom, Moodle)."
+          />
+
+          {/* Dark vs Light visual comparison */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
+            <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #1a1f2e' }}>
+              <div style={{ background: '#070b14', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#4d9fff' }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#4d9fff' }}>v1 — Dark (Figma original)</span>
+              </div>
+              <div style={{ background: '#0a0e1a', padding: '20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ background: '#0f1420', border: '1px solid #1a1f2e', borderRadius: 8, padding: '10px 14px' }}>
+                  <span style={{ fontSize: 12, color: '#8b9abf' }}>Tom do Feedback</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ flex: 1, background: '#0f1420', border: '1px solid #4d9fff', borderRadius: 8, padding: '8px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 11, color: '#4d9fff', fontWeight: 600 }}>Formal Acadêmico</span>
+                  </div>
+                  <div style={{ flex: 1, background: '#0f1420', border: '1px solid #1a1f2e', borderRadius: 8, padding: '8px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 11, color: '#8b9abf' }}>Construtivo</span>
+                  </div>
+                </div>
+                <div style={{ background: '#4d9fff', borderRadius: 8, padding: '10px', textAlign: 'center', marginTop: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#000' }}>Gerar Avaliação</span>
+                </div>
+              </div>
+            </div>
+            <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #E5E7EB' }}>
+              <div style={{ background: '#F9FAFB', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #E5E7EB' }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#0081f0' }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#0081f0' }}>v2 — Light (atual)</span>
+              </div>
+              <div style={{ background: 'white', padding: '20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 8, padding: '10px 14px' }}>
+                  <span style={{ fontSize: 12, color: '#6B7280' }}>Tom do Feedback</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ flex: 1, background: '#E6F3FF', border: '1px solid #0081f0', borderRadius: 8, padding: '8px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 11, color: '#0081f0', fontWeight: 600 }}>Construtivo</span>
+                  </div>
+                  <div style={{ flex: 1, background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 8, padding: '8px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 11, color: '#9CA3AF' }}>Rigoroso</span>
+                  </div>
+                </div>
+                <div style={{ background: 'linear-gradient(135deg, #0081f0, #810cfa)', borderRadius: 8, padding: '10px', textAlign: 'center', marginTop: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>Gerar Avaliação</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         <Divider />
@@ -389,8 +445,8 @@ export default function Portfolio() {
                 phase: 'Fase 2 — Reprojeto completo',
                 duration: 'Meses 3-5',
                 color: '#F59E0B',
-                description: 'Joguei o HTML fora e comecei do zero com Next.js + Express. Redesenhei a navegação, criei o sistema de perfis, separei exercícios de avaliações. Primeiro wireframes no papel, depois em código direto.',
-                learning: 'Wireframes no papel são rápidos. Ir direto para código quando o padrão visual já está definido é mais eficiente do que Figma → código.',
+                description: 'Joguei o HTML fora e comecei do zero com Next.js + Express. Criei o primeiro protótipo no Figma com tema totalmente dark — visualmente forte, mas inadequado para o contexto de uso. Após testar, decidi migrar para tema claro como padrão, mantendo o dark como opção. Redesenhei a navegação, separei exercícios de avaliações e criei o sistema de perfis.',
+                learning: 'O tema visual não é decisão estética — é decisão de contexto de uso. Professores trabalham em ambientes iluminados, em ferramentas claras. O Figma dark era bonito; o light era certo.',
               },
               {
                 phase: 'Fase 3 — Sistemas de negócio',
