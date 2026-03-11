@@ -52,18 +52,22 @@ export default function Portfolio() {
           <div style={{ cursor: 'pointer' }} onClick={() => router.push('/')}>
             <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 32, width: 'auto' }} />
           </div>
-          <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-            <a href="#problema" style={{ fontSize: 14, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Problema</a>
-            <a href="#decisoes" style={{ fontSize: 14, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Decisões</a>
-            <a href="#arquitetura" style={{ fontSize: 14, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Arquitetura</a>
-            <a href="#aprendizados" style={{ fontSize: 14, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Aprendizados</a>
-            <a href="mailto:kaue.peres@hotmail.com" style={{ background: '#0081f0', color: 'white', borderRadius: 8, padding: '8px 18px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Contato</a>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+            <a href="#inicio" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Início</a>
+            <a href="#problema" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Problema</a>
+            <a href="#pesquisa" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Pesquisa</a>
+            <a href="#decisoes" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Decisões</a>
+            <a href="#arquitetura" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Arquitetura</a>
+            <a href="#processo" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Processo</a>
+            <a href="#aprendizados" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Aprendizados</a>
+            <a href="#proximos" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Próximos passos</a>
+            <a href="#contato" style={{ background: '#0081f0', color: 'white', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Contato</a>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
-      <section style={{ padding: '120px 32px 80px', background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 55%, #1a0530 100%)', position: 'relative', overflow: 'hidden' }}>
+      <section id="inicio" style={{ padding: '120px 32px 80px', background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 55%, #1a0530 100%)', position: 'relative', overflow: 'hidden' }}>
         {/* Background decoration */}
         <div style={{ position: 'absolute', top: -200, right: -200, width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,12,250,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -100, left: -100, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,129,240,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -176,7 +180,7 @@ export default function Portfolio() {
         <Divider />
 
         {/* Como eu pesquisei */}
-        <section style={{ marginBottom: 80 }}>
+        <section id="pesquisa" style={{ marginBottom: 80 }}>
           <SectionLabel>02 · Pesquisa & Descoberta</SectionLabel>
           <h2 style={{ fontSize: 32, fontWeight: 800, color: '#00173f', letterSpacing: '-0.5px', marginBottom: 32 }}>O problema que eu mesmo vivia</h2>
 
@@ -433,7 +437,7 @@ export default function Portfolio() {
         <Divider />
 
         {/* Iterações */}
-        <section style={{ marginBottom: 80 }}>
+        <section id="processo" style={{ marginBottom: 80 }}>
           <SectionLabel>05 · Processo & Iterações</SectionLabel>
           <h2 style={{ fontSize: 32, fontWeight: 800, color: '#00173f', letterSpacing: '-0.5px', marginBottom: 12 }}>Do HTML ao SaaS em produção</h2>
           <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.7, marginBottom: 40 }}>
@@ -567,7 +571,7 @@ export default function Portfolio() {
         <Divider />
 
         {/* Próximos passos */}
-        <section style={{ marginBottom: 80 }}>
+        <section id="proximos" style={{ marginBottom: 80 }}>
           <SectionLabel>07 · Próximos Passos</SectionLabel>
           <h2 style={{ fontSize: 32, fontWeight: 800, color: '#00173f', letterSpacing: '-0.5px', marginBottom: 12 }}>O produto ainda está evoluindo</h2>
           <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.7, marginBottom: 40 }}>
@@ -593,7 +597,7 @@ export default function Portfolio() {
       </div>
 
       {/* CTA final */}
-      <section style={{ padding: '80px 32px', background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 60%, #1a0530 100%)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section id="contato" style={{ padding: '80px 32px', background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 60%, #1a0530 100%)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,12,250,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 600, margin: '0 auto', position: 'relative' }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 3, marginBottom: 20 }}>Vamos conversar</p>
