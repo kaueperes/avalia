@@ -139,6 +139,8 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
   const [toggleHover, setToggleHover] = useState(false);
   const [quotaCiclo, setQuotaCiclo] = useState(null);
   const [quotaExtra, setQuotaExtra] = useState(null);
+  const [quotaRelCiclo, setQuotaRelCiclo] = useState(null);
+  const [quotaRelExtra, setQuotaRelExtra] = useState(null);
   const [planFromStorage, setPlanFromStorage] = useState(null);
 
   useEffect(() => {
@@ -148,6 +150,8 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
         const u = JSON.parse(stored);
         if (u.quota_ciclo !== undefined) setQuotaCiclo(u.quota_ciclo);
         if (u.quota_extra !== undefined) setQuotaExtra(u.quota_extra);
+        if (u.quota_relatorios_ciclo !== undefined) setQuotaRelCiclo(u.quota_relatorios_ciclo);
+        if (u.quota_relatorios_extra !== undefined) setQuotaRelExtra(u.quota_relatorios_extra);
         if (u.plan) setPlanFromStorage(u.plan);
       }
     } catch {}
@@ -253,6 +257,32 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
                 }}>
                   Comprar mais
                 </span>
+              </div>
+            )}
+
+            {/* Quota Relatórios */}
+            {quotaRelCiclo !== null && (
+              <div
+                onClick={() => router.push('/conta')}
+                title="Ver detalhes dos seus relatórios"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '5px 12px', borderRadius: 8, cursor: 'pointer',
+                  border: `1px solid ${quotaRelCiclo === 0 && (quotaRelExtra ?? 0) === 0 ? '#EF4444' : border}`,
+                  background: quotaRelCiclo === 0 && (quotaRelExtra ?? 0) === 0 ? (darkMode ? '#2a1212' : '#FEF2F2') : 'none',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = navHover}
+                onMouseLeave={e => e.currentTarget.style.background = quotaRelCiclo === 0 && (quotaRelExtra ?? 0) === 0 ? (darkMode ? '#2a1212' : '#FEF2F2') : 'none'}
+              >
+                <span style={{ fontSize: 12, fontWeight: 600, color: quotaRelCiclo === 0 ? '#EF4444' : textMain }}>
+                  {quotaRelCiclo} relatórios restantes
+                </span>
+                {(quotaRelExtra ?? 0) > 0 && (
+                  <>
+                    <span style={{ fontSize: 12, color: textSub }}>+</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: textMain }}>{quotaRelExtra} extras</span>
+                  </>
+                )}
               </div>
             )}
 
