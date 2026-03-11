@@ -165,11 +165,12 @@ export default function Contato() {
                       onBlur={() => setFocusedField(null)}
                     >
                       <option value="">Selecione um assunto</option>
+                      <option value="Recrutamento / Oportunidade de trabalho">Recrutamento / Oportunidade de trabalho</option>
+                      <option value="Parceria ou institucional">Parceria ou institucional</option>
                       <option value="Dúvida sobre a plataforma">Dúvida sobre a plataforma</option>
                       <option value="Problema técnico">Problema técnico</option>
                       <option value="Dúvida sobre planos e pagamentos">Dúvida sobre planos e pagamentos</option>
                       <option value="Sugestão de melhoria">Sugestão de melhoria</option>
-                      <option value="Parceria ou institucional">Parceria ou institucional</option>
                       <option value="Outro">Outro</option>
                     </select>
                   </div>

@@ -67,7 +67,7 @@ export default function Portfolio() {
             <a href="#processo" onClick={scrollTo('processo')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Processo</a>
             <a href="#aprendizados" onClick={scrollTo('aprendizados')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Aprendizados</a>
             <a href="#proximos" onClick={scrollTo('proximos')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Próximos passos</a>
-            <a href="#contato" onClick={scrollTo('contato')} style={{ background: '#0081f0', color: 'white', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Contato</a>
+            <a href="/contato" style={{ background: '#0081f0', color: 'white', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Contato</a>
           </div>
         </div>
       </nav>
@@ -614,7 +614,7 @@ export default function Portfolio() {
             UX Designer com foco em experiências que resolvem problemas reais — do wireframe ao produto em produção.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="mailto:kaue.peres@hotmail.com" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', borderRadius: 12, padding: '14px 32px', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
+            <a href="/contato" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', borderRadius: 12, padding: '14px 32px', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
               ✉ Entrar em contato
             </a>
             <a href="https://avalia.education" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 12, padding: '14px 32px', fontSize: 15, fontWeight: 500, textDecoration: 'none' }}>
