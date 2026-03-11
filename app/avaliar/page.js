@@ -40,6 +40,7 @@ export default function AvaliarPage() {
   const cameraRef = useRef(null);
   const referenceFilesRef = useRef(null);
   const batchFilesRef = useRef(null);
+  const extraFilesRef = useRef(null);
   const [userName, setUserName] = useState('Professor');
   const [profiles, setProfiles] = useState([]);
   const [exercises, setExercises] = useState([]);
@@ -74,6 +75,7 @@ export default function AvaliarPage() {
   const [batchFiles, setBatchFiles] = useState([]);
   const [filePattern, setFilePattern] = useState('nome_matricula');
   const [dragZone, setDragZone] = useState(null);
+  const [extraFiles, setExtraFiles] = useState([]);
 
   // Resultado
   const [result, setResult] = useState(null);
@@ -150,10 +152,37 @@ export default function AvaliarPage() {
       if (TYPES[selectedType]?.input === 'obj' && studentFile) {
         try { workContent = await studentFile.text(); } catch { workContent = `[Arquivo: ${studentFile.name}]`; }
       }
+
+      // Helper: file → base64
+      const toBase64 = (file) => new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result.split(',')[1]);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+
+      // Collect all images to send to the AI as vision
+      const images = [];
+      if (TYPES[selectedType]?.input === 'img' && studentFile && studentFile.type.startsWith('image/')) {
+        images.push({ data: await toBase64(studentFile), mediaType: studentFile.type, label: `Trabalho do aluno: ${studentFile.name}` });
+      }
+      for (const f of referenceFiles) {
+        if (f.type.startsWith('image/')) {
+          images.push({ data: await toBase64(f), mediaType: f.type, label: `Referência: ${f.name}` });
+        }
+      }
+      for (const f of extraFiles) {
+        if (f.type.startsWith('image/')) {
+          images.push({ data: await toBase64(f), mediaType: f.type, label: `Arquivo adicional: ${f.name}` });
+        } else if (f.type === 'text/plain' || f.name.endsWith('.txt')) {
+          try { workContent = (workContent ? workContent + '\n\n' : '') + await f.text(); } catch {}
+        }
+      }
+
       const r = await fetch('/api/evaluate', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName, studentWork: workContent, tone, profName, profDisc, writingSample }),
+        body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName, studentWork: workContent, tone, profName, profDisc, writingSample, images: images.length > 0 ? images : undefined }),
       });
       const data = await r.json();
       if (!r.ok) { setEvalError(data.error || 'Erro ao gerar avaliação.'); return; }
@@ -416,10 +445,42 @@ export default function AvaliarPage() {
                 )}
 
                 {TYPES[selectedType]?.input === 'text' ? (
-                  <div>
-                    <label style={lbl}><Tooltip text="Cole aqui o trabalho escrito ou código do aluno para a IA analisar e avaliar.">Texto / Código do Aluno</Tooltip></label>
-                    <textarea style={{ ...inp, minHeight: 90, resize: 'vertical' }} value={studentWork} onChange={e => setStudentWork(e.target.value)} placeholder="Cole aqui o texto ou código do aluno..." />
-                  </div>
+                  <>
+                    <div>
+                      <label style={lbl}><Tooltip text="Cole aqui o trabalho escrito ou código do aluno para a IA analisar e avaliar.">Texto / Código do Aluno</Tooltip></label>
+                      <textarea style={{ ...inp, minHeight: 90, resize: 'vertical' }} value={studentWork} onChange={e => setStudentWork(e.target.value)} placeholder="Cole aqui o texto ou código do aluno..." />
+                    </div>
+                    <div style={{ marginTop: 12 }}>
+                      <label style={lbl}>
+                        <Tooltip text="Envie imagens ou arquivos .txt como contexto adicional. Útil para enviar prints, diagramas ou anexos do trabalho.">Imagens e arquivos adicionais</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
+                      </label>
+                      <input ref={extraFilesRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.txt" style={{ display: 'none' }} onChange={e => setExtraFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
+                      {extraFiles.length > 0 ? (
+                        <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
+                          {extraFiles.map((f, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderBottom: i < extraFiles.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12 }}>
+                              <span style={{ flex: 1, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+                              <span onClick={() => setExtraFiles(extraFiles.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
+                            </div>
+                          ))}
+                          {extraFiles.length < 5 && (
+                            <div onClick={() => extraFilesRef.current?.click()} style={{ padding: '8px 12px', fontSize: 12, color: '#0081f0', cursor: 'pointer', borderTop: '1px solid var(--border)', textAlign: 'center', fontWeight: 500 }}>+ Adicionar mais</div>
+                          )}
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => extraFilesRef.current?.click()}
+                          onMouseEnter={e => e.currentTarget.style.borderColor = '#0081f0'}
+                          onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                          style={{ border: '2px dashed var(--border)', borderRadius: 12, padding: '16px', textAlign: 'center', cursor: 'pointer', background: 'var(--bg-content)', transition: 'border-color .15s' }}
+                        >
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px', display: 'block' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>Imagens (JPG, PNG, WEBP) ou texto (.txt) · até 5</div>
+                        </div>
+                      )}
+                    </div>
+                  </>
                 ) : (
                   <>
                     {/* Drop zone principal */}

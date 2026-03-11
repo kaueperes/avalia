@@ -57,7 +57,7 @@ export async function POST(request) {
     }
   }
 
-  const { type, exerciseName, exerciseContext, criteria, studentName, studentWork, tone, profName, profDisc, writingSample } = await request.json();
+  const { type, exerciseName, exerciseContext, criteria, studentName, studentWork, tone, profName, profDisc, writingSample, images } = await request.json();
 
   if (!exerciseName || !criteria?.length) {
     return NextResponse.json({ error: 'Exercício e critérios são obrigatórios.' }, { status: 400 });
@@ -100,15 +100,27 @@ Regras:
 - O feedback deve ser escrito em português brasileiro
 - Os nomes dos critérios devem ser exatamente iguais aos fornecidos
 - Seja específico, construtivo e alinhado ao tom solicitado
-- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada`;
+- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada${images?.length > 0 ? `\n- Analise TODAS as imagens enviadas como parte integrante do trabalho do aluno` : ''}`;
 
   try {
-    const { model, maxTokens } = selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
+    // Use Sonnet when images are present (better vision quality); otherwise use adaptive selection
+    const { model, maxTokens } = images?.length > 0
+      ? { model: 'claude-sonnet-4-6', maxTokens: 1800 }
+      : selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
+
+    // Build message content: text prompt + vision blocks if images present
+    const messageContent = images?.length > 0
+      ? [
+          { type: 'text', text: prompt },
+          ...images.map(img => ({ type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } })),
+        ]
+      : prompt;
+
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await client.messages.create({
       model,
       max_tokens: maxTokens,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: messageContent }],
     });
 
     const text = message.content[0]?.text || '';
