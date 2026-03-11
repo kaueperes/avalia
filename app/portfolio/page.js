@@ -43,6 +43,12 @@ const DecisionCard = ({ number, title, problem, solution, why }) => (
 export default function Portfolio() {
   const router = useRouter();
 
+  const scrollTo = (id) => (e) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: 'white', color: '#111827', minHeight: '100vh' }}>
 
@@ -53,15 +59,15 @@ export default function Portfolio() {
             <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 32, width: 'auto' }} />
           </div>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <a href="#inicio" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Início</a>
-            <a href="#problema" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Problema</a>
-            <a href="#pesquisa" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Pesquisa</a>
-            <a href="#decisoes" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Decisões</a>
-            <a href="#arquitetura" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Arquitetura</a>
-            <a href="#processo" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Processo</a>
-            <a href="#aprendizados" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Aprendizados</a>
-            <a href="#proximos" style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Próximos passos</a>
-            <a href="#contato" style={{ background: '#0081f0', color: 'white', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Contato</a>
+            <a href="#inicio" onClick={scrollTo('inicio')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Início</a>
+            <a href="#problema" onClick={scrollTo('problema')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Problema</a>
+            <a href="#pesquisa" onClick={scrollTo('pesquisa')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Pesquisa</a>
+            <a href="#decisoes" onClick={scrollTo('decisoes')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Decisões</a>
+            <a href="#arquitetura" onClick={scrollTo('arquitetura')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Arquitetura</a>
+            <a href="#processo" onClick={scrollTo('processo')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Processo</a>
+            <a href="#aprendizados" onClick={scrollTo('aprendizados')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Aprendizados</a>
+            <a href="#proximos" onClick={scrollTo('proximos')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Próximos passos</a>
+            <a href="#contato" onClick={scrollTo('contato')} style={{ background: '#0081f0', color: 'white', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Contato</a>
           </div>
         </div>
       </nav>
