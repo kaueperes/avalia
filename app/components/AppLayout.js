@@ -214,6 +214,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
             {/* Quota */}
             {quotaCiclo !== null && (
               <div
+                className="quota-display"
                 onClick={() => router.push('/conta')}
                 title="Ver detalhes do seu plano"
                 style={{
