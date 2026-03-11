@@ -80,13 +80,13 @@ export default function Portfolio() {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 28 }}>
             <span style={{ display: 'inline-block', padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(0,129,240,0.2)', color: '#60a5fa', border: '1px solid rgba(96,165,250,0.3)' }}>Case Study</span>
             <span style={{ display: 'inline-block', padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(129,12,250,0.2)', color: '#c084fc', border: '1px solid rgba(192,132,252,0.3)' }}>EdTech · SaaS</span>
-            <span style={{ display: 'inline-block', padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(255,255,255,0.08)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.15)' }}>2024–2025</span>
+            <span style={{ display: 'inline-block', padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: 'rgba(255,255,255,0.08)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.15)' }}>2025–2026</span>
           </div>
 
           <h1 style={{ fontSize: 64, fontWeight: 900, color: 'white', lineHeight: 1.0, letterSpacing: '-2.5px', marginBottom: 28 }}>
             AvaliA<br />
             <span style={{ background: 'linear-gradient(90deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              Avaliação em escala,<br />sem perder o humano.
+              Menos tempo corrigindo.<br />Mais tempo ensinando.
             </span>
           </h1>
 
@@ -97,7 +97,7 @@ export default function Portfolio() {
           <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
             {[
               { label: 'Função', value: 'Designer & Fundador' },
-              { label: 'Período', value: '12 meses' },
+              { label: 'Período', value: '4 meses' },
               { label: 'Stack', value: 'Next.js · Claude AI' },
               { label: 'Status', value: 'Em produção' },
             ].map(({ label, value }) => (
@@ -256,14 +256,6 @@ export default function Portfolio() {
 
           <DecisionCard
             number="01"
-            title="Wizard linear em vez de formulário único"
-            problem="Um formulário com todos os campos de uma vez (tipo de trabalho, perfil, exercício, texto do aluno) é intimidador e causa abandono."
-            solution="Wizard de passos — uma decisão por tela. O usuário sente progresso constante e nunca fica perdido."
-            why="O peso cognitivo de 'quanto falta?' é eliminado pelo progresso visual. Cada passo completado é uma micro-vitória."
-          />
-
-          <DecisionCard
-            number="02"
             title="Perfil de professor como âncora de personalidade"
             problem="Feedback genérico de IA não tem valor. 'Bom trabalho, mas pode melhorar' poderia ter sido escrito por qualquer coisa."
             solution="O professor configura seu tom (construtivo, rigoroso, didático, neutro), disciplina e critérios uma única vez. A IA escreve no estilo dele."
@@ -271,7 +263,7 @@ export default function Portfolio() {
           />
 
           <DecisionCard
-            number="03"
+            number="02"
             title="Exercícios reutilizáveis separados da avaliação"
             problem="Se o professor precisa redigir o enunciado da atividade toda vez que avalia, o fluxo quebra no meio e ele desiste."
             solution="Biblioteca de exercícios criada uma vez, reutilizada em todas as avaliações subsequentes da mesma atividade."
@@ -279,7 +271,7 @@ export default function Portfolio() {
           />
 
           <DecisionCard
-            number="04"
+            number="03"
             title="Feedback editável antes de exportar"
             problem="Confiar 100% na IA sem revisão humana é um erro de produto. O professor precisa sentir que está no controle."
             solution="Após a IA gerar o feedback, o professor pode editar qualquer campo antes de exportar em PDF ou compartilhar."
@@ -287,7 +279,7 @@ export default function Portfolio() {
           />
 
           <DecisionCard
-            number="05"
+            number="04"
             title="Nota por critério + nota final calculada"
             problem="Uma nota única não ensina nada ao aluno sobre onde ele precisa melhorar."
             solution="Cada critério tem peso e nota individual. A nota final é calculada automaticamente pela plataforma."
