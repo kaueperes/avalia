@@ -1,8 +1,59 @@
 'use client';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Substitua FORMSPREE_ID pelo ID do seu formulário em formspree.io
+// Exemplo: se a URL for https://formspree.io/f/xabc1234, o ID é "xabc1234"
+const FORMSPREE_ID = 'SEU_ID_AQUI';
+// ─────────────────────────────────────────────────────────────────────────────
+
+const inputStyle = {
+  width: '100%',
+  padding: '13px 16px',
+  fontSize: 14,
+  color: '#111827',
+  background: 'white',
+  border: '1.5px solid #E5E7EB',
+  borderRadius: 10,
+  outline: 'none',
+  boxSizing: 'border-box',
+  fontFamily: 'inherit',
+  transition: 'border-color .15s',
+};
 
 export default function Contato() {
   const router = useRouter();
+  const [form, setForm] = useState({ nome: '', email: '', assunto: '', mensagem: '' });
+  const [status, setStatus] = useState('idle'); // idle | sending | success | error
+  const [focusedField, setFocusedField] = useState(null);
+
+  const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    if (FORMSPREE_ID === 'SEU_ID_AQUI') {
+      setStatus('success'); // modo demo para portfólio
+      return;
+    }
+    setStatus('sending');
+    try {
+      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(form),
+      });
+      setStatus(res.ok ? 'success' : 'error');
+    } catch {
+      setStatus('error');
+    }
+  };
+
+  const fieldStyle = name => ({
+    ...inputStyle,
+    borderColor: focusedField === name ? '#0081f0' : '#E5E7EB',
+    boxShadow: focusedField === name ? '0 0 0 3px rgba(0,129,240,0.1)' : 'none',
+  });
 
   return (
     <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: 'white', color: '#111827', minHeight: '100vh' }}>
@@ -13,7 +64,7 @@ export default function Contato() {
           <div style={{ cursor: 'pointer' }} onClick={() => router.push('/')}>
             <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 36, width: 'auto' }} />
           </div>
-          <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: 14, cursor: 'pointer' }}>
             ← Voltar ao início
           </button>
         </div>
@@ -28,36 +79,127 @@ export default function Contato() {
         </div>
       </section>
 
-      {/* Content */}
-      <section style={{ padding: '80px 32px', background: '#F9FAFB' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>
+      {/* Main content */}
+      <section style={{ padding: '80px 32px 96px', background: '#F9FAFB' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 48, alignItems: 'start' }}>
 
-          {/* Email */}
-          <div style={{ background: 'white', borderRadius: 20, padding: '36px 32px', border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', textAlign: 'center' }}>
-            <div style={{ width: 56, height: 56, borderRadius: 16, background: '#E6F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
-              ✉️
+          {/* Sidebar info */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ background: 'white', borderRadius: 20, padding: '28px', border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#E6F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 16 }}>✉️</div>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 6 }}>E-mail direto</h3>
+              <a href="mailto:contato@avalia.education" style={{ fontSize: 13, color: '#0081f0', textDecoration: 'none', fontWeight: 500 }}>contato@avalia.education</a>
+              <p style={{ fontSize: 13, color: '#9CA3AF', marginTop: 6 }}>Respondemos em até 24h úteis</p>
             </div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>E-mail</h3>
-            <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 20, lineHeight: 1.6 }}>Respondemos em até 24 horas úteis.</p>
-            <a href="mailto:contato@avalia.education" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#0081f0', color: 'white', padding: '12px 24px', borderRadius: 10, fontWeight: 600, fontSize: 14, textDecoration: 'none', transition: 'background .2s' }}
-              onMouseEnter={e => e.currentTarget.style.background = '#0033ad'}
-              onMouseLeave={e => e.currentTarget.style.background = '#0081f0'}>
-              contato@avalia.education
-            </a>
+
+            <div style={{ background: 'white', borderRadius: 20, padding: '28px', border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 16 }}>📖</div>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 6 }}>Central de Ajuda</h3>
+              <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 14 }}>Tutoriais e respostas para as dúvidas mais comuns.</p>
+              <button onClick={() => router.push('/ajuda')} style={{ fontSize: 13, fontWeight: 600, color: '#810cfa', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                Acessar →
+              </button>
+            </div>
+
+            <div style={{ background: 'white', borderRadius: 20, padding: '28px', border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', marginBottom: 12 }}>Horário de atendimento</div>
+              <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.8 }}>
+                <div>Segunda a sexta</div>
+                <div style={{ fontWeight: 600, color: '#374151' }}>9h às 18h (horário de Brasília)</div>
+              </div>
+            </div>
           </div>
 
-          {/* Ajuda */}
-          <div style={{ background: 'white', borderRadius: 20, padding: '36px 32px', border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', textAlign: 'center' }}>
-            <div style={{ width: 56, height: 56, borderRadius: 16, background: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
-              📖
-            </div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 8 }}>Central de Ajuda</h3>
-            <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 20, lineHeight: 1.6 }}>Tutoriais e respostas para as dúvidas mais comuns.</p>
-            <button onClick={() => router.push('/ajuda')} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', color: '#374151', border: '1.5px solid #E5E7EB', padding: '12px 24px', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', transition: 'border-color .2s, background .2s' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#9CA3AF'; e.currentTarget.style.background = '#F9FAFB'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E7EB'; e.currentTarget.style.background = 'white'; }}>
-              Acessar Central de Ajuda
-            </button>
+          {/* Form */}
+          <div style={{ background: 'white', borderRadius: 20, padding: '40px', border: '1px solid #E5E7EB', boxShadow: '0 8px 40px rgba(0,0,0,0.06)' }}>
+
+            {status === 'success' ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#F0FDF4', border: '2px solid #D1FAE5', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', fontSize: 32 }}>✓</div>
+                <h3 style={{ fontSize: 22, fontWeight: 800, color: '#111827', marginBottom: 12 }}>Mensagem enviada!</h3>
+                <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.65, marginBottom: 32 }}>
+                  Recebemos sua mensagem e responderemos em até 24 horas úteis no e-mail informado.
+                </p>
+                <button onClick={() => { setStatus('idle'); setForm({ nome: '', email: '', assunto: '', mensagem: '' }); }}
+                  style={{ background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                  Enviar outra mensagem
+                </button>
+              </div>
+            ) : (
+              <>
+                <div style={{ marginBottom: 32 }}>
+                  <h2 style={{ fontSize: 22, fontWeight: 800, color: '#00173f', marginBottom: 6 }}>Envie uma mensagem</h2>
+                  <p style={{ fontSize: 14, color: '#9CA3AF' }}>Preencha o formulário e entraremos em contato.</p>
+                </div>
+
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    <div>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Nome</label>
+                      <input
+                        name="nome" value={form.nome} onChange={handleChange} required
+                        placeholder="Seu nome"
+                        style={fieldStyle('nome')}
+                        onFocus={() => setFocusedField('nome')}
+                        onBlur={() => setFocusedField(null)}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>E-mail</label>
+                      <input
+                        name="email" type="email" value={form.email} onChange={handleChange} required
+                        placeholder="seu@email.com"
+                        style={fieldStyle('email')}
+                        onFocus={() => setFocusedField('email')}
+                        onBlur={() => setFocusedField(null)}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Assunto</label>
+                    <select
+                      name="assunto" value={form.assunto} onChange={handleChange} required
+                      style={{ ...fieldStyle('assunto'), appearance: 'none', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: 40 }}
+                      onFocus={() => setFocusedField('assunto')}
+                      onBlur={() => setFocusedField(null)}
+                    >
+                      <option value="">Selecione um assunto</option>
+                      <option value="Dúvida sobre a plataforma">Dúvida sobre a plataforma</option>
+                      <option value="Problema técnico">Problema técnico</option>
+                      <option value="Dúvida sobre planos e pagamentos">Dúvida sobre planos e pagamentos</option>
+                      <option value="Sugestão de melhoria">Sugestão de melhoria</option>
+                      <option value="Parceria ou institucional">Parceria ou institucional</option>
+                      <option value="Outro">Outro</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Mensagem</label>
+                    <textarea
+                      name="mensagem" value={form.mensagem} onChange={handleChange} required
+                      placeholder="Descreva sua dúvida ou mensagem com o máximo de detalhes possível..."
+                      rows={5}
+                      style={{ ...fieldStyle('mensagem'), resize: 'vertical', minHeight: 130 }}
+                      onFocus={() => setFocusedField('mensagem')}
+                      onBlur={() => setFocusedField(null)}
+                    />
+                  </div>
+
+                  {status === 'error' && (
+                    <div style={{ padding: '12px 16px', background: '#FEF2F2', borderRadius: 10, border: '1px solid #FECACA', fontSize: 13, color: '#DC2626' }}>
+                      Ocorreu um erro ao enviar. Tente novamente ou envie diretamente para contato@avalia.education
+                    </div>
+                  )}
+
+                  <button type="submit" disabled={status === 'sending'}
+                    style={{ background: status === 'sending' ? '#9CA3AF' : 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', border: 'none', borderRadius: 10, padding: '15px', fontSize: 15, fontWeight: 600, cursor: status === 'sending' ? 'not-allowed' : 'pointer', transition: 'opacity .2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    {status === 'sending' ? 'Enviando...' : 'Enviar mensagem'}
+                    {status !== 'sending' && <span>→</span>}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
 
         </div>
