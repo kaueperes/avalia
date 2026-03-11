@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const faqs = [
@@ -104,6 +104,29 @@ export default function CentralDeAjuda() {
   const router = useRouter();
   const [activecat, setActivecat] = useState(faqs[0].cat);
 
+  const scrollToSection = (cat) => {
+    setActivecat(cat);
+    const el = document.getElementById(cat);
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 96;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    const observers = faqs.map(({ cat }) => {
+      const el = document.getElementById(cat);
+      if (!el) return null;
+      const observer = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActivecat(cat); },
+        { rootMargin: '-15% 0px -75% 0px' }
+      );
+      observer.observe(el);
+      return observer;
+    });
+    return () => observers.forEach(o => o?.disconnect());
+  }, []);
+
   return (
     <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: 'white', color: '#111827', minHeight: '100vh' }}>
 
@@ -170,7 +193,7 @@ export default function CentralDeAjuda() {
             {/* Category sidebar */}
             <div style={{ position: 'sticky', top: 84, display: 'flex', flexDirection: 'column', gap: 4 }}>
               {faqs.map(({ cat }) => (
-                <button key={cat} onClick={() => setActivecat(cat)}
+                <button key={cat} onClick={() => scrollToSection(cat)}
                   style={{ textAlign: 'left', padding: '10px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: activecat === cat ? 700 : 400, background: activecat === cat ? '#E6F3FF' : 'transparent', color: activecat === cat ? '#0081f0' : '#6B7280', transition: 'all .15s' }}>
                   {cat}
                 </button>
