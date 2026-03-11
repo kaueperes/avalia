@@ -42,7 +42,7 @@ export async function POST(request) {
     }
   }
 
-  if (event.type === 'invoice.paid') {
+  if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;
     // Only reset quota on renewal (not on first payment, which is handled by checkout.session.completed)
     if (invoice.billing_reason === 'subscription_cycle') {
