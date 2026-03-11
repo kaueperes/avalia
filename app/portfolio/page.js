@@ -294,6 +294,14 @@ export default function Portfolio() {
             why="Tema claro reduz fadiga visual em sessões longas de correção. Dark themes estão associados a ferramentas de desenvolvedores — professores esperam interfaces parecidas com as ferramentas que já usam (Google Classroom, Moodle)."
           />
 
+          <DecisionCard
+            number="06"
+            title="Exercícios como entidade independente — não existia no design original"
+            problem="No Figma inicial, o enunciado do exercício era apenas um campo de texto dentro da tela de avaliação. O professor precisava redigir ou colar o enunciado toda vez que avaliava um trabalho da mesma atividade."
+            solution="Exercícios viraram uma página e entidade própria: o professor cria o enunciado uma vez, dá um nome, e reutiliza em quantas avaliações quiser. A IA usa o enunciado como contexto para gerar o feedback."
+            why="O enunciado é a âncora pedagógica da avaliação — sem ele, a IA gera feedback genérico. Separar exercícios da avaliação foi a decisão que mais elevou a qualidade do feedback gerado."
+          />
+
           {/* Dark vs Light visual comparison */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
             <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #1a1f2e' }}>
@@ -445,8 +453,8 @@ export default function Portfolio() {
                 phase: 'Fase 2 — Reprojeto completo',
                 duration: 'Meses 3-5',
                 color: '#F59E0B',
-                description: 'Joguei o HTML fora e comecei do zero com Next.js + Express. Criei o primeiro protótipo no Figma com tema totalmente dark — visualmente forte, mas inadequado para o contexto de uso. Após testar, decidi migrar para tema claro como padrão, mantendo o dark como opção. Redesenhei a navegação, separei exercícios de avaliações e criei o sistema de perfis.',
-                learning: 'O tema visual não é decisão estética — é decisão de contexto de uso. Professores trabalham em ambientes iluminados, em ferramentas claras. O Figma dark era bonito; o light era certo.',
+                description: 'Joguei o HTML fora e comecei do zero com Next.js + Express. Criei o primeiro protótipo no Figma com tema totalmente dark — visualmente forte, mas inadequado para o contexto de uso. Após testar, migrei para tema claro. Foi também nessa fase que percebi que o campo "enunciado" precisava ser muito mais do que um campo de texto na tela de avaliação: exercícios viraram uma entidade própria com página dedicada, o que transformou completamente a qualidade do feedback gerado pela IA.',
+                learning: 'Duas viradas nessa fase: tema claro é decisão de contexto, não estética. E separar exercícios da avaliação foi a decisão que mais impactou a qualidade do produto.',
               },
               {
                 phase: 'Fase 3 — Sistemas de negócio',
