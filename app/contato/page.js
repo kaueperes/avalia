@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 // ─────────────────────────────────────────────────────────────────────────────
 // Substitua FORMSPREE_ID pelo ID do seu formulário em formspree.io
 // Exemplo: se a URL for https://formspree.io/f/xabc1234, o ID é "xabc1234"
-const FORMSPREE_ID = 'SEU_ID_AQUI';
+const FORMSPREE_ID = 'xqeyqlly';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const inputStyle = {
