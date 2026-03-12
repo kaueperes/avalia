@@ -134,6 +134,7 @@ function ContaPageInner() {
   const [infoLoading, setInfoLoading] = useState(false);
   const [pwLoading, setPwLoading] = useState(false);
   const [upgradeLoading, setUpgradeLoading] = useState(null);
+  const [portalLoading, setPortalLoading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   useEffect(() => {
@@ -163,6 +164,22 @@ function ContaPageInner() {
     }
     if (searchParams.get('canceled')) showMsg(setPlanMsg, 'error', 'Pagamento cancelado. Nenhuma cobrança foi feita.');
   }, [router, searchParams]);
+
+  async function handlePortal() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    setPortalLoading(true);
+    try {
+      const res = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+      else showMsg(setPlanMsg, 'error', data.error || 'Erro ao abrir portal.');
+    } catch { showMsg(setPlanMsg, 'error', 'Erro de conexão.'); }
+    finally { setPortalLoading(false); }
+  }
 
   async function handleUpgrade(planKey) {
     const token = localStorage.getItem('token');
@@ -421,6 +438,26 @@ function ContaPageInner() {
           </>
         )}
       </Section>
+
+      {/* ── Gerenciar assinatura ── */}
+      {userPlan !== 'gratuito' && (
+        <Section title="Assinatura" subtitle="Gerencie ou cancele sua assinatura pelo portal do Stripe.">
+          <button
+            onClick={handlePortal}
+            disabled={portalLoading}
+            style={{
+              padding: '10px 24px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+              background: 'none', color: 'var(--text-main)',
+              border: '1px solid var(--border)', cursor: portalLoading ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {portalLoading ? 'Aguarde...' : 'Gerenciar assinatura'}
+          </button>
+          <p style={{ marginTop: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+            Você pode cancelar, trocar de plano ou atualizar o método de pagamento. O acesso continua até o fim do período já pago.
+          </p>
+        </Section>
+      )}
 
       {/* ── Zona de perigo ── */}
       <Section title="Zona de perigo" subtitle="Ações irreversíveis. Proceda com cuidado.">
