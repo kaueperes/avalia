@@ -28,6 +28,7 @@ export default function AvaliacoesPage() {
   const [reportMenuOpen, setReportMenuOpen] = useState(false);
   const reportMenuRef = useRef(null);
   const [detailDraft, setDetailDraft] = useState(null);
+  const [selected, setSelected] = useState(new Set());
 
   function token() { return localStorage.getItem('token'); }
 
@@ -64,6 +65,36 @@ export default function AvaliacoesPage() {
   const turmas = [...new Set(evaluations.map(e => e.turma).filter(Boolean))].sort();
   const exercises = [...new Set(evaluations.map(e => e.exerciseName).filter(Boolean))].sort();
   const institutions = [...new Set(evaluations.map(e => e.institution).filter(Boolean))].sort();
+
+  const selectedEvals = evaluations.filter(e => selected.has(e.id));
+  const selectedStudents = [...new Set(selectedEvals.map(e => e.studentName))];
+  const canStudentReport = selectedStudents.length === 1 && selectedEvals.length >= 2;
+  const canClassReport = selectedStudents.length >= 2;
+  const allFilteredSelected = filtered.length > 0 && filtered.every(e => selected.has(e.id));
+
+  function toggleSelect(id) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (allFilteredSelected) {
+      setSelected(prev => {
+        const next = new Set(prev);
+        filtered.forEach(e => next.delete(e.id));
+        return next;
+      });
+    } else {
+      setSelected(prev => {
+        const next = new Set(prev);
+        filtered.forEach(e => next.add(e.id));
+        return next;
+      });
+    }
+  }
 
   function clearFilters() { setSearch(''); setTypeFilter(''); setTurmaFilter(''); setExerciseFilter(''); setInstitutionFilter(''); setScoreMin(''); setScoreMax(''); }
 
@@ -160,11 +191,12 @@ export default function AvaliacoesPage() {
     setReportLoading(true);
     setReportError('');
     setClassReport(null);
+    const turmaCtx = selectedEvals.length === new Set(selectedEvals.map(e => e.turma)).size ? '' : (selectedEvals[0]?.turma || '');
     try {
       const r = await fetch('/api/analyze-class', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ evaluations: filtered, turma: turmaFilter, exerciseName: exerciseFilter }),
+        body: JSON.stringify({ evaluations: selectedEvals, turma: turmaCtx, exerciseName: '' }),
       });
       const data = await r.json();
       if (!r.ok) { setReportError(data.error || 'Erro ao gerar relatório.'); return; }
@@ -184,9 +216,11 @@ export default function AvaliacoesPage() {
   }
 
   function generateClassPDF(report) {
-    const avgScore = filtered.length ? (filtered.reduce((s,e)=>s+e.score,0)/filtered.length).toFixed(1) : '—';
-    const passing = filtered.filter(e=>e.score>=5).length;
-    const turmaTitle = turmaFilter || 'Turma';
+    const evalsForPDF = selectedEvals.length > 0 ? selectedEvals : filtered;
+    const avgScore = evalsForPDF.length ? (evalsForPDF.reduce((s,e)=>s+e.score,0)/evalsForPDF.length).toFixed(1) : '—';
+    const passing = evalsForPDF.filter(e=>e.score>=5).length;
+    const turmas_ = [...new Set(evalsForPDF.map(e => e.turma).filter(Boolean))];
+    const turmaTitle = turmas_.length === 1 ? turmas_[0] : (turmaFilter || 'Turma');
     const exerciseTitle = exerciseFilter ? ` · ${exerciseFilter}` : '';
     const date = new Date().toLocaleDateString('pt-BR');
 
@@ -210,7 +244,7 @@ export default function AvaliacoesPage() {
       <div style="border-bottom:2px solid #e5e7eb;padding-bottom:24px;margin-bottom:32px">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-weight:600;margin-bottom:6px">Relatório Pedagógico da Turma</div>
         <div style="font-size:26px;font-weight:800;color:#111">${turmaTitle}${exerciseTitle}</div>
-        <div style="font-size:13px;color:#9ca3af;margin-top:4px">Gerado em ${date} · ${filtered.length} alunos avaliados</div>
+        <div style="font-size:13px;color:#9ca3af;margin-top:4px">Gerado em ${date} · ${evalsForPDF.length} alunos avaliados</div>
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">
@@ -223,7 +257,7 @@ export default function AvaliacoesPage() {
           <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;margin-top:4px">Aprovados (≥5)</div>
         </div>
         <div style="background:#fafafa;border-radius:10px;padding:16px 20px">
-          <div style="font-size:28px;font-weight:800;color:#374151;line-height:1">${filtered.length}</div>
+          <div style="font-size:28px;font-weight:800;color:#374151;line-height:1">${evalsForPDF.length}</div>
           <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;margin-top:4px">Total avaliados</div>
         </div>
       </div>
@@ -265,7 +299,8 @@ export default function AvaliacoesPage() {
 
   function generateQuickPDF() {
     const date = new Date().toLocaleDateString('pt-BR');
-    const rows = filtered.map(e => {
+    const evalsForQuick = selectedEvals.length > 0 ? selectedEvals : filtered;
+    const rows = evalsForQuick.map(e => {
       const c = e.score >= 7 ? '#16a34a' : e.score >= 5 ? '#ca8a04' : '#dc2626';
       return `<tr>
         <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;font-weight:600;color:#111">${e.studentName}</td>
@@ -278,7 +313,7 @@ export default function AvaliacoesPage() {
       </tr>`;
     }).join('');
 
-    const avgScore = filtered.length ? (filtered.reduce((s,e)=>s+e.score,0)/filtered.length).toFixed(1) : '—';
+    const avgScore = evalsForQuick.length ? (evalsForQuick.reduce((s,e)=>s+e.score,0)/evalsForQuick.length).toFixed(1) : '—';
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
     <title>Notas — ${date}</title>
     <style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; } @media print { body { padding: 24px; } @page { margin: 1.5cm; } }</style>
@@ -315,8 +350,8 @@ export default function AvaliacoesPage() {
   }
 
   async function generateStudentReport() {
-    const studentEvals = filtered;
-    const studentName = search || (studentEvals[0]?.studentName || 'Aluno');
+    const studentEvals = selectedEvals;
+    const studentName = selectedStudents[0] || 'Aluno';
     setStudentReportLoading(true);
     setStudentReportError('');
     setStudentReport(null);
@@ -344,9 +379,9 @@ export default function AvaliacoesPage() {
   }
 
   function generateStudentPDF(report) {
-    const studentName = search || (filtered[0]?.studentName || 'Aluno');
+    const studentName = selectedStudents[0] || 'Aluno';
     const date = new Date().toLocaleDateString('pt-BR');
-    const scoresOverTime = filtered.slice().reverse().map(e =>
+    const scoresOverTime = selectedEvals.slice().sort((a,b) => new Date(a.createdAt)-new Date(b.createdAt)).map(e =>
       `${new Date(e.createdAt).toLocaleDateString('pt-BR')}: ${e.score.toFixed(1)}${e.exerciseName ? ` (${e.exerciseName})` : ''}`
     ).join('<br>');
 
@@ -357,7 +392,7 @@ export default function AvaliacoesPage() {
       <div style="border-bottom:2px solid #e5e7eb;padding-bottom:24px;margin-bottom:32px">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-weight:600;margin-bottom:6px">Parecer Individual do Aluno</div>
         <div style="font-size:26px;font-weight:800;color:#111">${studentName}</div>
-        <div style="font-size:13px;color:#9ca3af;margin-top:4px">Gerado em ${date} · ${filtered.length} avaliação(ões) analisada(s)</div>
+        <div style="font-size:13px;color:#9ca3af;margin-top:4px">Gerado em ${date} · ${selectedEvals.length} avaliação(ões) analisada(s)</div>
       </div>
       ${report.evolucao ? `<div style="margin-bottom:24px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Evolução das Notas</div><div style="font-size:13px;line-height:2;color:#374151">${scoresOverTime}</div></div>` : ''}
       <div style="margin-bottom:24px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Resumo do Desempenho</div><div style="font-size:14px;line-height:1.8;color:#374151">${report.resumo}</div></div>
@@ -392,10 +427,10 @@ export default function AvaliacoesPage() {
           <div ref={reportMenuRef} style={{ position: 'relative' }}>
             <button
               onClick={() => setReportMenuOpen(o => !o)}
-              disabled={filtered.length === 0}
-              style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '9px 16px', background: filtered.length === 0 ? 'var(--bg-card)' : 'linear-gradient(135deg, #7c3aed, #4f46e5)', color: filtered.length === 0 ? 'var(--text-muted)' : 'white', border: filtered.length === 0 ? '1px solid var(--border)' : 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: filtered.length === 0 ? 'not-allowed' : 'pointer', opacity: filtered.length === 0 ? 0.4 : 1 }}>
+              disabled={selected.size === 0}
+              style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '9px 16px', background: selected.size === 0 ? 'var(--bg-card)' : 'linear-gradient(135deg, #7c3aed, #4f46e5)', color: selected.size === 0 ? 'var(--text-muted)' : 'white', border: selected.size === 0 ? '1px solid var(--border)' : 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: selected.size === 0 ? 'not-allowed' : 'pointer', opacity: selected.size === 0 ? 0.4 : 1 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              Gerar Relatório
+              Gerar Relatório{selected.size > 0 ? ` (${selected.size})` : ''}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 2, opacity: 0.8 }}><polyline points="6 9 12 15 18 9"/></svg>
             </button>
 
@@ -428,8 +463,8 @@ export default function AvaliacoesPage() {
 
                 {/* Opção 2: Análise da turma */}
                 <button
-                  onClick={() => { setReportMenuOpen(false); setClassReport(null); setReportError(''); generateClassReport(); }}
-                  style={{ display: 'flex', alignItems: 'flex-start', gap: 14, width: '100%', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                  onClick={() => { if (!canClassReport) return; setReportMenuOpen(false); setClassReport(null); setReportError(''); generateClassReport(); }}
+                  style={{ display: 'flex', alignItems: 'flex-start', gap: 14, width: '100%', padding: '12px 16px', background: 'none', border: 'none', cursor: canClassReport ? 'pointer' : 'default', textAlign: 'left', opacity: canClassReport ? 1 : 0.5 }}
                   onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-content)'}
                   onMouseLeave={e => e.currentTarget.style.background = 'none'}
                 >
@@ -441,7 +476,9 @@ export default function AvaliacoesPage() {
                       <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>Análise Pedagógica da Turma</span>
                       <span style={{ fontSize: 10, fontWeight: 700, background: '#f5f3ff', color: '#7c3aed', borderRadius: 5, padding: '1px 7px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>IA</span>
                     </div>
-                    <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>IA identifica padrões de erro, pontos fortes e sugere intervenções. Age sobre os registros selecionados ou todos.</p>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
+                      {canClassReport ? `${selectedEvals.length} avaliações de ${selectedStudents.length} alunos selecionadas.` : 'Selecione avaliações de 2+ alunos diferentes.'}
+                    </p>
                   </div>
                 </button>
 
@@ -449,9 +486,9 @@ export default function AvaliacoesPage() {
 
                 {/* Opção 3: Parecer individual */}
                 <button
-                  onClick={() => { if (!search) return; setReportMenuOpen(false); setStudentReport(null); setStudentReportError(''); generateStudentReport(); }}
-                  style={{ display: 'flex', alignItems: 'flex-start', gap: 14, width: '100%', padding: '12px 16px', background: 'none', border: 'none', cursor: search ? 'pointer' : 'default', textAlign: 'left', opacity: search ? 1 : 0.5 }}
-                  onMouseEnter={e => { if (search) e.currentTarget.style.background = 'var(--bg-content)'; }}
+                  onClick={() => { if (!canStudentReport) return; setReportMenuOpen(false); setStudentReport(null); setStudentReportError(''); generateStudentReport(); }}
+                  style={{ display: 'flex', alignItems: 'flex-start', gap: 14, width: '100%', padding: '12px 16px', background: 'none', border: 'none', cursor: canStudentReport ? 'pointer' : 'default', textAlign: 'left', opacity: canStudentReport ? 1 : 0.5 }}
+                  onMouseEnter={e => { if (canStudentReport) e.currentTarget.style.background = 'var(--bg-content)'; }}
                   onMouseLeave={e => e.currentTarget.style.background = 'none'}
                 >
                   <div style={{ width: 34, height: 34, borderRadius: 9, background: '#fff7ed', border: '1px solid #f9731633', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -463,7 +500,7 @@ export default function AvaliacoesPage() {
                       <span style={{ fontSize: 10, fontWeight: 700, background: '#fff7ed', color: '#ea580c', borderRadius: 5, padding: '1px 7px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>IA</span>
                     </div>
                     <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
-                      {search ? `IA analisa evolução e gera um parecer formal de ${search}.` : 'IA analisa evolução e gera um parecer formal de um único aluno. Busque o nome dele acima.'}
+                      {canStudentReport ? `${selectedEvals.length} avaliações de ${selectedStudents[0]} selecionadas.` : 'Selecione 2+ avaliações do mesmo aluno.'}
                     </p>
                   </div>
                 </button>
@@ -553,6 +590,14 @@ export default function AvaliacoesPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ background: 'var(--bg-content)' }}>
+                <th style={{ padding: '10px 16px', width: 36 }}>
+                  <input
+                    type="checkbox"
+                    checked={allFilteredSelected}
+                    onChange={toggleSelectAll}
+                    style={{ cursor: 'pointer', width: 15, height: 15 }}
+                  />
+                </th>
                 {['Aluno', 'Tipo', 'Exercício', 'Nota', 'Conceito', 'Turma', 'Instituição', 'Professor', 'Data', ''].map(h => (
                   <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: 'var(--text-sub)', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                 ))}
@@ -562,7 +607,15 @@ export default function AvaliacoesPage() {
               {filtered.map(e => {
                 const c = scoreColor(e.score);
                 return (
-                  <tr key={e.id} style={{ borderTop: '1px solid var(--border-card)' }}>
+                  <tr key={e.id} style={{ borderTop: '1px solid var(--border-card)', background: selected.has(e.id) ? 'var(--bg-content)' : 'none' }}>
+                    <td style={{ padding: '13px 16px', width: 36 }}>
+                      <input
+                        type="checkbox"
+                        checked={selected.has(e.id)}
+                        onChange={() => toggleSelect(e.id)}
+                        style={{ cursor: 'pointer', width: 15, height: 15 }}
+                      />
+                    </td>
                     <td style={{ padding: '13px 16px', fontWeight: 600, color: 'var(--text-main)' }}>{e.studentName}</td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-muted)' }}>{TYPES[e.type]?.label || e.type}</td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-sub)', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.exerciseName || '—'}</td>
@@ -719,7 +772,7 @@ export default function AvaliacoesPage() {
                 <div style={{ width: 48, height: 48, border: '3px solid var(--border)', borderTop: '3px solid #7c3aed', borderRadius: '50%', margin: '0 auto 20px', animation: 'spin 0.9s linear infinite' }} />
                 <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
                 <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>Analisando a turma...</p>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>A IA está examinando {filtered.length} avaliações</p>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>A IA está examinando {selectedEvals.length} avaliações</p>
               </div>
             )}
             {/* Error state */}
@@ -738,7 +791,7 @@ export default function AvaliacoesPage() {
                     <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>
                       {turmaFilter || 'Todas as turmas'}{exerciseFilter ? ` · ${exerciseFilter}` : ''}
                     </h2>
-                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>{filtered.length} alunos avaliados</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>{selectedEvals.length} avaliações analisadas</p>
                   </div>
                   <button onClick={() => { setClassReport(null); setReportError(''); }} style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 18, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)', lineHeight: 1 }}>×</button>
                 </div>
@@ -746,9 +799,9 @@ export default function AvaliacoesPage() {
                 {/* KPIs */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
                   {[
-                    { label: 'Média da turma', value: filtered.length ? (filtered.reduce((s,e)=>s+e.score,0)/filtered.length).toFixed(1) : '—', color: '#0081f0' },
-                    { label: 'Aprovados (≥5)', value: filtered.filter(e=>e.score>=5).length, color: '#16a34a' },
-                    { label: 'Total avaliados', value: filtered.length, color: '#374151' },
+                    { label: 'Média da turma', value: selectedEvals.length ? (selectedEvals.reduce((s,e)=>s+e.score,0)/selectedEvals.length).toFixed(1) : '—', color: '#0081f0' },
+                    { label: 'Aprovados (≥5)', value: selectedEvals.filter(e=>e.score>=5).length, color: '#16a34a' },
+                    { label: 'Total avaliados', value: selectedEvals.length, color: '#374151' },
                   ].map(k => (
                     <div key={k.label} style={{ background: 'var(--bg-content)', borderRadius: 10, padding: '14px 18px', border: '1px solid var(--border-card)' }}>
                       <div style={{ fontSize: 26, fontWeight: 800, color: k.color, lineHeight: 1, marginBottom: 4 }}>{k.value}</div>
@@ -840,15 +893,15 @@ export default function AvaliacoesPage() {
               </div>
             )}
             {studentReport && !studentReportLoading && (() => {
-              const studentName = search || (filtered[0]?.studentName || 'Aluno');
-              const sortedEvals = filtered.slice().sort((a,b) => new Date(a.createdAt)-new Date(b.createdAt));
+              const studentName = selectedStudents[0] || 'Aluno';
+              const sortedEvals = selectedEvals.slice().sort((a,b) => new Date(a.createdAt)-new Date(b.createdAt));
               return (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
                     <div>
                       <p style={{ fontSize: 11, fontWeight: 700, color: '#ea580c', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Parecer Individual</p>
                       <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)' }}>{studentName}</h2>
-                      <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>{filtered.length} avaliação(ões) analisada(s)</p>
+                      <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>{selectedEvals.length} avaliação(ões) analisada(s)</p>
                     </div>
                     <button onClick={() => { setStudentReport(null); setStudentReportError(''); }} style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 18, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)', lineHeight: 1 }}>×</button>
                   </div>
