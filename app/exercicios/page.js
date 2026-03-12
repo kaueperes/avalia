@@ -109,11 +109,11 @@ export default function ExerciciosPage() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: exercises.length > 0 ? '1fr 1.2fr' : '1fr', gap: 24, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: exercises.length > 0 ? '1fr 1.2fr' : '1fr', gap: 24, alignItems: 'start', minWidth: 0, overflow: 'hidden' }}>
 
         {/* Lista */}
         {exercises.length > 0 && (
-          <div>
+          <div style={{ minWidth: 0, overflow: 'hidden' }}>
             <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 14 }}>Exercícios criados</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {exercises.map(ex => (
