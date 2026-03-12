@@ -230,66 +230,41 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
           {/* Right side */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
 
-            {/* Separator */}
-            {quotaCiclo !== null && <div style={{ width: 1, height: 20, background: border, margin: '0 4px' }} />}
-
-            {/* Quota */}
+            {/* Quota combinada */}
             {quotaCiclo !== null && (
-              <div
-                className="quota-display"
-                onClick={() => router.push('/conta')}
-                title="Ver detalhes do seu plano"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '5px 12px', borderRadius: 8, cursor: 'pointer',
-                  border: `1px solid ${quotaCiclo === 0 && (quotaExtra ?? 0) === 0 ? '#EF4444' : border}`,
-                  background: quotaCiclo === 0 && (quotaExtra ?? 0) === 0 ? (darkMode ? '#2a1212' : '#FEF2F2') : 'none',
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = navHover}
-                onMouseLeave={e => e.currentTarget.style.background = quotaCiclo === 0 && (quotaExtra ?? 0) === 0 ? (darkMode ? '#2a1212' : '#FEF2F2') : 'none'}
-              >
-                <span style={{ fontSize: 12, fontWeight: 600, color: quotaCiclo === 0 ? '#EF4444' : textMain }}>
-                  {quotaCiclo} avaliações restantes
-                </span>
-                {(quotaExtra ?? 0) > 0 && (
-                  <>
-                    <span style={{ fontSize: 12, color: textSub }}>+</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: textMain }}>{quotaExtra} extras</span>
-                  </>
-                )}
-                <span style={{
-                  fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
-                  background: 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', marginLeft: 2,
-                }}>
-                  Comprar mais
-                </span>
-              </div>
-            )}
-
-            {/* Quota Relatórios */}
-            {quotaRelCiclo !== null && (
-              <div
-                onClick={() => router.push('/conta')}
-                title="Ver detalhes dos seus relatórios"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '5px 12px', borderRadius: 8, cursor: 'pointer',
-                  border: `1px solid ${quotaRelCiclo === 0 && (quotaRelExtra ?? 0) === 0 ? '#EF4444' : border}`,
-                  background: quotaRelCiclo === 0 && (quotaRelExtra ?? 0) === 0 ? (darkMode ? '#2a1212' : '#FEF2F2') : 'none',
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = navHover}
-                onMouseLeave={e => e.currentTarget.style.background = quotaRelCiclo === 0 && (quotaRelExtra ?? 0) === 0 ? (darkMode ? '#2a1212' : '#FEF2F2') : 'none'}
-              >
-                <span style={{ fontSize: 12, fontWeight: 600, color: quotaRelCiclo === 0 ? '#EF4444' : textMain }}>
-                  {quotaRelCiclo} relatórios restantes
-                </span>
-                {(quotaRelExtra ?? 0) > 0 && (
-                  <>
-                    <span style={{ fontSize: 12, color: textSub }}>+</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: textMain }}>{quotaRelExtra} extras</span>
-                  </>
-                )}
-              </div>
+              <>
+                <div style={{ width: 1, height: 20, background: border, margin: '0 4px' }} />
+                <div
+                  className="quota-display"
+                  onClick={() => router.push('/conta')}
+                  title="Ver detalhes do seu plano"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '5px 12px', borderRadius: 8, cursor: 'pointer',
+                    border: `1px solid ${border}`,
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = navHover}
+                  onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                >
+                  <span style={{ fontSize: 12, fontWeight: 600, color: quotaCiclo === 0 && (quotaExtra ?? 0) === 0 ? '#EF4444' : textMain }}>
+                    {quotaCiclo}{(quotaExtra ?? 0) > 0 ? ` +${quotaExtra}` : ''} avaliações
+                  </span>
+                  {quotaRelCiclo !== null && (
+                    <>
+                      <span style={{ fontSize: 12, color: textSub }}>·</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: quotaRelCiclo === 0 && (quotaRelExtra ?? 0) === 0 ? '#EF4444' : textMain }}>
+                        {quotaRelCiclo}{(quotaRelExtra ?? 0) > 0 ? ` +${quotaRelExtra}` : ''} relatórios
+                      </span>
+                    </>
+                  )}
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
+                    background: 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', marginLeft: 2,
+                  }}>
+                    Comprar mais
+                  </span>
+                </div>
+              </>
             )}
 
             {/* User + Profile Dropdown */}
