@@ -143,7 +143,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
   const [quotaRelExtra, setQuotaRelExtra] = useState(null);
   const [planFromStorage, setPlanFromStorage] = useState(null);
 
-  useEffect(() => {
+  function syncQuotaFromStorage() {
     try {
       const stored = localStorage.getItem('user');
       if (stored) {
@@ -155,6 +155,12 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
         if (u.plan) setPlanFromStorage(u.plan);
       }
     } catch {}
+  }
+
+  useEffect(() => {
+    syncQuotaFromStorage();
+    window.addEventListener('storage', syncQuotaFromStorage);
+    return () => window.removeEventListener('storage', syncQuotaFromStorage);
   }, []);
 
   useEffect(() => {
