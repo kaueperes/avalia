@@ -106,11 +106,11 @@ export default function PerfisPage() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: profiles.length > 0 ? '1fr 1.2fr' : '1fr', gap: 24, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: profiles.length > 0 ? '1fr 1.2fr' : '1fr', gap: 24, alignItems: 'start', minWidth: 0, overflow: 'hidden' }}>
 
         {/* Lista de perfis */}
         {profiles.length > 0 && (
-          <div>
+          <div style={{ minWidth: 0, overflow: 'hidden' }}>
             <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 14 }}>Perfis criados</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {profiles.map(p => (
@@ -118,14 +118,14 @@ export default function PerfisPage() {
                   background: 'var(--bg-card)', border: `1px solid ${editingId === p.id ? '#0081f0' : 'var(--border-card)'}`,
                   borderRadius: 12, padding: '16px 20px',
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', marginBottom: 4 }}>{p.name}</p>
-                      <p style={{ fontSize: 12, color: 'var(--text-sub)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', overflow: 'hidden' }}>
+                    <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                      <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</p>
+                      <p style={{ fontSize: 12, color: 'var(--text-sub)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {p.discipline}{p.turma ? ` · ${p.turma}` : ''} · {TONES.find(t => t.id === p.tone)?.label || p.tone}{p.teachingLevel ? ` · ${TEACHING_LEVELS.find(l => l.value === p.teachingLevel)?.label}` : ''}
                       </p>
                     </div>
-                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                    <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 12 }}>
                       <button
                         onClick={() => startEdit(p)}
                         style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
