@@ -566,8 +566,8 @@ export default function AvaliacoesPage() {
                     <td style={{ padding: '13px 16px', color: 'var(--text-sub)' }}>{e.turma || '—'}</td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-muted)' }}>{e.profileName || '—'}</td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-sub)' }}>{new Date(e.createdAt).toLocaleDateString('pt-BR')}</td>
-                    <td style={{ padding: '13px 16px' }}>
-                      <div style={{ display: 'flex', gap: 6 }}>
+                    <td style={{ padding: '13px 16px', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
                         <button onClick={() => setDetail(e)} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: '#0081f0' }}>Ver</button>
                         <button onClick={() => generatePDF(e)} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>PDF</button>
                         <button onClick={() => { setDetail(e); setDetailDraft(JSON.parse(JSON.stringify(e))); }} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>Editar</button>
