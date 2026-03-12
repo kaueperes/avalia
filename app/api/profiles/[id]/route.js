@@ -3,16 +3,16 @@ import { supabase } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/auth';
 
 function fmt(p) {
-  return { id: p.id, userId: p.user_id, name: p.name, discipline: p.discipline, turma: p.turma, tone: p.tone, teachingLevel: p.teaching_level, writingSample: p.writing_sample, institutionLogo: p.institution_logo, createdAt: p.created_at };
+  return { id: p.id, userId: p.user_id, name: p.name, discipline: p.discipline, turma: p.turma, tone: p.tone, teachingLevel: p.teaching_level, writingSample: p.writing_sample, institutionLogo: p.institution_logo, institution: p.institution, createdAt: p.created_at };
 }
 
 export async function PUT(request, { params }) {
   const user = getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  const { name, discipline, turma, tone, teachingLevel, writingSample, institutionLogo } = await request.json();
+  const { name, discipline, turma, tone, teachingLevel, writingSample, institutionLogo, institution } = await request.json();
   const { data: p, error } = await supabase.from('profiles')
-    .update({ name, discipline, turma: turma || '', tone: tone || 'neutro', teaching_level: teachingLevel || '', writing_sample: writingSample || '', institution_logo: institutionLogo || '' })
+    .update({ name, discipline, turma: turma || '', tone: tone || 'neutro', teaching_level: teachingLevel || '', writing_sample: writingSample || '', institution_logo: institutionLogo || '', institution: institution || '' })
     .eq('id', params.id).eq('user_id', user.userId)
     .select().single();
 

@@ -6,7 +6,7 @@ import { TONES } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
 
-const BLANK = { name: '', discipline: '', turma: '', tone: 'neutro', teachingLevel: '', writingSample: '', institutionLogo: '' };
+const BLANK = { name: '', discipline: '', turma: '', tone: 'neutro', teachingLevel: '', writingSample: '', institutionLogo: '', institution: '' };
 
 const TEACHING_LEVELS = [
   { value: 'fundamental', label: '📚 Fundamental' },
@@ -78,7 +78,7 @@ export default function PerfisPage() {
   }
 
   function startEdit(p) {
-    setForm({ name: p.name, discipline: p.discipline, turma: p.turma || '', tone: p.tone || 'neutro', teachingLevel: p.teachingLevel || '', writingSample: p.writingSample || '', institutionLogo: p.institutionLogo || '' });
+    setForm({ name: p.name, discipline: p.discipline, turma: p.turma || '', tone: p.tone || 'neutro', teachingLevel: p.teachingLevel || '', writingSample: p.writingSample || '', institutionLogo: p.institutionLogo || '', institution: p.institution || '' });
     setEditingId(p.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -122,7 +122,7 @@ export default function PerfisPage() {
                     <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                       <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</p>
                       <p style={{ fontSize: 12, color: 'var(--text-sub)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {p.discipline}{p.turma ? ` · ${p.turma}` : ''} · {TONES.find(t => t.id === p.tone)?.label || p.tone}{p.teachingLevel ? ` · ${TEACHING_LEVELS.find(l => l.value === p.teachingLevel)?.label}` : ''}
+                        {p.discipline}{p.turma ? ` · ${p.turma}` : ''}{p.institution ? ` · ${p.institution}` : ''} · {TONES.find(t => t.id === p.tone)?.label || p.tone}{p.teachingLevel ? ` · ${TEACHING_LEVELS.find(l => l.value === p.teachingLevel)?.label}` : ''}
                       </p>
                     </div>
                     <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 12 }}>
@@ -169,6 +169,10 @@ export default function PerfisPage() {
               </select>
             </Field>
           </div>
+
+          <Field label="Instituição de ensino" hint="(opcional)" tooltip="Nome da escola, faculdade ou universidade. Aparece nos relatórios e PDFs gerados.">
+            <input style={inputStyle} value={form.institution} onChange={e => setForm(f => ({ ...f, institution: e.target.value }))} placeholder="Ex: FAAP, USP, Colégio Estadual..." />
+          </Field>
 
           <Field label="Nível de ensino" hint="(opcional)" tooltip="Informa à IA o nível dos alunos para adaptar o tom e a complexidade do feedback.">
             <div style={{ display: 'flex', gap: 8 }}>

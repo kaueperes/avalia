@@ -265,7 +265,7 @@ export default function AvaliarPage() {
               <div style={{ display: 'flex', gap: 8 }}>
                 <select style={{ ...inp, flex: 1 }} value={selectedProfileId} onChange={e => loadProfile(e.target.value)}>
                   <option value="">— Selecione um perfil —</option>
-                  {profiles.map(p => <option key={p.id} value={p.id}>{p.name} · {p.discipline}</option>)}
+                  {profiles.map(p => <option key={p.id} value={p.id}>{p.name} · {p.discipline}{p.turma ? ` · ${p.turma}` : ''}{p.institution ? ` · ${p.institution}` : ''}</option>)}
                 </select>
                 <Link href="/perfis" style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textDecoration: 'none', fontSize: 18, background: 'var(--bg-content)', flexShrink: 0 }}>+</Link>
               </div>
