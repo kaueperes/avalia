@@ -113,7 +113,7 @@ export default function RelatoriosPage() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
         <div>
           <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>IA Pedagógica</p>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Relatórios</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Gerenciar Relatórios</h1>
           <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Acesse os relatórios pedagógicos gerados por IA.</p>
         </div>
       </div>
