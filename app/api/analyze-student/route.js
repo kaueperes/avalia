@@ -82,6 +82,16 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
       await supabase.from('users').update({ quota_relatorios_extra: relExtra - 1 }).eq('id', user.userId);
     }
 
+    // Save report
+    await supabase.from('reports').insert({
+      user_id: user.userId,
+      type: 'aluno',
+      subject: studentName,
+      turma: evaluations[0]?.turma || '',
+      exercise_name: evaluations[0]?.exerciseName || '',
+      content: analysis,
+    });
+
     return NextResponse.json(analysis);
   } catch (err) {
     console.error('analyze-student error:', err);
