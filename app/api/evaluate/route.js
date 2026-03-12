@@ -100,7 +100,7 @@ Regras:
 - O feedback deve ser escrito em português brasileiro
 - Os nomes dos critérios devem ser exatamente iguais aos fornecidos
 - Seja específico, construtivo e alinhado ao tom solicitado
-- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada${images?.length > 0 ? `\n- Analise TODAS as imagens enviadas como parte integrante do trabalho do aluno` : ''}`;
+- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada${images?.length > 0 ? `\n- As imagens enviadas estão identificadas com rótulos ("Trabalho do aluno", "Referência para Correção", "Arquivo adicional"). Imagens de referência servem como gabarito/comparação — use-as para avaliar o trabalho do aluno, mas NÃO as trate como entregas do aluno` : ''}`;
 
   try {
     // Use Sonnet when images are present (better vision quality); otherwise use adaptive selection
@@ -109,10 +109,14 @@ Regras:
       : selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
 
     // Build message content: text prompt + vision blocks if images present
+    // Each image is preceded by a text label so the AI knows what it represents
     const messageContent = images?.length > 0
       ? [
           { type: 'text', text: prompt },
-          ...images.map(img => ({ type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } })),
+          ...images.flatMap(img => [
+            { type: 'text', text: img.label || 'Imagem:' },
+            { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } },
+          ]),
         ]
       : prompt;
 
