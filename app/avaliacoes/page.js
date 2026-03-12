@@ -14,6 +14,7 @@ export default function AvaliacoesPage() {
   const [typeFilter, setTypeFilter] = useState('');
   const [turmaFilter, setTurmaFilter] = useState('');
   const [exerciseFilter, setExerciseFilter] = useState('');
+  const [institutionFilter, setInstitutionFilter] = useState('');
   const [scoreMin, setScoreMin] = useState('');
   const [scoreMax, setScoreMax] = useState('');
   const [detail, setDetail] = useState(null);
@@ -54,6 +55,7 @@ export default function AvaliacoesPage() {
     if (typeFilter && e.type !== typeFilter) return false;
     if (turmaFilter && (e.turma || '').toLowerCase() !== turmaFilter.toLowerCase()) return false;
     if (exerciseFilter && (e.exerciseName || '') !== exerciseFilter) return false;
+    if (institutionFilter && (e.institution || '') !== institutionFilter) return false;
     if (scoreMin !== '' && e.score < Number(scoreMin)) return false;
     if (scoreMax !== '' && e.score > Number(scoreMax)) return false;
     return true;
@@ -61,8 +63,9 @@ export default function AvaliacoesPage() {
 
   const turmas = [...new Set(evaluations.map(e => e.turma).filter(Boolean))].sort();
   const exercises = [...new Set(evaluations.map(e => e.exerciseName).filter(Boolean))].sort();
+  const institutions = [...new Set(evaluations.map(e => e.institution).filter(Boolean))].sort();
 
-  function clearFilters() { setSearch(''); setTypeFilter(''); setTurmaFilter(''); setExerciseFilter(''); setScoreMin(''); setScoreMax(''); }
+  function clearFilters() { setSearch(''); setTypeFilter(''); setTurmaFilter(''); setExerciseFilter(''); setInstitutionFilter(''); setScoreMin(''); setScoreMax(''); }
 
   async function del(id) {
     if (!confirm('Excluir esta avaliação?')) return;
@@ -77,8 +80,8 @@ export default function AvaliacoesPage() {
   }
 
   function exportCSV() {
-    const rows = [['Aluno', 'Tipo', 'Exercício', 'Turma', 'Nota', 'Conceito', 'Professor', 'Data']];
-    filtered.forEach(e => rows.push([e.studentName, TYPES[e.type]?.label || e.type, e.exerciseName || '', e.turma || '', e.score.toFixed(1), scoreToGrade(e.score), e.profileName || '', new Date(e.createdAt).toLocaleDateString('pt-BR')]));
+    const rows = [['Aluno', 'Tipo', 'Exercício', 'Turma', 'Instituição', 'Nota', 'Conceito', 'Professor', 'Data']];
+    filtered.forEach(e => rows.push([e.studentName, TYPES[e.type]?.label || e.type, e.exerciseName || '', e.turma || '', e.institution || '', e.score.toFixed(1), scoreToGrade(e.score), e.profileName || '', new Date(e.createdAt).toLocaleDateString('pt-BR')]));
     const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }));
@@ -513,10 +516,14 @@ export default function AvaliacoesPage() {
             <option value="">Todos os exercícios</option>
             {exercises.map(ex => <option key={ex} value={ex}>{ex}</option>)}
           </select>
+          <select style={{ ...inpStyle, width: 180 }} value={institutionFilter} onChange={e => setInstitutionFilter(e.target.value)}>
+            <option value="">Todas as instituições</option>
+            {institutions.map(inst => <option key={inst} value={inst}>{inst}</option>)}
+          </select>
           <input style={{ ...inpStyle, width: 80 }} value={scoreMin} onChange={e => setScoreMin(e.target.value)} placeholder="Nota ≥" type="number" min="0" max="10" step="0.1" />
           <span style={{ fontSize: 12, color: 'var(--text-sub)' }}>—</span>
           <input style={{ ...inpStyle, width: 80 }} value={scoreMax} onChange={e => setScoreMax(e.target.value)} placeholder="≤ 10" type="number" min="0" max="10" step="0.1" />
-          {(search || typeFilter || turmaFilter || exerciseFilter || scoreMin || scoreMax) && (
+          {(search || typeFilter || turmaFilter || exerciseFilter || institutionFilter || scoreMin || scoreMax) && (
             <button onClick={clearFilters} style={{ ...inpStyle, cursor: 'pointer', color: 'var(--text-muted)' }}>× Limpar</button>
           )}
         </div>
@@ -546,7 +553,7 @@ export default function AvaliacoesPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ background: 'var(--bg-content)' }}>
-                {['Aluno', 'Tipo', 'Exercício', 'Nota', 'Conceito', 'Turma', 'Professor', 'Data', ''].map(h => (
+                {['Aluno', 'Tipo', 'Exercício', 'Nota', 'Conceito', 'Turma', 'Instituição', 'Professor', 'Data', ''].map(h => (
                   <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: 'var(--text-sub)', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                 ))}
               </tr>
@@ -564,6 +571,7 @@ export default function AvaliacoesPage() {
                       <span style={{ background: c.bg, color: c.text, borderRadius: 6, padding: '2px 10px', fontWeight: 700, fontSize: 12 }}>{scoreToGrade(e.score)}</span>
                     </td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-sub)' }}>{e.turma || '—'}</td>
+                    <td style={{ padding: '13px 16px', color: 'var(--text-sub)' }}>{e.institution || '—'}</td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-muted)' }}>{e.profileName || '—'}</td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-sub)' }}>{new Date(e.createdAt).toLocaleDateString('pt-BR')}</td>
                     <td style={{ padding: '13px 16px', textAlign: 'right' }}>

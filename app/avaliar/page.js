@@ -220,6 +220,7 @@ export default function AvaliarPage() {
         profileName: profName || '',
         turma: profTurma || '',
         exerciseName: exerciseName || '',
+        institution: profInstitution || '',
       }),
     });
     if (r.ok) setSaved(true);
