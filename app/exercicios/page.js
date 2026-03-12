@@ -119,9 +119,9 @@ export default function ExerciciosPage() {
               {exercises.map(ex => (
                 <div key={ex.id} style={{
                   background: 'var(--bg-card)', border: `1px solid ${editingId === ex.id ? '#0081f0' : 'var(--border-card)'}`,
-                  borderRadius: 12, padding: '16px 20px',
+                  borderRadius: 12, padding: '16px 20px', overflow: 'hidden',
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', overflow: 'hidden' }}>
                     <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                       <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ex.name}</p>
                       <p style={{ fontSize: 12, color: 'var(--text-sub)' }}>
