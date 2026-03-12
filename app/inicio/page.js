@@ -112,7 +112,7 @@ export default function InicioPage() {
         <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '24px 28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>Avaliações recentes</h2>
-            <button onClick={() => router.push('/painel')} style={{ fontSize: 13, fontWeight: 600, color: '#0081f0', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>
+            <button onClick={() => router.push('/avaliacoes')} style={{ fontSize: 13, fontWeight: 600, color: '#0081f0', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>
               Ver todas →
             </button>
           </div>
