@@ -50,6 +50,7 @@ export default function AvaliarPage() {
   const [profName, setProfName] = useState('');
   const [profDisc, setProfDisc] = useState('');
   const [profTurma, setProfTurma] = useState('');
+  const [profInstitution, setProfInstitution] = useState('');
   const [writingSample, setWritingSample] = useState('');
 
   // Tipo e exercício
@@ -107,12 +108,13 @@ export default function AvaliarPage() {
 
   function loadProfile(id) {
     setSelectedProfileId(id);
-    if (!id) { setProfName(''); setProfDisc(''); setProfTurma(''); setWritingSample(''); setTone('neutro'); return; }
+    if (!id) { setProfName(''); setProfDisc(''); setProfTurma(''); setProfInstitution(''); setWritingSample(''); setTone('neutro'); return; }
     const p = profiles.find(p => p.id === id);
     if (!p) return;
     setProfName(p.name || '');
     setProfDisc(p.discipline || '');
     setProfTurma(p.turma || '');
+    setProfInstitution(p.institution || '');
     setWritingSample(p.writingSample || '');
     if (p.tone) setTone(p.tone);
   }
@@ -182,7 +184,7 @@ export default function AvaliarPage() {
       const r = await fetch('/api/evaluate', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName, studentWork: workContent, tone, profName, profDisc, writingSample, images: images.length > 0 ? images : undefined }),
+        body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName, studentWork: workContent, tone, profName, profDisc, profInstitution, writingSample, images: images.length > 0 ? images : undefined }),
       });
       const data = await r.json();
       if (!r.ok) { setEvalError(data.error || 'Erro ao gerar avaliação.'); return; }
@@ -283,6 +285,10 @@ export default function AvaliarPage() {
                 <label style={lbl}><Tooltip text="Identificação da turma. Ex: Turma A, 3º semestre.">Turma</Tooltip></label>
                 <input style={inp} value={profTurma} onChange={e => setProfTurma(e.target.value)} placeholder="Turma B" />
               </div>
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <label style={lbl}><Tooltip text="Nome da escola, faculdade ou universidade. Aparece nos relatórios gerados.">Instituição de ensino</Tooltip></label>
+              <input style={inp} value={profInstitution} onChange={e => setProfInstitution(e.target.value)} placeholder="Ex: FAAP, USP, Colégio Estadual..." />
             </div>
           </div>
 
