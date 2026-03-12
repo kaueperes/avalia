@@ -40,11 +40,17 @@ export async function POST(request) {
     } else {
       const plan = PLANS[planKey];
       if (plan) {
+        let resetDate = null;
+        if (session.subscription) {
+          const sub = await stripe.subscriptions.retrieve(session.subscription);
+          resetDate = new Date(sub.current_period_end * 1000).toISOString();
+        }
         await supabase.from('users').update({
           plan: planKey,
           quota_ciclo: plan.limits.avaliacoes ?? 9999,
           quota_relatorios_ciclo: plan.limits.relatorios ?? 0,
           stripe_subscription_id: session.subscription,
+          quota_reset_date: resetDate,
         }).eq('id', userId);
       }
     }
@@ -58,9 +64,12 @@ export async function POST(request) {
       if (user) {
         const plan = PLANS[user.plan];
         if (plan) {
+          const periodEnd = invoice.lines?.data?.[0]?.period?.end;
+          const resetDate = periodEnd ? new Date(periodEnd * 1000).toISOString() : null;
           await supabase.from('users').update({
             quota_ciclo: plan.limits.avaliacoes ?? 9999,
             quota_relatorios_ciclo: plan.limits.relatorios ?? 0,
+            ...(resetDate && { quota_reset_date: resetDate }),
           }).eq('id', user.id);
         }
       }
