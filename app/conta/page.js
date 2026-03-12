@@ -300,32 +300,6 @@ function ContaPageInner() {
           <p style={{ fontSize: 13, color: planMsg.type === 'success' ? '#10B981' : '#EF4444', marginBottom: 16 }}>{planMsg.text}</p>
         )}
 
-        {/* Quota details */}
-        {quotaCiclo !== null && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
-            <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Avaliações do plano</p>
-              <p style={{ fontSize: 28, fontWeight: 800, color: quotaCiclo === 0 ? '#EF4444' : 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
-                {quotaCiclo}
-              </p>
-              {quotaResetDate ? (
-                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                  Renova em {new Date(quotaResetDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
-                </p>
-              ) : (
-                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Renova a cada ciclo de pagamento</p>
-              )}
-            </div>
-            <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Avaliações extras</p>
-              <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
-                {quotaExtra ?? 0}
-              </p>
-              <p style={{ fontSize: 12, color: '#10B981', fontWeight: 500 }}>Não expiram</p>
-            </div>
-          </div>
-        )}
-
         {/* Plan cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>
           {PLANS.map(plan => {
@@ -369,31 +343,58 @@ function ContaPageInner() {
           })}
         </div>
 
-        {/* Quota de relatórios */}
-        {quotaRelCiclo !== null && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
-            <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Relatórios do plano</p>
-              <p style={{ fontSize: 28, fontWeight: 800, color: quotaRelCiclo === 0 ? '#EF4444' : 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
-                {quotaRelCiclo}
-              </p>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Renova a cada ciclo de pagamento</p>
+        {/* Todas as cotas juntas */}
+        {quotaCiclo !== null && (
+          <>
+            <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Suas cotas</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 28 }}>
+              <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Avaliações do plano</p>
+                <p style={{ fontSize: 28, fontWeight: 800, color: quotaCiclo === 0 ? '#EF4444' : 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
+                  {quotaCiclo}
+                </p>
+                {quotaResetDate ? (
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                    Renova em {new Date(quotaResetDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
+                  </p>
+                ) : (
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Renova a cada ciclo</p>
+                )}
+              </div>
+              <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Avaliações extras</p>
+                <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
+                  {quotaExtra ?? 0}
+                </p>
+                <p style={{ fontSize: 12, color: '#10B981', fontWeight: 500 }}>Não expiram</p>
+              </div>
+              {quotaRelCiclo !== null && (
+                <>
+                  <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Relatórios do plano</p>
+                    <p style={{ fontSize: 28, fontWeight: 800, color: quotaRelCiclo === 0 ? '#EF4444' : 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
+                      {quotaRelCiclo}
+                    </p>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Renova a cada ciclo</p>
+                  </div>
+                  <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Relatórios extras</p>
+                    <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
+                      {quotaRelExtra ?? 0}
+                    </p>
+                    <p style={{ fontSize: 12, color: '#10B981', fontWeight: 500 }}>Não expiram</p>
+                  </div>
+                </>
+              )}
             </div>
-            <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Relatórios extras</p>
-              <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
-                {quotaRelExtra ?? 0}
-              </p>
-              <p style={{ fontSize: 12, color: '#10B981', fontWeight: 500 }}>Não expiram</p>
-            </div>
-          </div>
+          </>
         )}
 
-        {/* Add-ons de avaliações */}
+        {/* Comprar extras */}
         {userPlan !== 'gratuito' && (
           <>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>Pacotes de avaliações extras</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Comprar extras</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               {ADDONS.map(addon => (
                 <div key={addon.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
                   <div>
@@ -403,26 +404,13 @@ function ContaPageInner() {
                   <button
                     onClick={() => handleUpgrade(addon.id)}
                     disabled={upgradeLoading === addon.id}
-                    style={{
-                      padding: '8px 18px', borderRadius: 9, fontSize: 13, fontWeight: 700,
-                      background: upgradeLoading === addon.id ? 'var(--border)' : '#10B981',
-                      color: upgradeLoading === addon.id ? 'var(--text-muted)' : 'white', border: 'none', cursor: upgradeLoading === addon.id ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap',
-                    }}
+                    style={{ padding: '8px 18px', borderRadius: 9, fontSize: 13, fontWeight: 700, background: upgradeLoading === addon.id ? 'var(--border)' : '#10B981', color: upgradeLoading === addon.id ? 'var(--text-muted)' : 'white', border: 'none', cursor: upgradeLoading === addon.id ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}
                   >
                     {upgradeLoading === addon.id ? '...' : addon.price}
                   </button>
                 </div>
               ))}
-            </div>
-          </>
-        )}
-
-        {/* Add-ons de relatórios */}
-        {(userPlan === 'pro' || userPlan === 'premium') && (
-          <>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>Pacotes de relatórios extras</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-              {REPORT_ADDONS.map(addon => (
+              {(userPlan === 'pro' || userPlan === 'premium') && REPORT_ADDONS.map(addon => (
                 <div key={addon.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
                   <div>
                     <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 2 }}>{addon.label}</p>
@@ -431,11 +419,7 @@ function ContaPageInner() {
                   <button
                     onClick={() => handleUpgrade(addon.id)}
                     disabled={upgradeLoading === addon.id}
-                    style={{
-                      padding: '8px 18px', borderRadius: 9, fontSize: 13, fontWeight: 700,
-                      background: upgradeLoading === addon.id ? 'var(--border)' : '#7c3aed',
-                      color: upgradeLoading === addon.id ? 'var(--text-muted)' : 'white', border: 'none', cursor: upgradeLoading === addon.id ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap',
-                    }}
+                    style={{ padding: '8px 18px', borderRadius: 9, fontSize: 13, fontWeight: 700, background: upgradeLoading === addon.id ? 'var(--border)' : '#7c3aed', color: upgradeLoading === addon.id ? 'var(--text-muted)' : 'white', border: 'none', cursor: upgradeLoading === addon.id ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}
                   >
                     {upgradeLoading === addon.id ? '...' : addon.price}
                   </button>
