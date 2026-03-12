@@ -134,7 +134,9 @@ function ContaPageInner() {
   const [infoLoading, setInfoLoading] = useState(false);
   const [pwLoading, setPwLoading] = useState(false);
   const [upgradeLoading, setUpgradeLoading] = useState(null);
-  const [portalLoading, setPortalLoading] = useState(false);
+  const [cancelConfirm, setCancelConfirm] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [cancelDate, setCancelDate] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   useEffect(() => {
@@ -165,20 +167,25 @@ function ContaPageInner() {
     if (searchParams.get('canceled')) showMsg(setPlanMsg, 'error', 'Pagamento cancelado. Nenhuma cobrança foi feita.');
   }, [router, searchParams]);
 
-  async function handlePortal() {
+  async function handleCancelSubscription() {
     const token = localStorage.getItem('token');
     if (!token) return;
-    setPortalLoading(true);
+    setCancelLoading(true);
     try {
-      const res = await fetch('/api/stripe/portal', {
+      const res = await fetch('/api/stripe/cancel', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-      else showMsg(setPlanMsg, 'error', data.error || 'Erro ao abrir portal.');
-    } catch { showMsg(setPlanMsg, 'error', 'Erro de conexão.'); }
-    finally { setPortalLoading(false); }
+      if (data.ok) {
+        setCancelDate(data.cancelDate);
+        setCancelConfirm(false);
+      } else {
+        showMsg(setPlanMsg, 'error', data.error || 'Erro ao cancelar assinatura.');
+        setCancelConfirm(false);
+      }
+    } catch { showMsg(setPlanMsg, 'error', 'Erro de conexão.'); setCancelConfirm(false); }
+    finally { setCancelLoading(false); }
   }
 
   async function handleUpgrade(planKey) {
@@ -439,23 +446,55 @@ function ContaPageInner() {
         )}
       </Section>
 
-      {/* ── Gerenciar assinatura ── */}
+      {/* ── Cancelar assinatura ── */}
       {userPlan !== 'gratuito' && (
-        <Section title="Assinatura" subtitle="Gerencie ou cancele sua assinatura pelo portal do Stripe.">
-          <button
-            onClick={handlePortal}
-            disabled={portalLoading}
-            style={{
-              padding: '10px 24px', borderRadius: 10, fontSize: 14, fontWeight: 600,
-              background: 'none', color: 'var(--text-main)',
-              border: '1px solid var(--border)', cursor: portalLoading ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {portalLoading ? 'Aguarde...' : 'Gerenciar assinatura'}
-          </button>
-          <p style={{ marginTop: 8, fontSize: 12, color: 'var(--text-muted)' }}>
-            Você pode cancelar, trocar de plano ou atualizar o método de pagamento. O acesso continua até o fim do período já pago.
-          </p>
+        <Section title="Assinatura" subtitle="Cancele sua assinatura quando quiser, sem multa.">
+          {cancelDate ? (
+            <p style={{ fontSize: 14, color: '#10B981', fontWeight: 500 }}>
+              Assinatura cancelada. Seu acesso continua até {new Date(cancelDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}.
+            </p>
+          ) : !cancelConfirm ? (
+            <button
+              onClick={() => setCancelConfirm(true)}
+              style={{
+                padding: '10px 24px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+                background: 'none', color: '#EF4444',
+                border: '1px solid #EF444466', cursor: 'pointer',
+              }}
+            >
+              Cancelar assinatura
+            </button>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 420 }}>
+              <p style={{ fontSize: 14, color: 'var(--text-main)', lineHeight: 1.6 }}>
+                Tem certeza? Você continuará com acesso até o fim do período já pago, depois o plano volta para o gratuito.
+              </p>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  onClick={handleCancelSubscription}
+                  disabled={cancelLoading}
+                  style={{
+                    padding: '9px 20px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+                    background: '#EF4444', color: 'white', border: 'none',
+                    cursor: cancelLoading ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {cancelLoading ? 'Cancelando...' : 'Sim, cancelar'}
+                </button>
+                <button
+                  onClick={() => setCancelConfirm(false)}
+                  disabled={cancelLoading}
+                  style={{
+                    padding: '9px 20px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+                    background: 'none', color: 'var(--text-muted)',
+                    border: '1px solid var(--border)', cursor: 'pointer',
+                  }}
+                >
+                  Voltar
+                </button>
+              </div>
+            </div>
+          )}
         </Section>
       )}
 
