@@ -1,17 +1,25 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 export default function Tooltip({ text, children }) {
-  const [visible, setVisible] = useState(false);
+  const [pos, setPos] = useState(null);
+  const iconRef = useRef(null);
+
+  function show() {
+    if (!iconRef.current) return;
+    const r = iconRef.current.getBoundingClientRect();
+    setPos({ top: r.top - 8, left: r.left });
+  }
+
+  function hide() { setPos(null); }
 
   return (
-    <span
-      style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 4 }}
-      onMouseEnter={() => setVisible(true)}
-      onMouseLeave={() => setVisible(false)}
-    >
+    <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
       {children}
       <span
+        ref={iconRef}
+        onMouseEnter={show}
+        onMouseLeave={hide}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -31,12 +39,13 @@ export default function Tooltip({ text, children }) {
       >
         i
       </span>
-      {visible && (
+      {pos && (
         <span
           style={{
-            position: 'absolute',
-            bottom: 'calc(100% + 6px)',
-            left: 0,
+            position: 'fixed',
+            top: pos.top,
+            left: Math.min(pos.left, window.innerWidth - 296),
+            transform: 'translateY(-100%)',
             background: '#1e1e2e',
             color: '#fff',
             fontSize: 12,
