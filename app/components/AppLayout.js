@@ -233,7 +233,6 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
             {/* Quota combinada */}
             {quotaCiclo !== null && (
               <>
-                <div style={{ width: 1, height: 20, background: border, margin: '0 4px' }} />
                 <div
                   className="quota-display"
                   onClick={() => router.push('/conta')}
