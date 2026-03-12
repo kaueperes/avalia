@@ -26,6 +26,8 @@ export async function POST(request) {
   }
 
   const { evaluations, turma, exerciseName } = await request.json();
+  const institution = evaluations[0]?.institution || '';
+  const profileName = evaluations[0]?.profileName || '';
   if (!evaluations || evaluations.length === 0) {
     return NextResponse.json({ error: 'Nenhuma avaliação para analisar.' }, { status: 400 });
   }
@@ -57,6 +59,8 @@ export async function POST(request) {
   ).join('\n');
 
   const context = [
+    institution ? `Instituição: ${institution}` : null,
+    profileName ? `Professor(a): ${profileName}` : null,
     turma ? `Turma: ${turma}` : null,
     exerciseName ? `Exercício filtrado: ${exerciseName}` : null,
   ].filter(Boolean).join(' | ');
@@ -115,6 +119,8 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
       subject: '',
       turma: turma || '',
       exercise_name: exerciseName || '',
+      institution: institution,
+      profile_name: profileName,
       content: analysis,
     });
 

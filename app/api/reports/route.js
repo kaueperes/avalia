@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/auth';
 
 function fmt(r) {
-  return { id: r.id, type: r.type, subject: r.subject, turma: r.turma, exerciseName: r.exercise_name, content: r.content, createdAt: r.created_at };
+  return { id: r.id, type: r.type, subject: r.subject, turma: r.turma, exerciseName: r.exercise_name, institution: r.institution || '', profileName: r.profile_name || '', content: r.content, createdAt: r.created_at };
 }
 
 export async function GET(request) {

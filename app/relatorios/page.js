@@ -11,6 +11,7 @@ export default function RelatoriosPage() {
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState('');
   const [turmaFilter, setTurmaFilter] = useState('');
+  const [institutionFilter, setInstitutionFilter] = useState('');
   const [detail, setDetail] = useState(null);
 
   function token() { return localStorage.getItem('token'); }
@@ -31,10 +32,12 @@ export default function RelatoriosPage() {
   const canUseReports = ['pro', 'premium'].includes(userPlan);
 
   const turmas = [...new Set(reports.map(r => r.turma).filter(Boolean))].sort();
+  const institutions = [...new Set(reports.map(r => r.institution).filter(Boolean))].sort();
 
   const filtered = reports.filter(r => {
     if (typeFilter && r.type !== typeFilter) return false;
     if (turmaFilter && (r.turma || '') !== turmaFilter) return false;
+    if (institutionFilter && (r.institution || '') !== institutionFilter) return false;
     return true;
   });
 
@@ -64,7 +67,11 @@ export default function RelatoriosPage() {
         <div style="border-bottom:2px solid #e5e7eb;padding-bottom:24px;margin-bottom:32px">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-weight:600;margin-bottom:6px">Relatório Pedagógico da Turma</div>
           <div style="font-size:26px;font-weight:800;color:#111">${r.turma || 'Turma'}${r.exerciseName ? ` · ${r.exerciseName}` : ''}</div>
-          <div style="font-size:13px;color:#9ca3af;margin-top:4px">Gerado em ${date}</div>
+          <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:16px">
+            ${r.institution ? `<span style="font-size:13px;color:#374151"><strong style="color:#6b7280">Instituição:</strong> ${r.institution}</span>` : ''}
+            ${r.profileName ? `<span style="font-size:13px;color:#374151"><strong style="color:#6b7280">Professor(a):</strong> ${r.profileName}</span>` : ''}
+            <span style="font-size:13px;color:#9ca3af">Gerado em ${date}</span>
+          </div>
         </div>
         <div style="margin-bottom:28px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Resumo Geral</div><div style="font-size:14px;line-height:1.8;color:#374151">${c.resumo}</div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px">
@@ -85,7 +92,12 @@ export default function RelatoriosPage() {
         <div style="border-bottom:2px solid #e5e7eb;padding-bottom:24px;margin-bottom:32px">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-weight:600;margin-bottom:6px">Parecer Individual do Aluno</div>
           <div style="font-size:26px;font-weight:800;color:#111">${r.subject}</div>
-          <div style="font-size:13px;color:#9ca3af;margin-top:4px">Gerado em ${date}${r.turma ? ` · ${r.turma}` : ''}</div>
+          <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:16px">
+            ${r.turma ? `<span style="font-size:13px;color:#374151"><strong style="color:#6b7280">Turma:</strong> ${r.turma}</span>` : ''}
+            ${r.institution ? `<span style="font-size:13px;color:#374151"><strong style="color:#6b7280">Instituição:</strong> ${r.institution}</span>` : ''}
+            ${r.profileName ? `<span style="font-size:13px;color:#374151"><strong style="color:#6b7280">Professor(a):</strong> ${r.profileName}</span>` : ''}
+            <span style="font-size:13px;color:#9ca3af">Gerado em ${date}</span>
+          </div>
         </div>
         <div style="margin-bottom:24px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Resumo do Desempenho</div><div style="font-size:14px;line-height:1.8;color:#374151">${c.resumo}</div></div>
         ${c.pontosFortes?.length ? `<div style="margin-bottom:20px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#16a34a;margin-bottom:8px">Pontos Fortes</div><ul style="padding-left:18px">${c.pontosFortes.map(p=>`<li style="font-size:13px;color:#374151;margin-bottom:4px">${p}</li>`).join('')}</ul></div>` : ''}
@@ -105,7 +117,7 @@ export default function RelatoriosPage() {
     color: 'var(--text-main)', fontFamily: 'inherit', boxSizing: 'border-box',
   };
 
-  const hasFilters = typeFilter || turmaFilter;
+  const hasFilters = typeFilter || turmaFilter || institutionFilter;
 
   return (
     <AppLayout userName={userName}>
@@ -152,9 +164,15 @@ export default function RelatoriosPage() {
                   {turmas.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               )}
+              {institutions.length > 0 && (
+                <select style={{ ...inpStyle, width: 200 }} value={institutionFilter} onChange={e => setInstitutionFilter(e.target.value)}>
+                  <option value="">Todas as instituições</option>
+                  {institutions.map(i => <option key={i} value={i}>{i}</option>)}
+                </select>
+              )}
               {hasFilters && (
                 <button
-                  onClick={() => { setTypeFilter(''); setTurmaFilter(''); }}
+                  onClick={() => { setTypeFilter(''); setTurmaFilter(''); setInstitutionFilter(''); }}
                   style={{ padding: '9px 14px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, background: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontFamily: 'inherit' }}
                 >
                   × Limpar
@@ -191,7 +209,7 @@ export default function RelatoriosPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-content)' }}>
-                    {['Tipo', 'Aluno / Turma', 'Exercício', 'Data', ''].map(h => (
+                    {['Tipo', 'Aluno / Turma', 'Professor · Instituição', 'Exercício', 'Data', ''].map(h => (
                       <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
@@ -220,6 +238,11 @@ export default function RelatoriosPage() {
                         {r.type === 'aluno' && r.turma && (
                           <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 400, marginLeft: 6 }}>{r.turma}</span>
                         )}
+                      </td>
+                      <td style={{ padding: '13px 16px', fontSize: 13 }}>
+                        {r.profileName && <div style={{ color: 'var(--text-main)', fontWeight: 500 }}>{r.profileName}</div>}
+                        {r.institution && <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 1 }}>{r.institution}</div>}
+                        {!r.profileName && !r.institution && <span style={{ color: 'var(--text-muted)' }}>—</span>}
                       </td>
                       <td style={{ padding: '13px 16px', color: 'var(--text-sub)', fontSize: 13 }}>{r.exerciseName || '—'}</td>
                       <td style={{ padding: '13px 16px', color: 'var(--text-muted)', fontSize: 13, whiteSpace: 'nowrap' }}>
@@ -308,9 +331,11 @@ export default function RelatoriosPage() {
 
             {/* Modal body */}
             <div style={{ overflowY: 'auto', padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                Gerado em {new Date(detail.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
-              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, fontSize: 12, color: 'var(--text-muted)' }}>
+                {detail.profileName && <span><strong style={{ color: 'var(--text-sub)' }}>Professor(a):</strong> {detail.profileName}</span>}
+                {detail.institution && <span><strong style={{ color: 'var(--text-sub)' }}>Instituição:</strong> {detail.institution}</span>}
+                <span>Gerado em {new Date(detail.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
+              </div>
 
               {/* Resumo */}
               {detail.content.resumo && (

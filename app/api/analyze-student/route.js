@@ -26,6 +26,8 @@ export async function POST(request) {
   }
 
   const { evaluations, studentName } = await request.json();
+  const institution = evaluations[0]?.institution || '';
+  const profileName = evaluations[0]?.profileName || '';
   if (!evaluations || evaluations.length === 0) {
     return NextResponse.json({ error: 'Nenhuma avaliação para analisar.' }, { status: 400 });
   }
@@ -42,8 +44,13 @@ export async function POST(request) {
     ? (sorted[sorted.length - 1].score > sorted[0].score ? 'crescente' : sorted[sorted.length - 1].score < sorted[0].score ? 'decrescente' : 'estável')
     : 'única avaliação';
 
-  const prompt = `Você é um assistente pedagógico especialista em educação. Analise o histórico individual de avaliações do aluno abaixo e gere um parecer pedagógico formal e construtivo.
+  const studentContext = [
+    institution ? `Instituição: ${institution}` : null,
+    profileName ? `Professor(a): ${profileName}` : null,
+  ].filter(Boolean).join(' | ');
 
+  const prompt = `Você é um assistente pedagógico especialista em educação. Analise o histórico individual de avaliações do aluno abaixo e gere um parecer pedagógico formal e construtivo.
+${studentContext ? `\nContexto: ${studentContext}` : ''}
 Aluno: ${studentName}
 Total de avaliações: ${sorted.length}
 Média geral: ${avgScore}
@@ -89,6 +96,8 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
       subject: studentName,
       turma: evaluations[0]?.turma || '',
       exercise_name: evaluations[0]?.exerciseName || '',
+      institution: institution,
+      profile_name: profileName,
       content: analysis,
     });
 
