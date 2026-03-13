@@ -57,7 +57,7 @@ export async function POST(request) {
     }
   }
 
-  const { type, exerciseName, exerciseContext, criteria, studentName, studentWork, tone, profName, profDisc, writingSample, images } = await request.json();
+  const { type, exerciseName, exerciseContext, criteria, studentName, studentWork, tone, profName, profDisc, writingSample, images, referenceWeight } = await request.json();
 
   if (!exerciseName || !criteria?.length) {
     return NextResponse.json({ error: 'Exercício e critérios são obrigatórios.' }, { status: 400 });
@@ -100,7 +100,8 @@ Regras:
 - O feedback deve ser escrito em português brasileiro
 - Os nomes dos critérios devem ser exatamente iguais aos fornecidos
 - Seja específico, construtivo e alinhado ao tom solicitado
-- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada${images?.length > 0 ? `\n- As imagens enviadas estão identificadas com rótulos ("Trabalho do aluno", "Referência para Correção", "Arquivo adicional"). Imagens de referência servem como gabarito/comparação — use-as para avaliar o trabalho do aluno, mas NÃO as trate como entregas do aluno` : ''}`;
+- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada${images?.length > 0 ? `\n- As imagens enviadas estão identificadas com rótulos ("Trabalho do aluno", "Referência para Correção", "Arquivo adicional"). Imagens de referência servem como gabarito/comparação — use-as para avaliar o trabalho do aluno, mas NÃO as trate como entregas do aluno
+- Peso do gabarito na correção: ${{ livre: 'REFERÊNCIA LIVRE — use o gabarito apenas como orientação geral; valorize criatividade e interpretações pessoais', parcial: 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes', estrito: 'ESTRITO — o aluno deve seguir o gabarito de perto; penalize desvios significativos' }[referenceWeight] || 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes'}` : ''}`;
 
   try {
     // Use Sonnet when images are present (better vision quality); otherwise use adaptive selection

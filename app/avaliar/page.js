@@ -73,6 +73,7 @@ export default function AvaliarPage() {
   const [studentMatricula, setStudentMatricula] = useState('');
   const [studentFile, setStudentFile] = useState(null);
   const [referenceFiles, setReferenceFiles] = useState([]);
+  const [referenceWeight, setReferenceWeight] = useState('parcial');
   const [batchFiles, setBatchFiles] = useState([]);
   const [filePattern, setFilePattern] = useState('nome_matricula');
   const [dragZone, setDragZone] = useState(null);
@@ -184,7 +185,7 @@ export default function AvaliarPage() {
       const r = await fetch('/api/evaluate', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName, studentWork: workContent, tone, profName, profDisc, profInstitution, writingSample, images: images.length > 0 ? images : undefined }),
+        body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName, studentWork: workContent, tone, profName, profDisc, profInstitution, writingSample, images: images.length > 0 ? images : undefined, referenceWeight: referenceFiles.length > 0 ? referenceWeight : undefined }),
       });
       const data = await r.json();
       if (!r.ok) { setEvalError(data.error || 'Erro ao gerar avaliação.'); return; }
@@ -571,6 +572,16 @@ export default function AvaliarPage() {
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px', display: 'block' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
                           <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>.obj + imagens de concept</div>
+                        </div>
+                      )}
+                      {referenceFiles.length > 0 && (
+                        <div style={{ marginTop: 10 }}>
+                          <label style={{ ...lbl, marginBottom: 4 }}>Peso do gabarito na correção</label>
+                          <select style={inp} value={referenceWeight} onChange={e => setReferenceWeight(e.target.value)}>
+                            <option value="livre">Referência livre — apenas orientação, valorize a criatividade</option>
+                            <option value="parcial">Parcial — considere o gabarito, mas aceite variações</option>
+                            <option value="estrito">Estrito — o aluno deve seguir o gabarito de perto</option>
+                          </select>
                         </div>
                       )}
                     </div>
