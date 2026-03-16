@@ -72,6 +72,7 @@ export default function AvaliarPage() {
   const [studentWork, setStudentWork] = useState('');
   const [studentMatricula, setStudentMatricula] = useState('');
   const [studentFile, setStudentFile] = useState(null);
+  const [studentFiles, setStudentFiles] = useState([]); // para obj (múltiplos)
   const [referenceFiles, setReferenceFiles] = useState([]);
   const [referenceWeight, setReferenceWeight] = useState('parcial');
   const [batchFiles, setBatchFiles] = useState([]);
@@ -152,9 +153,6 @@ export default function AvaliarPage() {
     setSaved(false);
     try {
       let workContent = studentWork;
-      if (TYPES[selectedType]?.input === 'obj' && studentFile) {
-        try { workContent = await studentFile.text(); } catch { workContent = `[Arquivo: ${studentFile.name}]`; }
-      }
 
       // Helper: file → base64
       const toBase64 = (file) => new Promise((res, rej) => {
@@ -166,6 +164,20 @@ export default function AvaliarPage() {
 
       // Collect all images to send to the AI as vision
       const images = [];
+
+      if (TYPES[selectedType]?.input === 'obj' && studentFiles.length > 0) {
+        // .obj files → read as text; images → add to vision
+        const objTexts = [];
+        for (const f of studentFiles) {
+          if (f.name.endsWith('.obj')) {
+            try { objTexts.push(await f.text()); } catch { objTexts.push(`[Arquivo: ${f.name}]`); }
+          } else if (f.type.startsWith('image/')) {
+            images.push({ data: await toBase64(f), mediaType: f.type, label: `Trabalho do aluno: ${f.name}` });
+          }
+        }
+        if (objTexts.length > 0) workContent = objTexts.join('\n\n---\n\n');
+      }
+
       if (TYPES[selectedType]?.input === 'img' && studentFile && studentFile.type.startsWith('image/')) {
         images.push({ data: await toBase64(studentFile), mediaType: studentFile.type, label: `Trabalho do aluno: ${studentFile.name}` });
       }
@@ -230,7 +242,7 @@ export default function AvaliarPage() {
   function novaAvaliacao() {
     setResult(null); setSaved(false); setEvalError('');
     setStudentName(''); setStudentWork('');
-    setStudentMatricula(''); setStudentFile(null); setReferenceFiles([]); setBatchFiles([]);
+    setStudentMatricula(''); setStudentFile(null); setStudentFiles([]); setReferenceFiles([]); setBatchFiles([]);
   }
 
   const hasQuota = quotaCiclo === null || quotaCiclo > 0 || (quotaExtra !== null && quotaExtra > 0);
@@ -494,31 +506,72 @@ export default function AvaliarPage() {
                       <label style={{ ...lbl, marginBottom: 8 }}>
                         <Tooltip text="Envie o arquivo do trabalho do aluno: imagem, render, foto, screenshot ou arquivo .obj 3D. Pode combinar .obj + render para uma avaliação mais completa.">Arquivo do aluno</Tooltip>
                       </label>
-                      <input ref={studentFileRef} type="file" accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*' : 'image/*'} style={{ display: 'none' }} onChange={e => setStudentFile(e.target.files[0] || null)} />
-                      {studentFile ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 10 }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0081f0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                          <span style={{ flex: 1, fontSize: 12, color: '#0081f0', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{studentFile.name}</span>
-                          <span onClick={() => setStudentFile(null)} style={{ color: '#0081f0', cursor: 'pointer', fontSize: 16, opacity: 0.7, lineHeight: 1 }}>×</span>
-                        </div>
-                      ) : (
-                        <div
-                          onClick={() => studentFileRef.current?.click()}
-                          onMouseEnter={e => { if (dragZone !== 'student') e.currentTarget.style.borderColor = '#0081f0'; }}
-                          onMouseLeave={e => { if (dragZone !== 'student') e.currentTarget.style.borderColor = 'var(--border)'; }}
-                          onDragOver={e => { e.preventDefault(); setDragZone('student'); }}
-                          onDragLeave={() => setDragZone(null)}
-                          onDrop={e => { e.preventDefault(); setDragZone(null); const f = e.dataTransfer.files[0]; if (f) setStudentFile(f); }}
-                          style={{ border: `2px dashed ${dragZone === 'student' ? '#0081f0' : 'var(--border)'}`, borderRadius: 12, padding: '20px', textAlign: 'center', cursor: 'pointer', background: dragZone === 'student' ? 'var(--selected-bg)' : 'var(--bg-content)', transition: 'all .15s' }}
-                        >
-                          {TYPES[selectedType]?.input === 'obj' ? (
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 8px', display: 'block' }}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                          ) : (
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 8px', display: 'block' }}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                      <input ref={studentFileRef} type="file" accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*' : 'image/*'} multiple={TYPES[selectedType]?.input === 'obj'} style={{ display: 'none' }} onChange={e => {
+                        if (TYPES[selectedType]?.input === 'obj') {
+                          setStudentFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 6));
+                        } else {
+                          setStudentFile(e.target.files[0] || null);
+                        }
+                      }} />
+
+                      {/* Modo OBJ: lista de múltiplos arquivos */}
+                      {TYPES[selectedType]?.input === 'obj' ? (
+                        <>
+                          {studentFiles.length > 0 && (
+                            <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', marginBottom: 8 }}>
+                              {studentFiles.map((f, i) => (
+                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderBottom: i < studentFiles.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12 }}>
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0081f0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                  <span style={{ flex: 1, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{f.name}</span>
+                                  <span onClick={() => setStudentFiles(studentFiles.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
+                                </div>
+                              ))}
+                              {studentFiles.length < 6 && (
+                                <div onClick={() => studentFileRef.current?.click()} style={{ padding: '8px 12px', fontSize: 12, color: '#0081f0', cursor: 'pointer', borderTop: '1px solid var(--border)', textAlign: 'center', fontWeight: 500 }}>+ Adicionar mais</div>
+                              )}
+                            </div>
                           )}
-                          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>{TYPES[selectedType]?.input === 'obj' ? '.obj ou imagem' : 'imagem do trabalho'}</div>
-                        </div>
+                          {studentFiles.length === 0 && (
+                            <div
+                              onClick={() => studentFileRef.current?.click()}
+                              onMouseEnter={e => { if (dragZone !== 'student') e.currentTarget.style.borderColor = '#0081f0'; }}
+                              onMouseLeave={e => { if (dragZone !== 'student') e.currentTarget.style.borderColor = 'var(--border)'; }}
+                              onDragOver={e => { e.preventDefault(); setDragZone('student'); }}
+                              onDragLeave={() => setDragZone(null)}
+                              onDrop={e => { e.preventDefault(); setDragZone(null); setStudentFiles(prev => [...prev, ...Array.from(e.dataTransfer.files)].slice(0, 6)); }}
+                              style={{ border: `2px dashed ${dragZone === 'student' ? '#0081f0' : 'var(--border)'}`, borderRadius: 12, padding: '20px', textAlign: 'center', cursor: 'pointer', background: dragZone === 'student' ? 'var(--selected-bg)' : 'var(--bg-content)', transition: 'all .15s' }}
+                            >
+                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 8px', display: 'block' }}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
+                              <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>.obj e/ou imagens (até 6)</div>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        /* Modo IMG: arquivo único */
+                        <>
+                          {studentFile ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 10 }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0081f0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                              <span style={{ flex: 1, fontSize: 12, color: '#0081f0', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{studentFile.name}</span>
+                              <span onClick={() => setStudentFile(null)} style={{ color: '#0081f0', cursor: 'pointer', fontSize: 16, opacity: 0.7, lineHeight: 1 }}>×</span>
+                            </div>
+                          ) : (
+                            <div
+                              onClick={() => studentFileRef.current?.click()}
+                              onMouseEnter={e => { if (dragZone !== 'student') e.currentTarget.style.borderColor = '#0081f0'; }}
+                              onMouseLeave={e => { if (dragZone !== 'student') e.currentTarget.style.borderColor = 'var(--border)'; }}
+                              onDragOver={e => { e.preventDefault(); setDragZone('student'); }}
+                              onDragLeave={() => setDragZone(null)}
+                              onDrop={e => { e.preventDefault(); setDragZone(null); const f = e.dataTransfer.files[0]; if (f) setStudentFile(f); }}
+                              style={{ border: `2px dashed ${dragZone === 'student' ? '#0081f0' : 'var(--border)'}`, borderRadius: 12, padding: '20px', textAlign: 'center', cursor: 'pointer', background: dragZone === 'student' ? 'var(--selected-bg)' : 'var(--bg-content)', transition: 'all .15s' }}
+                            >
+                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 8px', display: 'block' }}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
+                              <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>imagem do trabalho</div>
+                            </div>
+                          )}
+                        </>
                       )}
 
                       {/* Câmera — só para img, aparece em todos os devices mas funciona melhor no mobile */}
