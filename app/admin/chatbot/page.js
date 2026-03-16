@@ -112,8 +112,8 @@ export default function AdminChatbotPage() {
 
             <div>
               <label style={labelStyle}>Nome do assistente</label>
-              <input style={inpStyle} value={name} onChange={e => setName(e.target.value)} placeholder={DEFAULT_BOT_NAME} />
-              <p style={subStyle}>Aparece no cabeçalho do chat e na mensagem de boas-vindas.</p>
+              <input style={inpStyle} value={name} onChange={e => setName(e.target.value)} placeholder="Vazio = sorteia aleatoriamente (Murilo ou Luca)" />
+              <p style={subStyle}>Aparece no cabeçalho do chat e na mensagem de boas-vindas. Deixe vazio para sortear aleatoriamente.</p>
             </div>
 
             <div>
