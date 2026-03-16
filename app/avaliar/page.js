@@ -516,6 +516,12 @@ export default function AvaliarPage() {
                         </div>
                       )}
                     </div>
+                    {selectedType === 'tcc' && !extraFiles.some(f => f.type.startsWith('image/')) && (
+                      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 10, padding: '10px 12px', background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: 9 }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <p style={{ fontSize: 12, color: '#92400e', lineHeight: 1.5, margin: 0 }}>Para avaliar <strong>formatação ABNT</strong> (margens, espaçamento, capa, referências), envie <strong>prints das páginas</strong> como imagem no campo acima — a IA analisa visualmente.</p>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <>
