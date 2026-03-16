@@ -490,7 +490,7 @@ export default function AvaliarPage() {
                       <label style={lbl}>
                         <Tooltip text="Envie imagens, .txt ou .docx como contexto adicional. O texto do .docx é extraído automaticamente. Útil para prints, diagramas ou anexos.">Imagens e arquivos adicionais</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
                       </label>
-                      <input ref={extraFilesRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.txt,.docx" style={{ display: 'none' }} onChange={e => setExtraFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
+                      <input ref={extraFilesRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.txt,.docx" style={{ display: 'none' }} onChange={e => setExtraFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, selectedType === 'tcc' ? 15 : 5))} />
                       {extraFiles.length > 0 ? (
                         <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
                           {extraFiles.map((f, i) => (
@@ -499,7 +499,7 @@ export default function AvaliarPage() {
                               <span onClick={() => setExtraFiles(extraFiles.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
                             </div>
                           ))}
-                          {extraFiles.length < 5 && (
+                          {extraFiles.length < (selectedType === 'tcc' ? 15 : 5) && (
                             <div onClick={() => extraFilesRef.current?.click()} style={{ padding: '8px 12px', fontSize: 12, color: '#0081f0', cursor: 'pointer', borderTop: '1px solid var(--border)', textAlign: 'center', fontWeight: 500 }}>+ Adicionar mais</div>
                           )}
                         </div>
@@ -512,7 +512,7 @@ export default function AvaliarPage() {
                         >
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px', display: 'block' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>Imagens (JPG, PNG, WEBP), .txt ou .docx · até 5</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>Imagens (JPG, PNG, WEBP), .txt ou .docx · até {selectedType === 'tcc' ? 15 : 5}</div>
                         </div>
                       )}
                     </div>
