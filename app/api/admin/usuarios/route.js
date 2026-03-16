@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
 import { getUserFromRequest } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 
@@ -19,7 +20,7 @@ export async function GET(request) {
 
   let query = supabase
     .from('users')
-    .select('id, name, email, plan, quota_ciclo, quota_extra, quota_relatorios_ciclo, quota_relatorios_extra, created_at, is_admin')
+    .select('id, name, email, plan, quota_ciclo, quota_extra, quota_relatorios_ciclo, quota_relatorios_extra, created_at, is_admin, blocked')
     .order('created_at', { ascending: false });
 
   if (search) {
@@ -37,11 +38,22 @@ export async function PATCH(request) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
   }
 
-  const { userId, plan, addQuota, addQuotaRel } = await request.json();
+  const { userId, plan, addQuota, addQuotaRel, blocked, resetPassword } = await request.json();
   if (!userId) return NextResponse.json({ error: 'userId obrigatório' }, { status: 400 });
+
+  // Reset de senha
+  if (resetPassword) {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    const tempPass = 'Avalia@' + Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    const hashed = await bcrypt.hash(tempPass, 10);
+    const { error } = await supabase.from('users').update({ password: hashed }).eq('id', userId);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true, tempPassword: tempPass });
+  }
 
   const updates = {};
   if (plan !== undefined) updates.plan = plan;
+  if (blocked !== undefined) updates.blocked = blocked;
 
   if (addQuota || addQuotaRel) {
     const { data: current } = await supabase.from('users').select('quota_ciclo, quota_relatorios_ciclo').eq('id', userId).single();

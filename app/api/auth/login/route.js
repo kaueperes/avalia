@@ -21,6 +21,10 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Email ou senha inválidos' }, { status: 401 });
     }
 
+    if (user.blocked) {
+      return NextResponse.json({ error: 'Esta conta foi bloqueada. Entre em contato com o suporte.' }, { status: 403 });
+    }
+
     const token = signToken({ userId: user.id, email: user.email });
     return NextResponse.json({
       token,
