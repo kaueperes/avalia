@@ -32,8 +32,6 @@ const TrashIcon = () => (
   </svg>
 );
 
-const BOT_NAMES = ['Murilo', 'Luca'];
-
 export default function ChatBot({ darkMode }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -41,7 +39,9 @@ export default function ChatBot({ darkMode }) {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
-  const [botName] = useState(() => BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)]);
+  const [botName, setBotName] = useState('Luca');
+  const [welcome, setWelcome] = useState('');
+  const [enabled, setEnabled] = useState(true);
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
@@ -52,6 +52,15 @@ export default function ChatBot({ darkMode }) {
         if (u.name) setUserName(u.name.split(' ')[0]);
       }
     } catch {}
+
+    fetch('/api/chatbot-config')
+      .then(r => r.json())
+      .then(data => {
+        setEnabled(data.enabled ?? true);
+        if (data.name) setBotName(data.name);
+        if (data.welcome) setWelcome(data.welcome);
+      })
+      .catch(() => {});
   }, []);
 
   const bg      = darkMode ? '#1a1e28' : '#ffffff';
@@ -107,6 +116,8 @@ export default function ChatBot({ darkMode }) {
       send();
     }
   }
+
+  if (!enabled) return null;
 
   return (
     <>
@@ -170,7 +181,7 @@ export default function ChatBot({ darkMode }) {
                   {userName ? `Olá, ${userName}!` : 'Olá!'}
                 </div>
                 <div style={{ fontSize: 13, color: textMuted, lineHeight: 1.5 }}>
-                  Eu sou o {botName}, assistente do AvaliA. O que deseja perguntar?
+                  {welcome || `Eu sou o ${botName}, assistente do AvaliA. O que deseja perguntar?`}
                 </div>
               </div>
             )}

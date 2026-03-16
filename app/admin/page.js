@@ -81,19 +81,26 @@ export default function AdminPage() {
           </div>
 
           {/* Acesso rápido */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 14, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-            <div>
-              <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>Gerenciar Usuários</p>
-              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Busque por email, altere planos, adicione cotas e gerencie contas.</p>
-            </div>
-            <button
-              onClick={() => router.push('/admin/usuarios')}
-              style={{ padding: '9px 20px', border: '1px solid var(--border)', borderRadius: 9, background: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', fontFamily: 'inherit' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-content)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'none'}
-            >
-              Abrir →
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[
+              { title: 'Gerenciar Usuários', desc: 'Busque por email, altere planos, adicione cotas e gerencie contas.', href: '/admin/usuarios' },
+              { title: 'Configurar Chatbot', desc: 'Ajuste o nome, boas-vindas, modelo de IA e prompt do assistente virtual.', href: '/admin/chatbot' },
+            ].map(({ title, desc, href }) => (
+              <div key={href} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 14, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+                <div>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 4 }}>{title}</p>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{desc}</p>
+                </div>
+                <button
+                  onClick={() => router.push(href)}
+                  style={{ padding: '9px 20px', border: '1px solid var(--border)', borderRadius: 9, background: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', fontFamily: 'inherit' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-content)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                >
+                  Abrir →
+                </button>
+              </div>
+            ))}
           </div>
         </>
       )}
