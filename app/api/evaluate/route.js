@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
 import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { TYPES, TONES } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
@@ -104,35 +105,61 @@ Regras:
 - Peso do gabarito na correção: ${{ livre: 'REFERÊNCIA LIVRE — use o gabarito apenas como orientação geral; valorize criatividade e interpretações pessoais', parcial: 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes', estrito: 'ESTRITO — o aluno deve seguir o gabarito de perto; penalize desvios significativos' }[referenceWeight] || 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes'}` : ''}`;
 
   try {
-    // Use Sonnet when images are present (better vision quality); otherwise use adaptive selection
-    const { model, maxTokens } = images?.length > 0
-      ? { model: 'claude-sonnet-4-6', maxTokens: 1800 }
-      : selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
+    const hasVideo = images?.some(img => img.mediaType?.startsWith('video/'));
 
-    // Build message content: text prompt + vision blocks if images present
-    // Each image is preceded by a text label so the AI knows what it represents
-    const messageContent = images?.length > 0
-      ? [
-          { type: 'text', text: prompt },
-          ...images.flatMap(img => [
-            { type: 'text', text: img.label || 'Imagem:' },
-            { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } },
-          ]),
-        ]
-      : prompt;
+    let parsed;
 
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const message = await client.messages.create({
-      model,
-      max_tokens: maxTokens,
-      messages: [{ role: 'user', content: messageContent }],
-    });
+    if (hasVideo) {
+      // Route to Gemini for video evaluation
+      if (!process.env.GEMINI_API_KEY) {
+        return NextResponse.json({ error: 'GEMINI_API_KEY não configurada.' }, { status: 503 });
+      }
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const geminiModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    const text = message.content[0]?.text || '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA. Tente novamente.' }, { status: 500 });
+      const parts = [
+        { text: prompt },
+        ...images.flatMap(img => [
+          { text: img.label || 'Arquivo:' },
+          { inlineData: { mimeType: img.mediaType, data: img.data } },
+        ]),
+      ];
 
-    const parsed = JSON.parse(jsonMatch[0]);
+      const result = await geminiModel.generateContent(parts);
+      const text = result.response.text();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA. Tente novamente.' }, { status: 500 });
+      parsed = JSON.parse(jsonMatch[0]);
+    } else {
+      // Use Sonnet when images are present (better vision quality); otherwise use adaptive selection
+      const { model, maxTokens } = images?.length > 0
+        ? { model: 'claude-sonnet-4-6', maxTokens: 1800 }
+        : selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
+
+      // Build message content: text prompt + vision blocks if images present
+      // Each image is preceded by a text label so the AI knows what it represents
+      const messageContent = images?.length > 0
+        ? [
+            { type: 'text', text: prompt },
+            ...images.flatMap(img => [
+              { type: 'text', text: img.label || 'Imagem:' },
+              { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } },
+            ]),
+          ]
+        : prompt;
+
+      const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+      const message = await client.messages.create({
+        model,
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content: messageContent }],
+      });
+
+      const text = message.content[0]?.text || '';
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA. Tente novamente.' }, { status: 500 });
+      parsed = JSON.parse(jsonMatch[0]);
+    }
 
     // Calculate weighted score
     const totalWeight = (parsed.criteriaScores || []).reduce((s, c) => s + (c.weight || 1), 0);
@@ -153,6 +180,6 @@ Regras:
     return NextResponse.json({ score, criteriaScores: parsed.criteriaScores, feedback: parsed.feedback });
   } catch (err) {
     console.error('evaluate error:', err);
-    return NextResponse.json({ error: 'Erro ao chamar a IA. Verifique sua chave ANTHROPIC_API_KEY.' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro ao chamar a IA. Tente novamente.' }, { status: 500 });
   }
 }

@@ -166,7 +166,6 @@ export default function AvaliarPage() {
       const images = [];
 
       if (TYPES[selectedType]?.input === 'obj' && studentFiles.length > 0) {
-        // .obj files → read as text; images → add to vision
         const objTexts = [];
         for (const f of studentFiles) {
           if (f.name.endsWith('.obj')) {
@@ -176,6 +175,17 @@ export default function AvaliarPage() {
           }
         }
         if (objTexts.length > 0) workContent = objTexts.join('\n\n---\n\n');
+      }
+
+      if (TYPES[selectedType]?.input === 'video' && studentFiles.length > 0) {
+        for (const f of studentFiles) {
+          if (f.size > 20 * 1024 * 1024) {
+            setEvalError(`O arquivo "${f.name}" é maior que 20MB. Reduza o tamanho ou exporte em qualidade menor.`);
+            setEvaluating(false);
+            return;
+          }
+          images.push({ data: await toBase64(f), mediaType: f.type, label: `Trabalho do aluno: ${f.name}` });
+        }
       }
 
       if (TYPES[selectedType]?.input === 'img' && studentFile && studentFile.type.startsWith('image/')) {
@@ -506,16 +516,22 @@ export default function AvaliarPage() {
                       <label style={{ ...lbl, marginBottom: 8 }}>
                         <Tooltip text="Envie o arquivo do trabalho do aluno: concept, render, obj, etc. Pode combinar arquivos para uma avaliação mais completa.">Arquivo do aluno</Tooltip>
                       </label>
-                      <input ref={studentFileRef} type="file" accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*' : 'image/*'} multiple={TYPES[selectedType]?.input === 'obj'} style={{ display: 'none' }} onChange={e => {
-                        if (TYPES[selectedType]?.input === 'obj') {
-                          setStudentFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 6));
-                        } else {
-                          setStudentFile(e.target.files[0] || null);
-                        }
-                      }} />
+                      <input ref={studentFileRef}
+                        type="file"
+                        accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*' : TYPES[selectedType]?.input === 'video' ? 'video/*,image/*' : 'image/*'}
+                        multiple={['obj', 'video'].includes(TYPES[selectedType]?.input)}
+                        style={{ display: 'none' }}
+                        onChange={e => {
+                          if (['obj', 'video'].includes(TYPES[selectedType]?.input)) {
+                            setStudentFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 6));
+                          } else {
+                            setStudentFile(e.target.files[0] || null);
+                          }
+                        }}
+                      />
 
-                      {/* Modo OBJ: lista de múltiplos arquivos */}
-                      {TYPES[selectedType]?.input === 'obj' ? (
+                      {/* Modo OBJ ou VIDEO: lista de múltiplos arquivos */}
+                      {['obj', 'video'].includes(TYPES[selectedType]?.input) ? (
                         <>
                           {studentFiles.length > 0 && (
                             <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', marginBottom: 8 }}>
@@ -543,7 +559,9 @@ export default function AvaliarPage() {
                             >
                               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 8px', display: 'block' }}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
-                              <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>.obj e/ou imagens (até 6)</div>
+                              <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>
+                                {TYPES[selectedType]?.input === 'video' ? 'vídeo (MP4, MOV) e/ou frames' : '.obj e/ou imagens (até 6)'}
+                              </div>
                             </div>
                           )}
                         </>
