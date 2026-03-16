@@ -28,14 +28,15 @@ export async function POST(request) {
   const { data: settingsData } = await supabase
     .from('settings')
     .select('key, value')
-    .in('key', ['chatbot_enabled', 'chatbot_system_prompt', 'chatbot_model']);
+    .in('key', ['chatbot_enabled', 'chatbot_system_prompt', 'chatbot_model', 'chatbot_name']);
   const s = Object.fromEntries((settingsData || []).map(r => [r.key, r.value]));
 
   if (s.chatbot_enabled === 'false') {
     return NextResponse.json({ error: 'O assistente está temporariamente desabilitado.' }, { status: 503 });
   }
 
-  const systemPrompt = s.chatbot_system_prompt || DEFAULT_SYSTEM_PROMPT;
+  const botName = s.chatbot_name || 'Luca';
+  const systemPrompt = (s.chatbot_system_prompt || DEFAULT_SYSTEM_PROMPT).replace(/\{nome\}/g, botName);
   const model = s.chatbot_model || DEFAULT_MODEL;
 
   try {
