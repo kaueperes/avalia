@@ -329,9 +329,7 @@ export default function AvaliarPage() {
             </div>
             {TYPES[selectedType] && (
               <div style={{ fontSize: 12, color: 'var(--text-sub)', padding: '8px 10px', background: 'var(--bg-content)', borderRadius: 8, border: '1px solid var(--border)', lineHeight: 1.5 }}>
-                {TYPES[selectedType].input === 'obj' && 'Envie o arquivo .obj (análise de topologia, vértices e faces) e/ou imagens de render — combinando os dois a avaliação fica mais completa.'}
-                {TYPES[selectedType].input === 'img' && 'Envie imagens do trabalho: render, foto, screenshot, digitalização ou qualquer arquivo visual (PNG, JPG, etc.).'}
-                {TYPES[selectedType].input === 'text' && 'Cole o texto, código ou conteúdo diretamente no campo abaixo. Você também pode enviar imagens de apoio se necessário.'}
+                {TYPES[selectedType].hint}
               </div>
             )}
           </div>
