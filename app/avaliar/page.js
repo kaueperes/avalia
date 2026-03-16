@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { TYPES, CATEGORIES, TONES, scoreToGrade, scoreColor } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
+import mammoth from 'mammoth';
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
@@ -202,6 +203,12 @@ export default function AvaliarPage() {
           images.push({ data: await toBase64(f), mediaType: f.type, label: `Arquivo adicional: ${f.name}` });
         } else if (f.type === 'text/plain' || f.name.endsWith('.txt')) {
           try { workContent = (workContent ? workContent + '\n\n' : '') + await f.text(); } catch {}
+        } else if (f.name.endsWith('.docx')) {
+          try {
+            const ab = await f.arrayBuffer();
+            const result = await mammoth.extractRawText({ arrayBuffer: ab });
+            workContent = (workContent ? workContent + '\n\n' : '') + result.value;
+          } catch {}
         }
       }
 
@@ -481,9 +488,9 @@ export default function AvaliarPage() {
                     </div>
                     <div style={{ marginTop: 12 }}>
                       <label style={lbl}>
-                        <Tooltip text="Envie imagens ou arquivos .txt como contexto adicional. Útil para enviar prints, diagramas ou anexos do trabalho.">Imagens e arquivos adicionais</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
+                        <Tooltip text="Envie imagens, .txt ou .docx como contexto adicional. O texto do .docx é extraído automaticamente. Útil para prints, diagramas ou anexos.">Imagens e arquivos adicionais</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
                       </label>
-                      <input ref={extraFilesRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.txt" style={{ display: 'none' }} onChange={e => setExtraFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
+                      <input ref={extraFilesRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.txt,.docx" style={{ display: 'none' }} onChange={e => setExtraFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
                       {extraFiles.length > 0 ? (
                         <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
                           {extraFiles.map((f, i) => (
@@ -505,7 +512,7 @@ export default function AvaliarPage() {
                         >
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px', display: 'block' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>Imagens (JPG, PNG, WEBP) ou texto (.txt) · até 5</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>Imagens (JPG, PNG, WEBP), .txt ou .docx · até 5</div>
                         </div>
                       )}
                     </div>
