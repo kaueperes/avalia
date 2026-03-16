@@ -181,7 +181,7 @@ export default function ChatBot({ darkMode }) {
                   {userName ? `Olá, ${userName}!` : 'Olá!'}
                 </div>
                 <div style={{ fontSize: 13, color: textMuted, lineHeight: 1.5 }}>
-                  {welcome || `Eu sou o ${botName}, assistente do AvaliA. O que deseja perguntar?`}
+                  {(welcome || `Eu sou o {nome}, assistente do AvaliA. O que deseja perguntar?`).replace('{nome}', botName)}
                 </div>
               </div>
             )}
