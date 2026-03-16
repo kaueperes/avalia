@@ -494,9 +494,9 @@ export default function AvaliarPage() {
                     {/* Drop zone principal */}
                     <div style={{ marginBottom: 12 }}>
                       <label style={{ ...lbl, marginBottom: 8 }}>
-                        <Tooltip text="Envie o arquivo do trabalho do aluno: imagem, render ou arquivo .obj 3D.">Arquivo {TYPES[selectedType]?.input === 'obj' ? '.obj' : ''} do aluno</Tooltip>
+                        <Tooltip text="Envie o arquivo do trabalho do aluno: imagem, render, foto, screenshot ou arquivo .obj 3D. Pode combinar .obj + render para uma avaliação mais completa.">Arquivo do aluno</Tooltip>
                       </label>
-                      <input ref={studentFileRef} type="file" accept={TYPES[selectedType]?.input === 'obj' ? '.obj' : 'image/*'} style={{ display: 'none' }} onChange={e => setStudentFile(e.target.files[0] || null)} />
+                      <input ref={studentFileRef} type="file" accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*' : 'image/*'} style={{ display: 'none' }} onChange={e => setStudentFile(e.target.files[0] || null)} />
                       {studentFile ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 10 }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0081f0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -519,7 +519,7 @@ export default function AvaliarPage() {
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 8px', display: 'block' }}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
                           )}
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>{TYPES[selectedType]?.input === 'obj' ? '.obj do aluno' : 'imagem do trabalho'}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>{TYPES[selectedType]?.input === 'obj' ? '.obj ou imagem' : 'imagem do trabalho'}</div>
                         </div>
                       )}
 
