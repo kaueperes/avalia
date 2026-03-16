@@ -190,6 +190,14 @@ export default function AvaliarPage() {
         }
       }
 
+      if (TYPES[selectedType]?.input === 'imgs' && studentFiles.length > 0) {
+        for (const f of studentFiles) {
+          if (f.type.startsWith('image/')) {
+            images.push({ data: await toBase64(f), mediaType: f.type, label: `Trabalho do aluno: ${f.name}` });
+          }
+        }
+      }
+
       if (TYPES[selectedType]?.input === 'img' && studentFile && studentFile.type.startsWith('image/')) {
         images.push({ data: await toBase64(studentFile), mediaType: studentFile.type, label: `Trabalho do aluno: ${studentFile.name}` });
       }
@@ -273,6 +281,7 @@ export default function AvaliarPage() {
     color: 'var(--text-main)', fontFamily: 'inherit', boxSizing: 'border-box',
   };
   const lbl = { display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 };
+  const maxExtraFiles = selectedType === 'tcc' ? 15 : selectedType === 'musica_partitura' ? 10 : 5;
   const secLabel = { fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 };
   const section = { padding: '22px 24px', borderBottom: '1px solid var(--border-card)' };
 
@@ -490,7 +499,7 @@ export default function AvaliarPage() {
                       <label style={lbl}>
                         <Tooltip text="Envie imagens, .txt ou .docx como contexto adicional. O texto do .docx é extraído automaticamente. Útil para prints, diagramas ou anexos.">Imagens e arquivos adicionais</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
                       </label>
-                      <input ref={extraFilesRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.txt,.docx" style={{ display: 'none' }} onChange={e => setExtraFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, selectedType === 'tcc' ? 15 : 5))} />
+                      <input ref={extraFilesRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.txt,.docx" style={{ display: 'none' }} onChange={e => setExtraFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, maxExtraFiles))} />
                       {extraFiles.length > 0 ? (
                         <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
                           {extraFiles.map((f, i) => (
@@ -499,7 +508,7 @@ export default function AvaliarPage() {
                               <span onClick={() => setExtraFiles(extraFiles.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
                             </div>
                           ))}
-                          {extraFiles.length < (selectedType === 'tcc' ? 15 : 5) && (
+                          {extraFiles.length < maxExtraFiles && (
                             <div onClick={() => extraFilesRef.current?.click()} style={{ padding: '8px 12px', fontSize: 12, color: '#0081f0', cursor: 'pointer', borderTop: '1px solid var(--border)', textAlign: 'center', fontWeight: 500 }}>+ Adicionar mais</div>
                           )}
                         </div>
@@ -512,7 +521,7 @@ export default function AvaliarPage() {
                         >
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px', display: 'block' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>Imagens (JPG, PNG, WEBP), .txt ou .docx · até {selectedType === 'tcc' ? 15 : 5}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>Imagens (JPG, PNG, WEBP), .txt ou .docx · até {maxExtraFiles}</div>
                         </div>
                       )}
                     </div>
@@ -533,19 +542,19 @@ export default function AvaliarPage() {
                       <input ref={studentFileRef}
                         type="file"
                         accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*' : TYPES[selectedType]?.input === 'video' ? 'video/*,image/*' : 'image/*'}
-                        multiple={['obj', 'video'].includes(TYPES[selectedType]?.input)}
+                        multiple={['obj', 'video', 'imgs'].includes(TYPES[selectedType]?.input)}
                         style={{ display: 'none' }}
                         onChange={e => {
-                          if (['obj', 'video'].includes(TYPES[selectedType]?.input)) {
-                            setStudentFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 6));
+                          if (['obj', 'video', 'imgs'].includes(TYPES[selectedType]?.input)) {
+                            setStudentFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 10));
                           } else {
                             setStudentFile(e.target.files[0] || null);
                           }
                         }}
                       />
 
-                      {/* Modo OBJ ou VIDEO: lista de múltiplos arquivos */}
-                      {['obj', 'video'].includes(TYPES[selectedType]?.input) ? (
+                      {/* Modo OBJ, VIDEO ou IMGS: lista de múltiplos arquivos */}
+                      {['obj', 'video', 'imgs'].includes(TYPES[selectedType]?.input) ? (
                         <>
                           {studentFiles.length > 0 && (
                             <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', marginBottom: 8 }}>
@@ -556,7 +565,7 @@ export default function AvaliarPage() {
                                   <span onClick={() => setStudentFiles(studentFiles.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
                                 </div>
                               ))}
-                              {studentFiles.length < 6 && (
+                              {studentFiles.length < 10 && (
                                 <div onClick={() => studentFileRef.current?.click()} style={{ padding: '8px 12px', fontSize: 12, color: '#0081f0', cursor: 'pointer', borderTop: '1px solid var(--border)', textAlign: 'center', fontWeight: 500 }}>+ Adicionar mais</div>
                               )}
                             </div>
@@ -568,13 +577,13 @@ export default function AvaliarPage() {
                               onMouseLeave={e => { if (dragZone !== 'student') e.currentTarget.style.borderColor = 'var(--border)'; }}
                               onDragOver={e => { e.preventDefault(); setDragZone('student'); }}
                               onDragLeave={() => setDragZone(null)}
-                              onDrop={e => { e.preventDefault(); setDragZone(null); setStudentFiles(prev => [...prev, ...Array.from(e.dataTransfer.files)].slice(0, 6)); }}
+                              onDrop={e => { e.preventDefault(); setDragZone(null); setStudentFiles(prev => [...prev, ...Array.from(e.dataTransfer.files)].slice(0, 10)); }}
                               style={{ border: `2px dashed ${dragZone === 'student' ? '#0081f0' : 'var(--border)'}`, borderRadius: 12, padding: '20px', textAlign: 'center', cursor: 'pointer', background: dragZone === 'student' ? 'var(--selected-bg)' : 'var(--bg-content)', transition: 'all .15s' }}
                             >
                               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 8px', display: 'block' }}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
                               <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>
-                                {TYPES[selectedType]?.input === 'video' ? 'vídeo (MP4, MOV) e/ou frames' : '.obj e/ou imagens (até 6)'}
+                                {TYPES[selectedType]?.input === 'video' ? 'vídeo (MP4, MOV) e/ou imagens (até 10)' : TYPES[selectedType]?.input === 'imgs' ? 'imagens JPG, PNG, WEBP (até 10)' : '.obj e/ou imagens (até 10)'}
                               </div>
                             </div>
                           )}
