@@ -504,7 +504,7 @@ export default function AvaliarPage() {
                     {/* Drop zone principal */}
                     <div style={{ marginBottom: 12 }}>
                       <label style={{ ...lbl, marginBottom: 8 }}>
-                        <Tooltip text="Envie o arquivo do trabalho do aluno: imagem, render, foto, screenshot ou arquivo .obj 3D. Pode combinar .obj + render para uma avaliação mais completa.">Arquivo do aluno</Tooltip>
+                        <Tooltip text="Envie o arquivo do trabalho do aluno: concept, render, obj, etc. Pode combinar arquivos para uma avaliação mais completa.">Arquivo do aluno</Tooltip>
                       </label>
                       <input ref={studentFileRef} type="file" accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*' : 'image/*'} multiple={TYPES[selectedType]?.input === 'obj'} style={{ display: 'none' }} onChange={e => {
                         if (TYPES[selectedType]?.input === 'obj') {
