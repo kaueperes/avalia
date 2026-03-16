@@ -39,7 +39,7 @@ export default function ChatBot({ darkMode }) {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
-  const [botName, setBotName] = useState('Luca');
+  const [botName, setBotName] = useState(() => ['Murilo', 'Luca'][Math.floor(Math.random() * 2)]);
   const [welcome, setWelcome] = useState('');
   const [enabled, setEnabled] = useState(true);
   const [userName, setUserName] = useState('');
@@ -57,7 +57,7 @@ export default function ChatBot({ darkMode }) {
       .then(r => r.json())
       .then(data => {
         setEnabled(data.enabled ?? true);
-        if (data.name) setBotName(data.name);
+        if (data.name) setBotName(data.name); // só sobrescreve se tiver nome configurado
         if (data.welcome) setWelcome(data.welcome);
       })
       .catch(() => {});
