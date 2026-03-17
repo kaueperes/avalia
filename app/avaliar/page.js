@@ -438,7 +438,10 @@ export default function AvaliarPage() {
                           {TYPE_ICONS[k]}
                         </svg>
                       </div>
-                      {v.label}
+                      <span style={{ display: 'grid' }}>
+                        <span style={{ fontWeight: 700, visibility: 'hidden', gridArea: '1/1', lineHeight: 'inherit' }}>{v.label}</span>
+                        <span style={{ gridArea: '1/1', lineHeight: 'inherit' }}>{v.label}</span>
+                      </span>
                     </div>
                   ))}
                 </div>
