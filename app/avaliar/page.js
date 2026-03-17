@@ -404,7 +404,7 @@ export default function AvaliarPage() {
             <div style={{ padding: '0 24px 10px', ...secLabel }}><Tooltip text="Selecione a categoria e o tipo específico do trabalho enviado pelo aluno. Isso define como a IA vai analisar.">Tipo de Trabalho</Tooltip></div>
             <div style={{ display: 'flex', borderTop: '1px solid var(--border-card)' }}>
               {/* Sidebar de categorias */}
-              <div style={{ width: 182, flexShrink: 0, borderRight: '1px solid var(--border-card)', padding: '10px 8px', background: 'var(--bg-content)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <div style={{ width: 168, flexShrink: 0, borderRight: '1px solid var(--border-card)', padding: '10px 8px', background: 'var(--bg-content)', display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {Object.entries(CATEGORIES).map(([catKey, cat]) => (
                   <div key={catKey} onClick={() => setActiveCat(catKey)} style={{
                     display: 'flex', alignItems: 'center', gap: 8,
