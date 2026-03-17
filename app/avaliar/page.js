@@ -362,7 +362,7 @@ export default function AvaliarPage() {
       </div>
 
       {/* Grid 2 colunas */}
-      <div style={{ display: 'grid', gridTemplateColumns: '520px 1fr', gap: 24, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '560px 1fr', gap: 24, alignItems: 'start' }}>
 
         {/* COLUNA ESQUERDA — Configuração */}
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 16, overflow: 'hidden' }}>
@@ -432,16 +432,14 @@ export default function AvaliarPage() {
                       borderRadius: 9, background: selectedType === k ? 'var(--selected-bg)' : 'var(--bg-content)',
                       fontSize: 11.5, fontWeight: selectedType === k ? 700 : 500,
                       color: selectedType === k ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', lineHeight: 1.35,
+                      minHeight: 76, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <div style={{ width: 20, height: 20, margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: 20, height: 20, marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           {TYPE_ICONS[k]}
                         </svg>
                       </div>
-                      <span style={{ display: 'grid' }}>
-                        <span style={{ fontWeight: 700, visibility: 'hidden', gridArea: '1/1', lineHeight: 'inherit' }}>{v.label}</span>
-                        <span style={{ gridArea: '1/1', lineHeight: 'inherit' }}>{v.label}</span>
-                      </span>
+                      {v.label}
                     </div>
                   ))}
                 </div>
