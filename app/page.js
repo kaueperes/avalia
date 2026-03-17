@@ -495,10 +495,10 @@ export default function Home() {
                   onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}
                   onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: 10 }}>{icon}</svg>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'white', marginBottom: 8 }}>{label}</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                    {types.map(t => <span key={t} style={{ fontSize: 11.5, color: '#64748B' }}>{t}</span>)}
-                    <span style={{ fontSize: 11.5, color: '#334155' }}>e mais...</span>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'white', marginBottom: 10 }}>{label}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                    {types.map(t => <span key={t} style={{ fontSize: 13, color: '#64748B' }}>{t}</span>)}
+                    <span style={{ fontSize: 12, color: '#3d4f63' }}>e mais...</span>
                   </div>
                 </div>
               ))}
