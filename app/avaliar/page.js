@@ -412,11 +412,14 @@ export default function AvaliarPage() {
                     background: activeCat === catKey ? 'var(--selected-bg)' : 'transparent',
                     border: `1px solid ${activeCat === catKey ? '#0081f033' : 'transparent'}`,
                     color: activeCat === catKey ? '#0081f0' : 'var(--text-sub)',
-                    fontWeight: 600,
+                    fontWeight: activeCat === catKey ? 700 : 500,
                     fontSize: 12.5, lineHeight: 1.35, transition: 'all .12s',
                   }}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>{CAT_ICONS[catKey]}</svg>
-                    <span>{cat.label}</span>
+                    <span style={{ display: 'grid' }}>
+                      <span style={{ fontWeight: 700, visibility: 'hidden', gridArea: '1/1', lineHeight: 'inherit' }}>{cat.label}</span>
+                      <span style={{ gridArea: '1/1', lineHeight: 'inherit' }}>{cat.label}</span>
+                    </span>
                   </div>
                 ))}
               </div>
