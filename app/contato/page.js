@@ -60,13 +60,26 @@ export default function Contato() {
 
       {/* Navbar */}
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(14px)', borderBottom: '1px solid rgba(0,0,0,0.07)', padding: '0 32px' }}>
+        <style>{`.pub-nav-link { text-decoration: none; font-size: 15px; font-weight: 450; color: #6B7280; transition: color .15s; } .pub-nav-link:hover { color: #111827; }`}</style>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           <div style={{ cursor: 'pointer' }} onClick={() => router.push('/')}>
             <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 36, width: 'auto' }} />
           </div>
-          <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: 14, cursor: 'pointer' }}>
-            ← Voltar ao início
-          </button>
+          <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
+            <a href="/#funcionalidades" className="pub-nav-link">Funcionalidades</a>
+            <a href="/#disciplinas" className="pub-nav-link">Tipos de Trabalho</a>
+            <a href="/#coordenadores" className="pub-nav-link">Para Coordenadores</a>
+            <a href="/#planos" className="pub-nav-link">Planos</a>
+            <a href="/central-de-ajuda" className="pub-nav-link">Ajuda</a>
+          </div>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: '#374151', fontWeight: 500, fontSize: 15, cursor: 'pointer', padding: '8px 14px', borderRadius: 8 }}>
+              Entrar
+            </button>
+            <button onClick={() => router.push('/signup')} style={{ background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, padding: '9px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+              Começar grátis
+            </button>
+          </div>
         </div>
       </nav>
 

@@ -23,9 +23,17 @@ export default function Privacidade() {
           <div style={{ cursor: 'pointer' }} onClick={() => router.push('/')}>
             <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 36, width: 'auto' }} />
           </div>
-          <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: 14, cursor: 'pointer' }}>
-            ← Voltar ao início
-          </button>
+          <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
+            <a href="/#funcionalidades" style={{ textDecoration: 'none', fontSize: 15, fontWeight: 450, color: '#6B7280' }}>Funcionalidades</a>
+            <a href="/#disciplinas" style={{ textDecoration: 'none', fontSize: 15, fontWeight: 450, color: '#6B7280' }}>Tipos de Trabalho</a>
+            <a href="/#coordenadores" style={{ textDecoration: 'none', fontSize: 15, fontWeight: 450, color: '#6B7280' }}>Para Coordenadores</a>
+            <a href="/#planos" style={{ textDecoration: 'none', fontSize: 15, fontWeight: 450, color: '#6B7280' }}>Planos</a>
+            <a href="/central-de-ajuda" style={{ textDecoration: 'none', fontSize: 15, fontWeight: 450, color: '#6B7280' }}>Ajuda</a>
+          </div>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: '#374151', fontWeight: 500, fontSize: 15, cursor: 'pointer', padding: '8px 14px', borderRadius: 8 }}>Entrar</button>
+            <button onClick={() => router.push('/signup')} style={{ background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, padding: '9px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Começar grátis</button>
+          </div>
         </div>
       </nav>
 
