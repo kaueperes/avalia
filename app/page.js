@@ -143,6 +143,7 @@ export default function Home() {
           .grid-plans { grid-template-columns: 1fr !important; }
           .nav-links { display: none !important; }
           .footer-grid { grid-template-columns: 1fr !important; }
+          .cat-grid { grid-template-columns: repeat(2,1fr) !important; }
         }
       `}</style>
 
@@ -196,8 +197,8 @@ export default function Home() {
               <span style={{ background: 'linear-gradient(135deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>corrigindo trabalho por trabalho</span>
             </h1>
 
-            <p className="hero-sub" style={{ fontSize: 20, color: '#94A3B8', lineHeight: 1.65, maxWidth: 540, margin: '0 auto 44px', fontWeight: 400 }}>
-              Você gasta horas avaliando pilhas de trabalhos e ainda se pergunta se está sendo consistente. O AvaliA avalia com seus critérios, no seu estilo — do 1º ao 30º trabalho.
+            <p className="hero-sub" style={{ fontSize: 20, color: '#94A3B8', lineHeight: 1.65, maxWidth: 560, margin: '0 auto 44px', fontWeight: 400 }}>
+              Você gasta horas avaliando redações, vídeos, projetos e códigos — e ainda se pergunta se está sendo consistente. O AvaliA avalia com seus critérios, no seu estilo, em qualquer disciplina.
             </p>
 
             <div className="hero-ctas" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
@@ -346,7 +347,7 @@ export default function Home() {
                 tag: '02 — Avaliação',
                 title: 'Cole o texto,\nreceba o feedback',
                 desc: 'Sem processos complicados. Cole o trabalho do aluno, selecione o exercício e em segundos você tem nota por critério e feedback personalizado — pronto para compartilhar.',
-                points: ['25+ tipos de trabalho suportados', 'Feedback por critério com nota', 'Comentários pedagógicos precisos'],
+                points: ['60+ tipos: texto, vídeo, imagem e código', 'Feedback por critério com nota', 'Comentários pedagógicos precisos'],
                 right: true,
                 visual: (
                   <div style={{ direction: 'ltr', background: 'white', borderRadius: 20, border: '1px solid #E5E7EB', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
@@ -468,6 +469,125 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── DISCIPLINAS ────────────────────────────────────────────────────── */}
+        <section style={{ padding: '96px 32px', background: '#00173f' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 64 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Para todas as disciplinas</p>
+              <h2 style={{ fontSize: 44, fontWeight: 800, color: 'white', letterSpacing: '-1px', marginBottom: 16 }}>Vai muito além de redações</h2>
+              <p style={{ fontSize: 18, color: '#94A3B8', maxWidth: 520, margin: '0 auto' }}>60+ tipos de trabalho em 11 categorias — incluindo avaliação de vídeo por IA.</p>
+            </div>
+            <div className="cat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+              {[
+                { label: '3D e Animação',            types: ['Modelagem 3D', 'Animação', 'Rigging', 'VFX'],          color: '#818cf8', icon: <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><line x1="12" y1="22.08" x2="12" y2="12"/></> },
+                { label: 'Audiovisual',               types: ['Edição de Vídeo', 'Motion Graphics', 'Apresentação Oral', 'Locução'], color: '#f472b6', icon: <><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></> },
+                { label: 'Design',                    types: ['Design Gráfico', 'Identidade Visual', 'UX/UI', 'Concept Art'], color: '#34d399', icon: <><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></> },
+                { label: 'Música e Áudio',            types: ['Partitura', 'Composição', 'Produção Musical', 'Sound Design'], color: '#fbbf24', icon: <><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></> },
+                { label: 'Texto e Escrita',           types: ['Redação', 'TCC', 'Roteiro', 'Copywriting'],            color: '#60a5fa', icon: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/></> },
+                { label: 'Código e Tecnologia',       types: ['Programação', 'HTML/CSS/JS', 'Mobile', 'Banco de Dados'], color: '#a78bfa', icon: <><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></> },
+                { label: 'Arquitetura e Eng.',        types: ['Prancha', 'BIM', 'Maquete', 'Desenho Técnico'],        color: '#f97316', icon: <><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v2z"/><path d="M4 15v-3a8 8 0 0 1 16 0v3"/></> },
+                { label: 'Arte e Artesanato',         types: ['Pintura', 'Escultura', 'Cerâmica', 'Gravura'],          color: '#e879f9', icon: <><path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3z"/></> },
+                { label: 'Ed. Física e Saúde',        types: ['Exercício', 'Dança', 'Técnica Esportiva'],              color: '#4ade80', icon: <path d="M22 12h-4l-3 9L9 3l-3 9H2"/> },
+                { label: 'Línguas e Acessibilidade',  types: ['Libras', 'Tradução', 'Produção Oral'],                  color: '#38bdf8', icon: <><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></> },
+                { label: 'Outros',                    types: ['Design de Produto', 'Gastronomia', 'Proj. Interdisciplinar'], color: '#94a3b8', icon: <><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></> },
+              ].map(({ label, types, color, icon }) => (
+                <div key={label} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: '20px 18px', transition: 'background .2s, border-color .2s' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: 10 }}>{icon}</svg>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'white', marginBottom: 8 }}>{label}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    {types.map(t => <span key={t} style={{ fontSize: 11.5, color: '#64748B' }}>{t}</span>)}
+                    <span style={{ fontSize: 11.5, color: '#334155' }}>e mais...</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 40, padding: '16px 24px', background: 'rgba(0,129,240,0.1)', border: '1px solid rgba(0,129,240,0.2)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+              <span style={{ fontSize: 14, color: '#94A3B8' }}>Trabalhos em <strong style={{ color: '#60a5fa' }}>vídeo</strong> (apresentações, danças, exercícios, Libras, animações) são avaliados automaticamente por IA de visão computacional.</span>
+            </div>
+          </div>
+        </section>
+
+        {/* ── COORDENADORES ──────────────────────────────────────────────────── */}
+        <section style={{ padding: '96px 32px', background: 'white' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, alignItems: 'center' }}>
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#810cfa', letterSpacing: 1, marginBottom: 16, textTransform: 'uppercase' }}>Para coordenadores e gestores</p>
+                <h2 style={{ fontSize: 38, fontWeight: 800, color: '#00173f', lineHeight: 1.15, letterSpacing: '-1px', marginBottom: 20 }}>Dados pedagógicos reais para decisões assertivas</h2>
+                <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, marginBottom: 32 }}>
+                  O AvaliA não é só uma ferramenta de correção — é uma plataforma de inteligência pedagógica. Coordenadores e gestores têm acesso a dados consolidados que antes exigiam horas de tabulação manual.
+                </p>
+                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {[
+                    'Relatório de turma com média, aprovação e desempenho por critério',
+                    'Identifique quais critérios a turma toda está errando',
+                    'Acompanhe a evolução de alunos ao longo do semestre',
+                    'Dados prontos para reuniões pedagógicas e conselhos de classe',
+                    'Exportação em PDF e CSV para registros institucionais',
+                  ].map(p => (
+                    <li key={p} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 15, color: '#374151', lineHeight: 1.55 }}>
+                      <span style={{ width: 22, height: 22, borderRadius: '50%', background: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                        <CheckMark color="#810cfa" />
+                      </span>
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E5E7EB', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+                <div style={{ padding: '14px 20px', background: '#F9FAFB', borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#810cfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Relatório de Turma — IA</span>
+                  <span style={{ marginLeft: 'auto', fontSize: 11, padding: '3px 8px', borderRadius: 6, background: '#f3e8ff', color: '#810cfa', fontWeight: 600 }}>Pro / Premium</span>
+                </div>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #F3F4F6' }}>
+                  <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Resumo da turma</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                    {[['7.4', 'Média geral', '#0081f0'], ['79%', 'Aprovação', '#10B981'], ['34', 'Avaliados', '#6B7280']].map(([val, label, color]) => (
+                      <div key={label} style={{ textAlign: 'center', padding: '12px 8px', background: '#F9FAFB', borderRadius: 10, border: '1px solid #F3F4F6' }}>
+                        <div style={{ fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{val}</div>
+                        <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #F3F4F6' }}>
+                  <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Desempenho por critério</div>
+                  {[['Estrutura do texto', 81, '#0081f0'], ['Argumentação', 58, '#EF4444'], ['Gramática e ortografia', 76, '#10B981'], ['Conclusão', 69, '#f59e0b']].map(([label, val, color]) => (
+                    <div key={label} style={{ marginBottom: 9 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6B7280', marginBottom: 4 }}>
+                        <span>{label}</span>
+                        <span style={{ fontWeight: 700, color: val < 65 ? '#EF4444' : '#374151' }}>{val}%</span>
+                      </div>
+                      <div style={{ height: 5, background: '#F3F4F6', borderRadius: 3 }}>
+                        <div style={{ height: '100%', width: `${val}%`, background: val < 65 ? '#FCA5A5' : color, borderRadius: 3 }} />
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ marginTop: 8, padding: '8px 10px', background: '#FEF2F2', borderRadius: 8, border: '1px solid #FECACA', display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: 12, color: '#EF4444', marginTop: 1 }}>⚠</span>
+                    <span style={{ fontSize: 12, color: '#DC2626', fontWeight: 500, lineHeight: 1.5 }}>Argumentação (58%) abaixo da meta — considere revisar a abordagem em aula</span>
+                  </div>
+                </div>
+                <div style={{ padding: '14px 20px' }}>
+                  <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Alunos que precisam de atenção</div>
+                  {[['Júlia R.', 3.8], ['Pedro A.', 4.6], ['Marcos T.', 4.9]].map(([name, score]) => (
+                    <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 8px', background: '#FEF2F2', borderRadius: 8, marginBottom: 4 }}>
+                      <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#EF4444', flexShrink: 0 }}>{name[0]}</div>
+                      <span style={{ fontSize: 13, color: '#374151', flex: 1 }}>{name}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#EF4444' }}>{score.toFixed(1)}</span>
+                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 100, background: '#FEF2F2', color: '#EF4444', fontWeight: 600, border: '1px solid #FECACA' }}>Atenção</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ── SOCIAL PROOF ───────────────────────────────────────────────────── */}
         <section style={{ padding: '96px 32px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
@@ -479,7 +599,7 @@ export default function Home() {
               {[
                 { name: 'Ana Lima', role: 'Professora de Português · UFMG', quote: 'Eu corrigia 30 redações todo fim de semana. Hoje faço o mesmo em menos de 1 hora — e o feedback ficou ainda mais preciso. Não consigo mais imaginar minha rotina sem o AvaliA.' },
                 { name: 'Carlos Santos', role: 'Professor de Programação · UNIP', quote: 'O que mais me surpreendeu foi a consistência. Antes eu era claramente mais rigoroso nas últimas avaliações do que nas primeiras. Agora o padrão é sempre o mesmo.' },
-                { name: 'Maria Oliveira', role: 'Coordenadora Pedagógica · Colégio São Paulo', quote: 'Toda a equipe aderiu em menos de uma semana. O tempo que economizávamos em correções virou tempo real de planejamento pedagógico.' },
+                { name: 'Maria Oliveira', role: 'Coordenadora Pedagógica · Colégio São Paulo', quote: 'Os relatórios de turma mudaram nossa forma de trabalhar. Em minutos vejo quais critérios estão abaixo da média, apresento os dados nas reuniões de equipe e tomamos decisões pedagógicas com base real. Toda a escola aderiu.' },
               ].map(t => (
                 <div key={t.name} className="testimonial-card">
                   <div style={{ display: 'flex', gap: 3, marginBottom: 20 }}>
@@ -512,8 +632,8 @@ export default function Home() {
               {[
                 { Ic: BrainIcon,    title: 'IA pedagógica',        desc: 'Treinada para educação. Entende contexto, disciplina e objetivos pedagógicos reais.' },
                 { Ic: UsersIcon,    title: 'Múltiplos perfis',      desc: 'Gerencie disciplinas e turmas distintas com perfis completamente independentes.' },
-                { Ic: FileTextIcon, title: '25+ formatos',          desc: 'Redações, relatórios, projetos, provas dissertativas, seminários e muito mais.' },
-                { Ic: BarChartIcon, title: 'Analytics da turma',    desc: 'Dashboards visuais com desempenho individual, médias e evolução ao longo do tempo.' },
+                { Ic: FileTextIcon, title: '60+ tipos de trabalho',  desc: 'Texto, vídeo, imagem, código, partitura, 3D e muito mais — 11 categorias para todas as disciplinas.' },
+                { Ic: BarChartIcon, title: 'Relatórios de turma',   desc: 'Dados consolidados por turma: média, aprovação, critérios abaixo da meta e alunos que precisam de atenção.' },
                 { Ic: DownloadIcon, title: 'Exportação flexível',   desc: 'Exporte em PDF ou CSV para registros institucionais e reuniões pedagógicas.' },
                 { Ic: CheckIcon,    title: 'Critérios customizados', desc: 'Defina e salve seus próprios critérios de avaliação reutilizáveis por exercício.' },
               ].map(({ Ic, title, desc }) => (
@@ -692,7 +812,7 @@ export default function Home() {
               </div>
             </div>
             <div style={{ borderTop: '1px solid #001025', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-              <span style={{ fontSize: 13, color: '#4B5563' }}>© 2025 AvaliA · avalia.education</span>
+              <span style={{ fontSize: 13, color: '#4B5563' }}>© 2026 AvaliA · avalia.education</span>
               <span style={{ fontSize: 13, color: '#4B5563' }}>Todos os direitos reservados</span>
             </div>
           </div>
