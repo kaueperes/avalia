@@ -790,9 +790,10 @@ export default function Home() {
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 18 }}>Produto</div>
                 {[
                   { label: 'Funcionalidades', href: '#funcionalidades' },
-                  { label: 'Como funciona', href: '#como-funciona' },
+                  { label: 'Tipos de Trabalho', href: '#disciplinas' },
+                  { label: 'Para Coordenadores', href: '#coordenadores' },
                   { label: 'Planos', href: '#planos' },
-                  { label: 'Entrar', href: '/login' },
+                  { label: 'Ajuda', href: '/central-de-ajuda' },
                 ].map(({ label, href }) => (
                   <a key={label} href={href} style={{ display: 'block', fontSize: 14, color: '#6B7280', marginBottom: 12, cursor: 'pointer', transition: 'color .15s', textDecoration: 'none' }}
                     onMouseEnter={e => e.target.style.color = 'white'}
