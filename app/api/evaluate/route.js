@@ -105,12 +105,14 @@ Regras:
 - Peso do gabarito na correção: ${{ livre: 'REFERÊNCIA LIVRE — use o gabarito apenas como orientação geral; valorize criatividade e interpretações pessoais', parcial: 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes', estrito: 'ESTRITO — o aluno deve seguir o gabarito de perto; penalize desvios significativos' }[referenceWeight] || 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes'}` : ''}`;
 
   try {
-    const hasVideo = images?.some(img => img.mediaType?.startsWith('video/'));
+    const hasVideoOrAudio = images?.some(img =>
+      img.mediaType?.startsWith('video/') || img.mediaType?.startsWith('audio/')
+    );
 
     let parsed;
 
-    if (hasVideo) {
-      // Route to Gemini for video evaluation
+    if (hasVideoOrAudio) {
+      // Route to Gemini for video/audio evaluation
       if (!process.env.GEMINI_API_KEY) {
         return NextResponse.json({ error: 'GEMINI_API_KEY não configurada.' }, { status: 503 });
       }

@@ -620,7 +620,7 @@ export default function AvaliarPage() {
                       </label>
                       <input ref={studentFileRef}
                         type="file"
-                        accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*' : TYPES[selectedType]?.input === 'video' ? 'video/*,image/*' : 'image/*'}
+                        accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*' : TYPES[selectedType]?.input === 'video' ? 'video/*,audio/*,image/*' : 'image/*'}
                         multiple={['obj', 'video', 'imgs'].includes(TYPES[selectedType]?.input)}
                         style={{ display: 'none' }}
                         onChange={e => {
@@ -662,7 +662,7 @@ export default function AvaliarPage() {
                               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 8px', display: 'block' }}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
                               <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>
-                                {TYPES[selectedType]?.input === 'video' ? 'vídeo (MP4, MOV) e/ou imagens (até 10)' : TYPES[selectedType]?.input === 'imgs' ? 'imagens JPG, PNG, WEBP (até 10)' : '.obj e/ou imagens (até 10)'}
+                                {TYPES[selectedType]?.input === 'video' ? 'vídeo (MP4, MOV), áudio (MP3, WAV, M4A) e/ou imagens (até 10)' : TYPES[selectedType]?.input === 'imgs' ? 'imagens JPG, PNG, WEBP (até 10)' : '.obj e/ou imagens (até 10)'}
                               </div>
                             </div>
                           )}
