@@ -425,14 +425,14 @@ export default function AvaliarPage() {
               </div>
               {/* Grid de tipos */}
               <div style={{ flex: 1, padding: '12px 12px 16px', minWidth: 0 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 10 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 10 }}>
                   {Object.entries(TYPES).filter(([, v]) => v.cat === activeCat).map(([k, v]) => (
                     <div key={k} onClick={() => switchType(k)} style={{
                       padding: '11px 5px', border: `1px solid ${selectedType === k ? '#0081f0' : 'var(--border)'}`,
                       borderRadius: 9, background: selectedType === k ? 'var(--selected-bg)' : 'var(--bg-content)',
                       fontSize: 11.5, fontWeight: selectedType === k ? 700 : 500,
                       color: selectedType === k ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', lineHeight: 1.35,
-                      minHeight: 76, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      minHeight: 68, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                     }}>
                       <div style={{ width: 20, height: 20, marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
