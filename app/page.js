@@ -161,10 +161,12 @@ export default function Home() {
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 36, width: 'auto' }} />
             </div>
-            <div className="nav-links" style={{ display: 'flex', gap: 36 }}>
+            <div className="nav-links" style={{ display: 'flex', gap: 32 }}>
               <a href="#funcionalidades" className="nav-link nav-link-light">Funcionalidades</a>
-              <a href="#como-funciona" className="nav-link nav-link-light">Como funciona</a>
+              <a href="#disciplinas" className="nav-link nav-link-light">Tipos de Trabalho</a>
+              <a href="#coordenadores" className="nav-link nav-link-light">Para Coordenadores</a>
               <a href="#planos" className="nav-link nav-link-light">Planos</a>
+              <a href="/central-de-ajuda" className="nav-link nav-link-light">Ajuda</a>
             </div>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
               <button onClick={() => router.push('/login')} style={{ background: 'none', border: 'none', color: '#374151', fontWeight: 500, fontSize: 15, cursor: 'pointer', padding: '8px 14px', borderRadius: 8 }}
@@ -470,7 +472,7 @@ export default function Home() {
         </section>
 
         {/* ── DISCIPLINAS ────────────────────────────────────────────────────── */}
-        <section style={{ padding: '96px 32px', background: '#00173f' }}>
+        <section id="disciplinas" style={{ padding: '96px 32px', background: '#00173f' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 64 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Para todas as disciplinas</p>
@@ -511,7 +513,7 @@ export default function Home() {
         </section>
 
         {/* ── COORDENADORES ──────────────────────────────────────────────────── */}
-        <section style={{ padding: '96px 32px', background: 'white' }}>
+        <section id="coordenadores" style={{ padding: '96px 32px', background: 'white' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, alignItems: 'center' }}>
               <div>
