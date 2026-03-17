@@ -412,7 +412,7 @@ export default function AvaliarPage() {
                     background: activeCat === catKey ? 'var(--selected-bg)' : 'transparent',
                     border: `1px solid ${activeCat === catKey ? '#0081f033' : 'transparent'}`,
                     color: activeCat === catKey ? '#0081f0' : 'var(--text-sub)',
-                    fontWeight: activeCat === catKey ? 700 : 500,
+                    fontWeight: 600,
                     fontSize: 12.5, lineHeight: 1.35, transition: 'all .12s',
                   }}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>{CAT_ICONS[catKey]}</svg>
