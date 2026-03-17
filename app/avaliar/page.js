@@ -348,7 +348,7 @@ export default function AvaliarPage() {
       </div>
 
       {/* Grid 2 colunas */}
-      <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', gap: 24, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '500px 1fr', gap: 24, alignItems: 'start' }}>
 
         {/* COLUNA ESQUERDA — Configuração */}
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 16, overflow: 'hidden' }}>
@@ -390,34 +390,34 @@ export default function AvaliarPage() {
             <div style={{ padding: '0 24px 10px', ...secLabel }}><Tooltip text="Selecione a categoria e o tipo específico do trabalho enviado pelo aluno. Isso define como a IA vai analisar.">Tipo de Trabalho</Tooltip></div>
             <div style={{ display: 'flex', borderTop: '1px solid var(--border-card)' }}>
               {/* Sidebar de categorias */}
-              <div style={{ width: 148, flexShrink: 0, borderRight: '1px solid var(--border-card)', padding: '8px 6px', background: 'var(--bg-content)', display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <div style={{ width: 162, flexShrink: 0, borderRight: '1px solid var(--border-card)', padding: '10px 8px', background: 'var(--bg-content)', display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {Object.entries(CATEGORIES).map(([catKey, cat]) => (
                   <div key={catKey} onClick={() => setActiveCat(catKey)} style={{
-                    display: 'flex', alignItems: 'center', gap: 7,
-                    padding: '8px 9px', borderRadius: 8, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '8px 10px', borderRadius: 8, cursor: 'pointer',
                     background: activeCat === catKey ? 'var(--selected-bg)' : 'transparent',
                     border: `1px solid ${activeCat === catKey ? '#0081f033' : 'transparent'}`,
                     color: activeCat === catKey ? '#0081f0' : 'var(--text-sub)',
                     fontWeight: activeCat === catKey ? 700 : 500,
-                    fontSize: 11.5, lineHeight: 1.3, transition: 'all .12s',
+                    fontSize: 12.5, lineHeight: 1.35, transition: 'all .12s',
                   }}>
-                    <span style={{ fontSize: 13, flexShrink: 0 }}>{cat.icon}</span>
+                    <span style={{ fontSize: 14, flexShrink: 0 }}>{cat.icon}</span>
                     <span>{cat.label}</span>
                   </div>
                 ))}
               </div>
               {/* Grid de tipos */}
-              <div style={{ flex: 1, padding: '10px 10px 14px', minWidth: 0 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 5, marginBottom: 8 }}>
+              <div style={{ flex: 1, padding: '12px 12px 16px', minWidth: 0 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 10 }}>
                   {Object.entries(TYPES).filter(([, v]) => v.cat === activeCat).map(([k, v]) => (
                     <div key={k} onClick={() => switchType(k)} style={{
-                      padding: '10px 4px', border: `1px solid ${selectedType === k ? '#0081f0' : 'var(--border)'}`,
+                      padding: '11px 5px', border: `1px solid ${selectedType === k ? '#0081f0' : 'var(--border)'}`,
                       borderRadius: 9, background: selectedType === k ? 'var(--selected-bg)' : 'var(--bg-content)',
-                      fontSize: 11, fontWeight: selectedType === k ? 700 : 500,
-                      color: selectedType === k ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', lineHeight: 1.3,
+                      fontSize: 11.5, fontWeight: selectedType === k ? 700 : 500,
+                      color: selectedType === k ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', lineHeight: 1.35,
                     }}>
-                      <div style={{ width: 18, height: 18, margin: '0 auto 5px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <div style={{ width: 20, height: 20, margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           {TYPE_ICONS[k]}
                         </svg>
                       </div>
@@ -426,7 +426,7 @@ export default function AvaliarPage() {
                   ))}
                 </div>
                 {TYPES[selectedType] && (
-                  <div style={{ fontSize: 11.5, color: 'var(--text-sub)', padding: '7px 9px', background: 'var(--bg-content)', borderRadius: 7, border: '1px solid var(--border)', lineHeight: 1.5 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-sub)', padding: '8px 10px', background: 'var(--bg-content)', borderRadius: 8, border: '1px solid var(--border)', lineHeight: 1.5 }}>
                     {TYPES[selectedType].hint}
                   </div>
                 )}
