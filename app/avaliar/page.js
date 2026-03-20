@@ -847,16 +847,14 @@ export default function AvaliarPage() {
                           <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>.obj + imagens de concept</div>
                         </div>
                       )}
-                      {referenceFiles.length > 0 && (
-                        <div style={{ marginTop: 10 }}>
-                          <label style={{ ...lbl, marginBottom: 4 }}>Peso do gabarito na correção</label>
-                          <select style={inp} value={referenceWeight} onChange={e => setReferenceWeight(e.target.value)}>
-                            <option value="livre">Referência livre — apenas orientação, valorize a criatividade</option>
-                            <option value="parcial">Parcial — considere o gabarito, mas aceite variações</option>
-                            <option value="estrito">Estrito — o aluno deve seguir o gabarito de perto</option>
-                          </select>
-                        </div>
-                      )}
+                      <div style={{ marginTop: 10 }}>
+                        <label style={{ ...lbl, marginBottom: 4 }}>Peso do gabarito na correção</label>
+                        <select style={inp} value={referenceWeight} onChange={e => setReferenceWeight(e.target.value)}>
+                          <option value="livre">Referência livre — apenas orientação, valorize a criatividade</option>
+                          <option value="parcial">Parcial — considere o gabarito, mas aceite variações</option>
+                          <option value="estrito">Estrito — o aluno deve seguir o gabarito de perto</option>
+                        </select>
+                      </div>
                     </div>
                   </>
                 )}
