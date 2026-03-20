@@ -128,6 +128,9 @@ export default function AvaliarPage() {
   const [selectedExerciseId, setSelectedExerciseId] = useState('');
   const [exerciseName, setExerciseName] = useState('');
   const [exerciseContext, setExerciseContext] = useState('');
+  const [showAiPrompt, setShowAiPrompt] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
   const [criteria, setCriteria] = useState([]);
   const [newCritName, setNewCritName] = useState('');
   const [newCritWeight, setNewCritWeight] = useState(2);
@@ -362,6 +365,21 @@ export default function AvaliarPage() {
     color: 'var(--text-main)', fontFamily: 'inherit', boxSizing: 'border-box',
   };
   const lbl = { display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 };
+  async function generateContext() {
+    if (!aiPrompt.trim()) return;
+    setAiLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const r = await fetch('/api/exercises/generate', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exerciseName, exerciseType: selectedType, briefDescription: aiPrompt }),
+      });
+      const d = await r.json();
+      if (d.context) { setExerciseContext(d.context); setShowAiPrompt(false); setAiPrompt(''); }
+    } finally { setAiLoading(false); }
+  }
+
   const maxExtraFiles = selectedType === 'tcc' ? 15 : ['musica_partitura', 'arranjo_musical', 'storyboard'].includes(selectedType) ? 10 : 5;
   const secLabel = { fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 };
   const section = { padding: '22px 24px', borderBottom: '1px solid var(--border-card)' };
@@ -484,7 +502,31 @@ export default function AvaliarPage() {
               <input style={inp} value={exerciseName} onChange={e => setExerciseName(e.target.value)} placeholder="Ex: Exercício 3 — Modelagem de Personagem" />
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={lbl}><Tooltip text="Descreva o que foi pedido ao aluno. Quanto mais detalhado, melhor será a avaliação da IA.">Enunciado / Descrição</Tooltip></label>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <label style={lbl}><Tooltip text="Descreva o que foi pedido ao aluno. Quanto mais detalhado, melhor será a avaliação da IA.">Enunciado / Descrição</Tooltip></label>
+                <button onClick={() => setShowAiPrompt(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 9px', border: '1px solid #0081f033', borderRadius: 7, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2v4h4"/></svg>
+                  Criar com IA
+                </button>
+              </div>
+              {showAiPrompt && (
+                <div style={{ marginBottom: 8, padding: '10px 12px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 10 }}>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6, fontWeight: 500 }}>Descreva o exercício brevemente e a IA gera o enunciado completo:</p>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <input
+                      style={{ ...inp, flex: 1, fontSize: 12, padding: '7px 10px' }}
+                      value={aiPrompt}
+                      onChange={e => setAiPrompt(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && generateContext()}
+                      placeholder="Ex: modelagem de personagem low poly, foco em otimização..."
+                      autoFocus
+                    />
+                    <button onClick={generateContext} disabled={aiLoading || !aiPrompt.trim()} style={{ padding: '7px 14px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: aiLoading ? 'wait' : 'pointer', opacity: !aiPrompt.trim() ? 0.5 : 1, flexShrink: 0 }}>
+                      {aiLoading ? 'Gerando...' : 'Gerar'}
+                    </button>
+                  </div>
+                </div>
+              )}
               <textarea style={{ ...inp, minHeight: 64, resize: 'vertical' }} value={exerciseContext} onChange={e => setExerciseContext(e.target.value)} placeholder="Descreva o objetivo e requisitos do exercício..." />
             </div>
             <div>
