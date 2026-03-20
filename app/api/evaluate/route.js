@@ -101,8 +101,9 @@ Regras:
 - O feedback deve ser escrito em português brasileiro
 - Os nomes dos critérios devem ser exatamente iguais aos fornecidos
 - Seja específico, construtivo e alinhado ao tom solicitado
-- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada${images?.length > 0 ? `\n- Os arquivos enviados estão identificados com rótulos: "Trabalho do aluno" = produção do aluno a ser avaliada; "Referência do aluno" = material consultado pelo aluno como inspiração/fonte (use como contexto, mas NÃO avalie como produção dele); "Referência para Correção" = gabarito do professor (use como parâmetro de avaliação); "Arquivo adicional" = contexto extra
-- Peso do gabarito na correção: ${{ livre: 'REFERÊNCIA LIVRE — use o gabarito apenas como orientação geral; valorize criatividade e interpretações pessoais', parcial: 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes', estrito: 'ESTRITO — o aluno deve seguir o gabarito de perto; penalize desvios significativos' }[referenceWeight] || 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes'}` : ''}`;
+- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada${images?.length > 0 ? `\n- Os arquivos enviados estão identificados com rótulos: "Trabalho do aluno" = produção do aluno a ser avaliada; "Referência do aluno" = material consultado pelo aluno como inspiração/fonte (use como contexto, mas NÃO avalie como produção dele); "Referência para Correção" = gabarito interno do professor (use apenas para calibrar a avaliação — NUNCA mencione, cite ou faça referência ao gabarito no feedback); "Arquivo adicional" = contexto extra
+- Peso do gabarito na correção: ${{ livre: 'REFERÊNCIA LIVRE — use o gabarito apenas como orientação geral; valorize criatividade e interpretações pessoais', parcial: 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes', estrito: 'ESTRITO — o aluno deve seguir o gabarito de perto; penalize desvios significativos' }[referenceWeight] || 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes'}
+- O gabarito é uma ferramenta interna do professor. Jamais mencione sua existência no feedback ao aluno` : ''}`;
 
   try {
     const hasVideoOrAudio = images?.some(img =>
