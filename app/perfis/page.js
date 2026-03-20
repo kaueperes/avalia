@@ -77,6 +77,12 @@ export default function PerfisPage() {
     load();
   }
 
+  async function duplicate(p) {
+    const copy = { name: `Cópia de ${p.name}`, discipline: p.discipline, turma: p.turma || '', tone: p.tone || 'neutro', teachingLevel: p.teachingLevel || '', writingSample: p.writingSample || '', institutionLogo: p.institutionLogo || '', institution: p.institution || '' };
+    const r = await fetch('/api/profiles', { method: 'POST', headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' }, body: JSON.stringify(copy) });
+    if (r.ok) { load(); setMsg({ text: 'Perfil duplicado!', ok: true }); setTimeout(() => setMsg({ text: '', ok: true }), 3000); }
+  }
+
   function startEdit(p) {
     setForm({ name: p.name, discipline: p.discipline, turma: p.turma || '', tone: p.tone || 'neutro', teachingLevel: p.teachingLevel || '', writingSample: p.writingSample || '', institutionLogo: p.institutionLogo || '', institution: p.institution || '' });
     setEditingId(p.id);
@@ -130,6 +136,11 @@ export default function PerfisPage() {
                         onClick={() => startEdit(p)}
                         style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
                         Editar
+                      </button>
+                      <button
+                        onClick={() => duplicate(p)}
+                        style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
+                        Duplicar
                       </button>
                       <button
                         onClick={() => del(p.id)}
