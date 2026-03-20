@@ -490,9 +490,19 @@ export default function AvaliarPage() {
             <div>
               <label style={{ ...lbl, marginBottom: 8 }}><Tooltip text="Cada critério recebe nota de 0 a 10. O peso (×) multiplica a importância do critério na nota final.">Critérios</Tooltip></label>
               {criteria.map((c, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 9, marginBottom: 6, fontSize: 13 }}>
-                  <span style={{ flex: 1, color: 'var(--text-main)' }}>{c.name}</span>
-                  <span style={{ fontSize: 10, background: 'var(--selected-bg)', color: '#0081f0', borderRadius: 4, padding: '2px 6px', flexShrink: 0 }}>{c.weight}×</span>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 9, marginBottom: 6, fontSize: 13 }}>
+                  <input
+                    value={c.name}
+                    onChange={e => { const cr = [...criteria]; cr[i] = { ...cr[i], name: e.target.value }; setCriteria(cr); }}
+                    style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-main)', fontSize: 13, outline: 'none', minWidth: 0 }}
+                  />
+                  <select
+                    value={c.weight}
+                    onChange={e => { const cr = [...criteria]; cr[i] = { ...cr[i], weight: Number(e.target.value) }; setCriteria(cr); }}
+                    style={{ fontSize: 11, background: 'var(--selected-bg)', color: '#0081f0', border: '1px solid #0081f033', borderRadius: 4, padding: '2px 4px', flexShrink: 0, cursor: 'pointer' }}
+                  >
+                    <option value={1}>1×</option><option value={2}>2×</option><option value={3}>3×</option>
+                  </select>
                   <span onClick={() => setCriteria(criteria.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
                 </div>
               ))}
