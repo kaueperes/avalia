@@ -98,6 +98,20 @@ export default function AvaliacoesPage() {
 
   function clearFilters() { setSearch(''); setTypeFilter(''); setTurmaFilter(''); setExerciseFilter(''); setInstitutionFilter(''); setScoreMin(''); setScoreMax(''); }
 
+  async function saveEdit() {
+    if (!detailDraft) return;
+    const r = await fetch(`/api/evaluations/${detail.id}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ studentName: detailDraft.studentName, score: detailDraft.score, feedback: detailDraft.feedback, criteria: detailDraft.criteria }),
+    });
+    if (r.ok) {
+      setEvaluations(prev => prev.map(e => e.id === detail.id ? { ...e, ...detailDraft } : e));
+      setDetail(detailDraft);
+      setDetailDraft(null);
+    }
+  }
+
   async function del(id) {
     if (!confirm('Excluir esta avaliação?')) return;
     await fetch(`/api/evaluations/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token()}` } });
@@ -656,8 +670,17 @@ export default function AvaliacoesPage() {
 
               {/* Cabeçalho */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
-                <div>
-                  <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>{detail.studentName}</h2>
+                <div style={{ flex: 1, minWidth: 0, marginRight: 20 }}>
+                  {editing ? (
+                    <input
+                      value={detailDraft.studentName || ''}
+                      onChange={e => setDetailDraft(dd => ({ ...dd, studentName: e.target.value }))}
+                      placeholder="Nome do aluno"
+                      style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', border: '1px solid var(--border)', borderRadius: 8, padding: '5px 10px', background: 'var(--bg-content)', fontFamily: 'inherit', width: '100%', marginBottom: 6 }}
+                    />
+                  ) : (
+                    <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>{detail.studentName}</h2>
+                  )}
                   <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
                     {TYPES[detail.type]?.label || detail.type} · {new Date(detail.createdAt).toLocaleDateString('pt-BR')}
                     {detail.turma ? ` · ${detail.turma}` : ''}
@@ -745,9 +768,14 @@ export default function AvaliacoesPage() {
                   Gerar PDF
                 </button>
                 {editing ? (
-                  <button onClick={() => setDetailDraft(null)} style={{ padding: '10px 18px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 14, fontWeight: 500, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
-                    Cancelar edição
-                  </button>
+                  <>
+                    <button onClick={saveEdit} style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                      Salvar alterações
+                    </button>
+                    <button onClick={() => setDetailDraft(null)} style={{ padding: '10px 18px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 14, fontWeight: 500, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
+                      Cancelar
+                    </button>
+                  </>
                 ) : (
                   <button onClick={() => setDetailDraft(JSON.parse(JSON.stringify(detail)))} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 18px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 14, fontWeight: 500, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
