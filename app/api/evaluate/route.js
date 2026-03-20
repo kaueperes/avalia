@@ -30,8 +30,8 @@ function selectModel({ studentWork, criteria, writingSample, exerciseContext, to
   if (['rigoroso', 'didatico', 'formal'].includes(tone)) complexity += 1;
 
   return complexity >= 4
-    ? { model: 'claude-sonnet-4-6', maxTokens: 1800 }
-    : { model: 'claude-haiku-4-5-20251001', maxTokens: 1200 };
+    ? { model: 'claude-sonnet-4-6', maxTokens: 3000 }
+    : { model: 'claude-haiku-4-5-20251001', maxTokens: 2000 };
 }
 
 export async function POST(request) {
@@ -143,11 +143,14 @@ Regras:
       const text = result.response.text();
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA. Tente novamente.' }, { status: 500 });
-      parsed = JSON.parse(jsonMatch[0]);
+      try { parsed = JSON.parse(jsonMatch[0]); } catch {
+        // Try stripping control characters that break JSON.parse
+        parsed = JSON.parse(jsonMatch[0].replace(/[\u0000-\u001F\u007F]/g, ' '));
+      }
     } else {
       // Use Sonnet when images are present (better vision quality); otherwise use adaptive selection
       const { model, maxTokens } = images?.length > 0
-        ? { model: 'claude-sonnet-4-6', maxTokens: 1800 }
+        ? { model: 'claude-sonnet-4-6', maxTokens: 3000 }
         : selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
 
       // Build message content: text prompt + vision blocks if images present
@@ -172,7 +175,10 @@ Regras:
       const text = message.content[0]?.text || '';
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA. Tente novamente.' }, { status: 500 });
-      parsed = JSON.parse(jsonMatch[0]);
+      try { parsed = JSON.parse(jsonMatch[0]); } catch {
+        // Try stripping control characters that break JSON.parse
+        parsed = JSON.parse(jsonMatch[0].replace(/[\u0000-\u001F\u007F]/g, ' '));
+      }
     }
 
     // Calculate weighted score
