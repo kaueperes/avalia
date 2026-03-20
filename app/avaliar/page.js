@@ -104,6 +104,7 @@ const TYPE_ICONS = {
 
 export default function AvaliarPage() {
   const router = useRouter();
+  const resultPanelRef = useRef(null);
   const studentFileRef = useRef(null);
   const cameraRef = useRef(null);
   const referenceFilesRef = useRef(null);
@@ -233,7 +234,7 @@ export default function AvaliarPage() {
     setEvalError('');
     setResult(null);
     setSaved(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    resultPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     try {
       let workContent = studentWork;
       const fileForName = studentFile || studentFiles[0] || extraFiles[0];
@@ -959,7 +960,7 @@ export default function AvaliarPage() {
         </div>
 
         {/* COLUNA DIREITA — Resultado */}
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 16, overflow: 'hidden', minHeight: 480 }}>
+        <div ref={resultPanelRef} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 16, overflow: 'hidden', minHeight: 480 }}>
 
           {!result && !generating && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '64px 40px', textAlign: 'center' }}>
