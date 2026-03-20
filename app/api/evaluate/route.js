@@ -98,16 +98,17 @@ Avalie o trabalho e responda APENAS com JSON válido (sem markdown, sem texto fo
 
 Contexto importante: este é um trabalho acadêmico de um aluno em formação. As notas devem refletir o desempenho esperado para o nível de aprendizado, não um padrão profissional.
 
-Para calcular a nota de cada critério, parta de 10.0 e deduza pontos somente pelos problemas claramente identificados:
+Para calcular a nota de cada critério, parta de 10.0 e deduza somente por problemas concretos e identificáveis:
 - Ausência completa ou falha que inviabiliza totalmente o critério: -2.0 a -3.0
-- Problema relevante que compromete parcialmente o critério: -0.5 a -1.5
-- Imprecisão pequena ou sugestão de melhoria: -0.1 a -0.4
-- Execução adequada: mantenha em 9.5–10.0
-Aplique no máximo UMA dedução por problema encontrado — não acumule deduções sobre o mesmo ponto. Se houver dúvida entre duas notas, escolha sempre a maior. Reserve notas abaixo de 6.0 apenas para trabalhos que falham completamente nos requisitos do critério.
+- Problema claro que compromete parcialmente o critério: -0.5 a -1.5
+- Erro pontual e específico (não uma sugestão de melhoria): -0.1 a -0.4
+- Sem problema concreto identificado: 10.0 — não invente deduções
+
+IMPORTANTE: 10.0 significa que o critério foi atendido — não significa "perfeição absoluta". Se o trabalho cumpre o critério, a nota é 10.0. Só deduza se conseguir apontar um erro específico, não uma vaga "área de melhoria". Aplique no máximo UMA dedução por problema. Na dúvida, escolha sempre a nota maior.
 
 Regras:
 - Notas de 0.0 a 10.0 (uma casa decimal)
-- Deduza apenas pelo que está comprovadamente errado ou ausente — não penalize estilo pessoal, escolhas subjetivas ou desvios de padrão profissional
+- Não penalize estilo pessoal, escolhas subjetivas, formatação diferente do esperado ou desvios que não comprometem o critério
 - O feedback deve ser escrito em português brasileiro
 - Os nomes dos critérios devem ser exatamente iguais aos fornecidos
 - Seja específico, construtivo e alinhado ao tom solicitado
