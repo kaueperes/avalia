@@ -101,7 +101,7 @@ Regras:
 - O feedback deve ser escrito em português brasileiro
 - Os nomes dos critérios devem ser exatamente iguais aos fornecidos
 - Seja específico, construtivo e alinhado ao tom solicitado
-- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada${images?.length > 0 ? `\n- As imagens enviadas estão identificadas com rótulos ("Trabalho do aluno", "Referência para Correção", "Arquivo adicional"). Imagens de referência servem como gabarito/comparação — use-as para avaliar o trabalho do aluno, mas NÃO as trate como entregas do aluno
+- Se não houver trabalho do aluno, ainda assim gere uma avaliação contextualizada${images?.length > 0 ? `\n- Os arquivos enviados estão identificados com rótulos: "Trabalho do aluno" = produção do aluno a ser avaliada; "Referência do aluno" = material consultado pelo aluno como inspiração/fonte (use como contexto, mas NÃO avalie como produção dele); "Referência para Correção" = gabarito do professor (use como parâmetro de avaliação); "Arquivo adicional" = contexto extra
 - Peso do gabarito na correção: ${{ livre: 'REFERÊNCIA LIVRE — use o gabarito apenas como orientação geral; valorize criatividade e interpretações pessoais', parcial: 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes', estrito: 'ESTRITO — o aluno deve seguir o gabarito de perto; penalize desvios significativos' }[referenceWeight] || 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes'}` : ''}`;
 
   try {

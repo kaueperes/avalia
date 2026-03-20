@@ -107,6 +107,7 @@ export default function AvaliarPage() {
   const studentFileRef = useRef(null);
   const cameraRef = useRef(null);
   const referenceFilesRef = useRef(null);
+  const studentRefFilesRef = useRef(null);
   const batchFilesRef = useRef(null);
   const extraFilesRef = useRef(null);
   const [userName, setUserName] = useState('Professor');
@@ -143,6 +144,7 @@ export default function AvaliarPage() {
   const [studentFiles, setStudentFiles] = useState([]); // para obj (múltiplos)
   const [referenceFiles, setReferenceFiles] = useState([]);
   const [referenceWeight, setReferenceWeight] = useState('parcial');
+  const [studentRefFiles, setStudentRefFiles] = useState([]);
   const [batchFiles, setBatchFiles] = useState([]);
   const [filePattern, setFilePattern] = useState('nome_matricula');
   const [dragZone, setDragZone] = useState(null);
@@ -267,9 +269,22 @@ export default function AvaliarPage() {
       if (TYPES[selectedType]?.input === 'img' && studentFile && studentFile.type.startsWith('image/')) {
         images.push({ data: await toBase64(studentFile), mediaType: studentFile.type, label: `Trabalho do aluno: ${studentFile.name}` });
       }
+      for (const f of studentRefFiles) {
+        if (f.type.startsWith('image/') || f.type.startsWith('video/') || f.type.startsWith('audio/') || f.name.endsWith('.obj')) {
+          images.push({ data: await toBase64(f), mediaType: f.type || 'application/octet-stream', label: `Referência do aluno: ${f.name}` });
+        } else if (f.type === 'text/plain' || f.name.endsWith('.txt')) {
+          try { workContent = (workContent ? workContent + '\n\n[Referência do aluno]\n' : '[Referência do aluno]\n') + await f.text(); } catch {}
+        } else if (f.name.endsWith('.docx')) {
+          try {
+            const ab = await f.arrayBuffer();
+            const result = await mammoth.extractRawText({ arrayBuffer: ab });
+            workContent = (workContent ? workContent + '\n\n[Referência do aluno]\n' : '[Referência do aluno]\n') + result.value;
+          } catch {}
+        }
+      }
       for (const f of referenceFiles) {
         if (f.type.startsWith('image/')) {
-          images.push({ data: await toBase64(f), mediaType: f.type, label: `Referência: ${f.name}` });
+          images.push({ data: await toBase64(f), mediaType: f.type, label: `Referência para Correção: ${f.name}` });
         }
       }
       for (const f of extraFiles) {
@@ -706,6 +721,41 @@ export default function AvaliarPage() {
                             Tirar foto com a câmera
                           </button>
                         </>
+                      )}
+                    </div>
+
+                    {/* Referências do aluno */}
+                    <div>
+                      <label style={lbl}>
+                        <Tooltip text="Material que o aluno usou como referência ou inspiração. A IA usa como contexto mas não avalia como produção do aluno.">Referências do aluno</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
+                      </label>
+                      <div style={{ fontSize: 11, color: 'var(--text-sub)', marginBottom: 8, lineHeight: 1.5 }}>
+                        Imagens, vídeos, áudios, textos ou arquivos que o aluno usou como base. A IA entende o contexto sem confundir com o trabalho dele.
+                      </div>
+                      <input ref={studentRefFilesRef} type="file" multiple accept="image/*,video/*,audio/*,.obj,.txt,.docx" style={{ display: 'none' }} onChange={e => setStudentRefFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
+                      {studentRefFiles.length > 0 ? (
+                        <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
+                          {studentRefFiles.map((f, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderBottom: i < studentRefFiles.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12 }}>
+                              <span style={{ flex: 1, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+                              <span onClick={() => setStudentRefFiles(studentRefFiles.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
+                            </div>
+                          ))}
+                          {studentRefFiles.length < 5 && (
+                            <div onClick={() => studentRefFilesRef.current?.click()} style={{ padding: '8px 12px', fontSize: 12, color: '#0081f0', cursor: 'pointer', borderTop: '1px solid var(--border)', textAlign: 'center', fontWeight: 500 }}>+ Adicionar mais</div>
+                          )}
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => studentRefFilesRef.current?.click()}
+                          onMouseEnter={e => e.currentTarget.style.borderColor = '#0081f0'}
+                          onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                          style={{ border: '2px dashed var(--border)', borderRadius: 12, padding: '16px', textAlign: 'center', cursor: 'pointer', background: 'var(--bg-content)', transition: 'all .15s' }}
+                        >
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px', display: 'block' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>imagem, vídeo, áudio, .obj, .txt, .docx</div>
+                        </div>
                       )}
                     </div>
 
