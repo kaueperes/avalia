@@ -96,8 +96,18 @@ Avalie o trabalho e responda APENAS com JSON válido (sem markdown, sem texto fo
   "feedback": "Texto completo do feedback em português, no tom especificado"
 }
 
+Contexto importante: este é um trabalho acadêmico de um aluno em formação. As notas devem refletir o desempenho esperado para o nível de aprendizado, não um padrão profissional.
+
+Tabela de referência para as notas:
+- 9.0–10.0: Excelente — supera as expectativas para o nível, pouquíssimos ou nenhum ajuste necessário
+- 7.5–8.9: Bom — atende bem aos requisitos com alguns pontos de melhoria
+- 6.0–7.4: Satisfatório — atende o mínimo mas apresenta lacunas relevantes
+- 4.0–5.9: Insuficiente — não atende adequadamente aos requisitos
+- 0.0–3.9: Muito abaixo do esperado — entrega incompleta ou incorreta
+
 Regras:
 - Notas de 0.0 a 10.0 (uma casa decimal)
+- Use a tabela de referência acima para calibrar as notas com precisão — evite concentrar notas na faixa 6–7.5 sem justificativa real
 - O feedback deve ser escrito em português brasileiro
 - Os nomes dos critérios devem ser exatamente iguais aos fornecidos
 - Seja específico, construtivo e alinhado ao tom solicitado
