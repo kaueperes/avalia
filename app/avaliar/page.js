@@ -233,6 +233,7 @@ export default function AvaliarPage() {
     setEvalError('');
     setResult(null);
     setSaved(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     try {
       let workContent = studentWork;
       const fileForName = studentFile || studentFiles[0] || extraFiles[0];
