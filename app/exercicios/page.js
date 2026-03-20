@@ -33,6 +33,9 @@ export default function ExerciciosPage() {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState({ text: '', ok: true });
+  const [showAiPrompt, setShowAiPrompt] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
 
   function token() { return localStorage.getItem('token'); }
 
@@ -80,6 +83,24 @@ export default function ExerciciosPage() {
     setForm({ name: ex.name, type: ex.type, context: ex.context || '', criteria: ex.criteria || [] });
     setEditingId(ex.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function generateContext() {
+    if (!aiPrompt.trim()) return;
+    setAiLoading(true);
+    try {
+      const r = await fetch('/api/exercises/generate', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exerciseName: form.name, exerciseType: form.type, briefDescription: aiPrompt }),
+      });
+      const d = await r.json();
+      if (d.context) {
+        setForm(f => ({ ...f, context: d.context }));
+        setShowAiPrompt(false);
+        setAiPrompt('');
+      }
+    } finally { setAiLoading(false); }
   }
 
   function cancelEdit() {
@@ -176,14 +197,49 @@ export default function ExerciciosPage() {
           </div>
 
           <div className="form-grid">
-            <Field label="Enunciado / Descrição" hint="(opcional)" tooltip="Descreva o objetivo e os requisitos do exercício. Quanto mais detalhado, mais precisa será a avaliação da IA.">
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>
+                  <Tooltip text="Descreva o objetivo e os requisitos do exercício. Quanto mais detalhado, mais precisa será a avaliação da IA.">Enunciado / Descrição</Tooltip>
+                  <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}> (opcional)</span>
+                </label>
+                <button
+                  onClick={() => setShowAiPrompt(v => !v)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', border: '1px solid #0081f033', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2v4h4"/></svg>
+                  Criar com IA
+                </button>
+              </div>
+              {showAiPrompt && (
+                <div style={{ marginBottom: 10, padding: '12px 14px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 10 }}>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 500 }}>Descreva o exercício em poucas palavras e a IA gera o enunciado completo:</p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      style={{ ...inputStyle, flex: 1, fontSize: 13, padding: '8px 12px' }}
+                      value={aiPrompt}
+                      onChange={e => setAiPrompt(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && generateContext()}
+                      placeholder="Ex: modelagem de personagem low poly para game, foco em otimização..."
+                      autoFocus
+                    />
+                    <button
+                      onClick={generateContext}
+                      disabled={aiLoading || !aiPrompt.trim()}
+                      style={{ padding: '8px 16px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: aiLoading ? 'wait' : 'pointer', opacity: !aiPrompt.trim() ? 0.5 : 1, flexShrink: 0 }}
+                    >
+                      {aiLoading ? 'Gerando...' : 'Gerar'}
+                    </button>
+                  </div>
+                </div>
+              )}
               <textarea
                 style={{ ...inputStyle, minHeight: 160, resize: 'vertical', lineHeight: 1.6 }}
                 value={form.context}
                 onChange={e => setForm(f => ({ ...f, context: e.target.value }))}
                 placeholder="Descreva o objetivo, requisitos e restrições. Quanto mais detalhado, mais precisa será a avaliação."
               />
-            </Field>
+            </div>
 
             <div>
               <Field label="Critérios de Avaliação" tooltip="Cada critério recebe nota de 0 a 10. O peso (×) define a importância do critério na nota final.">
