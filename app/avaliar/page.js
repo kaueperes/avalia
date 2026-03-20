@@ -141,6 +141,7 @@ export default function AvaliarPage() {
   // Aluno
   const [tone, setTone] = useState('neutro');
   const [studentName, setStudentName] = useState('');
+  const [resolvedStudentName, setResolvedStudentName] = useState('');
   const [studentWork, setStudentWork] = useState('');
   const [studentMatricula, setStudentMatricula] = useState('');
   const [studentFile, setStudentFile] = useState(null);
@@ -218,6 +219,14 @@ export default function AvaliarPage() {
     setNewCritName(''); setNewCritWeight(2);
   }
 
+  function extractNameFromFile(file) {
+    if (!file) return '';
+    const base = file.name.replace(/\.[^.]+$/, ''); // remove extension
+    const parts = base.split(/[_\-\s]+/);
+    const nameParts = parts.filter(p => !/^\d+$/.test(p)); // remove pure numbers (matricula)
+    return nameParts.join(' ').trim();
+  }
+
   async function runEvaluation() {
     if (!exerciseName.trim()) return;
     setGenerating(true);
@@ -226,6 +235,9 @@ export default function AvaliarPage() {
     setSaved(false);
     try {
       let workContent = studentWork;
+      const fileForName = studentFile || studentFiles[0] || extraFiles[0];
+      const resolved = studentName.trim() || extractNameFromFile(fileForName);
+      setResolvedStudentName(resolved);
 
       // Helper: file → base64
       const toBase64 = (file) => new Promise((res, rej) => {
@@ -307,7 +319,7 @@ export default function AvaliarPage() {
       const r = await fetch('/api/evaluate', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName, studentWork: workContent, tone, profName, profDisc, profInstitution, writingSample, images: images.length > 0 ? images : undefined, referenceWeight: referenceFiles.length > 0 ? referenceWeight : undefined }),
+        body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName: resolved, studentWork: workContent, tone, profName, profDisc, profInstitution, writingSample, images: images.length > 0 ? images : undefined, referenceWeight: referenceWeight }),
       });
       const data = await r.json();
       if (!r.ok) { setEvalError(data.error || 'Erro ao gerar avaliação.'); return; }
@@ -335,7 +347,7 @@ export default function AvaliarPage() {
       method: 'POST',
       headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        studentName: studentName || 'Aluno',
+        studentName: resolved || 'Aluno',
         type: selectedType,
         score: result.score,
         feedback: result.feedback,
@@ -970,7 +982,7 @@ export default function AvaliarPage() {
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, gap: 16 }}>
                 <div>
                   <p style={{ fontSize: 11, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 4 }}>Resultado</p>
-                  <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>{studentName || 'Aluno'}</h2>
+                  <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginBottom: 4 }}>{resolvedStudentName || 'Aluno'}</h2>
                   <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
                     {TYPES[selectedType]?.label || selectedType} · {exerciseName}
                     {profTurma ? ` · ${profTurma}` : ''}{profName ? ` · ${profName}` : ''}
