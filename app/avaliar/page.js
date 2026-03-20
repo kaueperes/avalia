@@ -160,6 +160,7 @@ export default function AvaliarPage() {
   const [generating, setGenerating] = useState(false);
   const [evalError, setEvalError] = useState('');
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // Cota
   const [quotaCiclo, setQuotaCiclo] = useState(null);
@@ -345,23 +346,26 @@ export default function AvaliarPage() {
   }
 
   async function saveResult() {
-    if (!result || saved) return;
-    const r = await fetch('/api/evaluations', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        studentName: resolved || 'Aluno',
-        type: selectedType,
-        score: result.score,
-        feedback: result.feedback,
-        criteria: result.criteriaScores,
-        profileName: profName || '',
-        turma: profTurma || '',
-        exerciseName: exerciseName || '',
-        institution: profInstitution || '',
-      }),
-    });
-    if (r.ok) setSaved(true);
+    if (!result || saved || saving) return;
+    setSaving(true);
+    try {
+      const r = await fetch('/api/evaluations', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentName: resolvedStudentName || 'Aluno',
+          type: selectedType,
+          score: result.score,
+          feedback: result.feedback,
+          criteria: result.criteriaScores,
+          profileName: profName || '',
+          turma: profTurma || '',
+          exerciseName: exerciseName || '',
+          institution: profInstitution || '',
+        }),
+      });
+      if (r.ok) setSaved(true);
+    } finally { setSaving(false); }
   }
 
   function novaAvaliacao() {
@@ -993,9 +997,9 @@ export default function AvaliarPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   {!saved ? (
-                    <button onClick={saveResult} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 18px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    <button onClick={saveResult} disabled={saving} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 18px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                      Salvar
+                      {saving ? 'Salvando...' : 'Salvar'}
                     </button>
                   ) : (
                     <span style={{ padding: '9px 18px', background: '#ECFDF5', border: '1px solid #10B98133', color: '#10B981', borderRadius: 9, fontSize: 13, fontWeight: 600 }}>✓ Salvo</span>
