@@ -234,7 +234,8 @@ export default function AvaliarPage() {
     setEvalError('');
     setResult(null);
     setSaved(false);
-    resultPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => resultPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     try {
       let workContent = studentWork;
       const fileForName = studentFile || studentFiles[0] || extraFiles[0];

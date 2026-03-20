@@ -98,16 +98,16 @@ Avalie o trabalho e responda APENAS com JSON válido (sem markdown, sem texto fo
 
 Contexto importante: este é um trabalho acadêmico de um aluno em formação. As notas devem refletir o desempenho esperado para o nível de aprendizado, não um padrão profissional.
 
-Para calcular a nota de cada critério, parta de 10.0 e deduza pontos pelos problemas encontrados:
-- Problema grave que compromete o objetivo do critério: -2.0 a -3.0
-- Problema relevante mas não crítico: -0.5 a -1.5
-- Imprecisão ou ponto de melhoria menor: -0.1 a -0.4
-- Execução competente sem problemas identificáveis: mantenha próximo de 10.0
-Reserve notas abaixo de 6.0 apenas para trabalhos que falham em requisitos fundamentais.
+Para calcular a nota de cada critério, parta de 10.0 e deduza pontos somente pelos problemas claramente identificados:
+- Ausência completa ou falha grave que inviabiliza o critério: -3.0 a -4.0
+- Problema relevante que compromete parcialmente o critério: -1.0 a -2.0
+- Imprecisão pequena ou ponto de melhoria menor: -0.1 a -0.5
+- Execução adequada sem problemas identificáveis: mantenha em 9.5–10.0
+Se houver dúvida entre duas notas, escolha sempre a maior. Reserve notas abaixo de 6.0 apenas para trabalhos que falham em requisitos fundamentais do critério.
 
 Regras:
 - Notas de 0.0 a 10.0 (uma casa decimal)
-- Use o método de dedução acima para cada critério — parta de 10.0 e deduza apenas pelo que está errado ou incompleto
+- Parta de 10.0 e deduza apenas pelo que está comprovadamente errado ou ausente — não deduza por achismos ou padrões profissionais
 - O feedback deve ser escrito em português brasileiro
 - Os nomes dos critérios devem ser exatamente iguais aos fornecidos
 - Seja específico, construtivo e alinhado ao tom solicitado
