@@ -49,6 +49,20 @@ export async function POST(request) {
     profileName ? `Professor(a): ${profileName}` : null,
   ].filter(Boolean).join(' | ');
 
+  const criteriaMap2 = {};
+  for (const e of sorted) {
+    for (const c of (e.criteria || [])) {
+      if (!criteriaMap2[c.name]) criteriaMap2[c.name] = { total: 0, count: 0 };
+      criteriaMap2[c.name].total += c.score || 0;
+      criteriaMap2[c.name].count += 1;
+    }
+  }
+  const stats = {
+    media: parseFloat(avgScore),
+    timeline: sorted.map(e => ({ exerciseName: e.exerciseName || 'Exercício', score: e.score, date: e.createdAt })),
+    criteriaAverages: Object.entries(criteriaMap2).map(([name, d]) => ({ name, avg: parseFloat((d.total / d.count).toFixed(1)) })).sort((a, b) => b.avg - a.avg),
+  };
+
   const prompt = `Você é um assistente pedagógico especialista em educação. Analise o histórico individual de avaliações do aluno abaixo e gere um parecer pedagógico formal e construtivo.
 ${studentContext ? `\nContexto: ${studentContext}` : ''}
 Aluno: ${studentName}
@@ -98,10 +112,10 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
       exercise_name: evaluations[0]?.exerciseName || '',
       institution: institution,
       profile_name: profileName,
-      content: analysis,
+      content: { ...analysis, stats },
     });
 
-    return NextResponse.json(analysis);
+    return NextResponse.json({ ...analysis, stats });
   } catch (err) {
     console.error('analyze-student error:', err);
     return NextResponse.json({ error: 'Erro ao chamar a IA. Verifique sua chave ANTHROPIC_API_KEY.' }, { status: 500 });

@@ -50,6 +50,21 @@ export async function POST(request) {
     avg: (d.total / d.count).toFixed(1),
   })).sort((a, b) => b.avg - a.avg);
 
+  const stats = {
+    total: evaluations.length,
+    media: parseFloat(avgScore),
+    aprovados: passing,
+    melhorNota: parseFloat(Math.max(...evaluations.map(e => e.score)).toFixed(1)),
+    piorNota: parseFloat(Math.min(...evaluations.map(e => e.score)).toFixed(1)),
+    distribuicao: [
+      { label: '0–4', count: evaluations.filter(e => e.score < 5).length },
+      { label: '5–6', count: evaluations.filter(e => e.score >= 5 && e.score < 7).length },
+      { label: '7–8', count: evaluations.filter(e => e.score >= 7 && e.score < 9).length },
+      { label: '9–10', count: evaluations.filter(e => e.score >= 9).length },
+    ],
+    criteriaAverages: criteriaAvg.map(c => ({ name: c.name, avg: parseFloat(c.avg) })),
+  };
+
   const criteriaText = criteriaAvg.length > 0
     ? criteriaAvg.map(c => `- ${c.name}: média ${c.avg}`).join('\n')
     : '(sem critérios detalhados)';
@@ -121,10 +136,10 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
       exercise_name: exerciseName || '',
       institution: institution,
       profile_name: profileName,
-      content: analysis,
+      content: { ...analysis, stats },
     });
 
-    return NextResponse.json(analysis);
+    return NextResponse.json({ ...analysis, stats });
   } catch (err) {
     console.error('analyze-class error:', err);
     return NextResponse.json({ error: 'Erro ao chamar a IA. Verifique sua chave ANTHROPIC_API_KEY.' }, { status: 500 });
