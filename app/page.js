@@ -730,7 +730,7 @@ export default function Home() {
                   <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 119</span>
                   <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
                 </div>
-                <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para coordenadores e instituições</p>
+                <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para professores de alta demanda</p>
                 <button onClick={() => router.push('/signup')} style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px', display: 'flex', alignItems: 'center', background: '#d97706', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
                   Assinar Premium
                 </button>
