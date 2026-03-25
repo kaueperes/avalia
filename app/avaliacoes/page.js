@@ -5,6 +5,23 @@ import { TYPES, scoreToGrade, scoreColor } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
 
+// ── Chart helpers ─────────────────────────────────────────────────────────────
+function _esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _cc(v) { return v >= 7 ? '#16a34a' : v >= 5 ? '#d97706' : '#ef4444'; }
+function _barsSVG(items, width = 420) {
+  if (!items?.length) return '';
+  const lW=150,vW=36,bW=width-lW-vW,bH=20,gap=10,pV=6;
+  const H=items.length*(bH+gap)+pV*2;
+  return `<svg width="${width}" height="${H}" xmlns="http://www.w3.org/2000/svg">${items.map((d,i)=>{const y=pV+i*(bH+gap);const w=Math.max(4,Math.min((d.avg/10)*bW,bW));const col=_cc(d.avg);const lbl=_esc(d.name.length>20?d.name.substring(0,20)+'…':d.name);return `<text x="0" y="${y+14}" font-size="11" fill="#4b5563" font-family="Arial,sans-serif">${lbl}</text><rect x="${lW}" y="${y}" width="${bW}" height="${bH}" rx="3" fill="#f3f4f6"/><rect x="${lW}" y="${y}" width="${w}" height="${bH}" rx="3" fill="${col}" opacity="0.85"/><text x="${lW+w+5}" y="${y+14}" font-size="11" font-weight="700" fill="${col}" font-family="Arial,sans-serif">${d.avg.toFixed(1)}</text>`;}).join('')}</svg>`;
+}
+function _histSVG(dist) {
+  if (!dist?.length) return '';
+  const max=Math.max(...dist.map(d=>d.count),1);
+  const W=300,H=110,bW=50,bGap=14,pL=8,pB=26,maxH=H-pB-14;
+  const colors=['#ef4444','#f59e0b','#3b82f6','#22c55e'];
+  return `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">${dist.map((d,i)=>{const x=pL+i*(bW+bGap);const h=Math.max(2,(d.count/max)*maxH);const y=H-pB-h;return `<rect x="${x}" y="${y}" width="${bW}" height="${h}" rx="3" fill="${colors[i]}" opacity="0.85"/><text x="${x+bW/2}" y="${y-4}" text-anchor="middle" font-size="12" font-weight="700" fill="${colors[i]}" font-family="Arial,sans-serif">${d.count}</text><text x="${x+bW/2}" y="${H-7}" text-anchor="middle" font-size="11" fill="#6b7280" font-family="Arial,sans-serif">${_esc(d.label)}</text>`;}).join('')}</svg>`;
+}
+
 export default function AvaliacoesPage() {
   const router = useRouter();
   const [userName, setUserName] = useState('Professor');
@@ -837,6 +854,24 @@ export default function AvaliacoesPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* Gráficos */}
+                {classReport.stats && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+                    {classReport.stats.distribuicao && (
+                      <div style={{ background: 'var(--bg-content)', borderRadius: 10, padding: '14px 16px', border: '1px solid var(--border-card)' }}>
+                        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Distribuição de notas</p>
+                        <div dangerouslySetInnerHTML={{ __html: _histSVG(classReport.stats.distribuicao) }} />
+                      </div>
+                    )}
+                    {classReport.stats.criteriaAverages?.length > 0 && (
+                      <div style={{ background: 'var(--bg-content)', borderRadius: 10, padding: '14px 16px', border: '1px solid var(--border-card)' }}>
+                        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Média por critério</p>
+                        <div dangerouslySetInnerHTML={{ __html: _barsSVG(classReport.stats.criteriaAverages, 260) }} />
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Resumo */}
                 <div style={{ background: 'var(--bg-content)', borderRadius: 10, padding: '16px 20px', marginBottom: 24, border: '1px solid var(--border-card)' }}>
