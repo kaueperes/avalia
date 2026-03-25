@@ -695,7 +695,7 @@ export default function Home() {
                   Assinar Essencial
                 </button>
                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {['120 avaliações/mês', '4 perfis de professor', 'Exercícios ilimitados', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot de suporte (50 msg)', 'Histórico completo'].map(item => (
+                  {['120 avaliações/mês', '4 perfis de professor', 'Exercícios ilimitados', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (50 msg)', 'Histórico completo'].map(item => (
                     <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
                       <CheckMark color="#66b3ff" /> {item}
                     </div>
