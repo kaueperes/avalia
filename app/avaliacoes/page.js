@@ -855,23 +855,34 @@ export default function AvaliacoesPage() {
                   ))}
                 </div>
 
-                {/* Gráficos */}
-                {classReport.stats && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
-                    {classReport.stats.distribuicao && (
+                {/* Gráficos — computados do selectedEvals */}
+                {(() => {
+                  const dist = [
+                    { label: '0–4', count: selectedEvals.filter(e => e.score < 5).length },
+                    { label: '5–6', count: selectedEvals.filter(e => e.score >= 5 && e.score < 7).length },
+                    { label: '7–8', count: selectedEvals.filter(e => e.score >= 7 && e.score < 9).length },
+                    { label: '9–10', count: selectedEvals.filter(e => e.score >= 9).length },
+                  ];
+                  const cMap = {};
+                  for (const e of selectedEvals) for (const c of (e.criteria || [])) {
+                    if (!cMap[c.name]) cMap[c.name] = { total: 0, n: 0 };
+                    cMap[c.name].total += c.score || 0; cMap[c.name].n += 1;
+                  }
+                  const cAvg = Object.entries(cMap).map(([name, d]) => ({ name, avg: parseFloat((d.total/d.n).toFixed(1)) })).sort((a,b) => b.avg - a.avg);
+                  if (!cAvg.length) return null;
+                  return (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
                       <div style={{ background: 'var(--bg-content)', borderRadius: 10, padding: '14px 16px', border: '1px solid var(--border-card)' }}>
                         <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Distribuição de notas</p>
-                        <div dangerouslySetInnerHTML={{ __html: _histSVG(classReport.stats.distribuicao) }} />
+                        <div dangerouslySetInnerHTML={{ __html: _histSVG(dist) }} />
                       </div>
-                    )}
-                    {classReport.stats.criteriaAverages?.length > 0 && (
                       <div style={{ background: 'var(--bg-content)', borderRadius: 10, padding: '14px 16px', border: '1px solid var(--border-card)' }}>
                         <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Média por critério</p>
-                        <div dangerouslySetInnerHTML={{ __html: _barsSVG(classReport.stats.criteriaAverages, 260) }} />
+                        <div dangerouslySetInnerHTML={{ __html: _barsSVG(cAvg, 260) }} />
                       </div>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  );
+                })()}
 
                 {/* Resumo */}
                 <div style={{ background: 'var(--bg-content)', borderRadius: 10, padding: '16px 20px', marginBottom: 24, border: '1px solid var(--border-card)' }}>
