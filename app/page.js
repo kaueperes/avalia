@@ -1,5 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 // ── Lucide-style SVG icons ────────────────────────────────────────────────────
 const Icon = ({ d, size = 20 }) => (
@@ -38,6 +39,7 @@ const Star = () => (
 // ═════════════════════════════════════════════════════════════════════════════
 export default function Home() {
   const router = useRouter();
+  const [planTab, setPlanTab] = useState('individual');
 
   return (
     <>
@@ -654,95 +656,201 @@ export default function Home() {
         {/* ── PRICING ────────────────────────────────────────────────────────── */}
         <section id="planos" style={{ padding: '96px 32px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
           <div style={{ maxWidth: 1060, margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <div style={{ textAlign: 'center', marginBottom: 48 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Planos</p>
               <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', marginBottom: 14 }}>Simples e transparente</h2>
-              <p style={{ fontSize: 17, color: '#6B7280' }}>Comece grátis. Faça upgrade quando precisar.</p>
-            </div>
-            <div className="grid-plans" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, alignItems: 'start' }}>
-
-              {/* GRATUITO */}
-              <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Gratuito</p>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
-                  <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 0</span>
-                </div>
-                <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para experimentar a plataforma</p>
-                <button onClick={() => router.push('/signup')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px' }}>
-                  Criar conta grátis
+              <p style={{ fontSize: 17, color: '#6B7280', marginBottom: 32 }}>Comece grátis. Faça upgrade quando precisar.</p>
+              {/* Toggle pill */}
+              <div style={{ display: 'inline-flex', background: '#E5E7EB', borderRadius: 100, padding: 4, gap: 4 }}>
+                <button onClick={() => setPlanTab('individual')} style={{ padding: '8px 24px', borderRadius: 100, border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', transition: 'all .2s', background: planTab === 'individual' ? '#00173f' : 'transparent', color: planTab === 'individual' ? 'white' : '#6B7280' }}>
+                  Planos Individuais
                 </button>
-                <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {['5 avaliações/mês', '1 perfil de professor', '3 exercícios salvos', 'Avaliação individual', 'PDF individual', 'Histórico de avaliações'].map(item => (
-                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
-                      <CheckMark /> {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* ESSENCIAL */}
-              <div className="plan-card" style={{ background: '#00173f', border: '1px solid #00173f', position: 'relative', transform: 'scale(1.03)' }}>
-                <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#810cfa', color: 'white', padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: 0.5 }}>
-                  MAIS POPULAR
-                </div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Essencial</p>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontSize: 40, fontWeight: 800, color: 'white', letterSpacing: '-1px', lineHeight: 1 }}>R$ 29</span>
-                  <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)' }}>/mês</span>
-                </div>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 28 }}>Para professores ativos</p>
-                <button onClick={() => router.push('/signup')} className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px', background: '#0081f0' }}>
-                  Assinar Essencial
+                <button onClick={() => setPlanTab('institucional')} style={{ padding: '8px 24px', borderRadius: 100, border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', transition: 'all .2s', background: planTab === 'institucional' ? '#00173f' : 'transparent', color: planTab === 'institucional' ? 'white' : '#6B7280' }}>
+                  Planos Institucionais
                 </button>
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {['120 avaliações/mês', '4 perfis de professor', 'Exercícios ilimitados', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (50 msg)', 'Histórico completo'].map(item => (
-                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
-                      <CheckMark color="#66b3ff" /> {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* PRO */}
-              <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Pro</p>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 59</span>
-                  <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
-                </div>
-                <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para quem avalia turmas inteiras</p>
-                <button onClick={() => router.push('/signup')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px' }}>
-                  Assinar Pro
-                </button>
-                <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {['180 avaliações/mês', '6 perfis de professor', 'Exercícios ilimitados', '10 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (150 msg)', 'Filtros avançados'].map(item => (
-                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
-                      <CheckMark /> {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* PREMIUM */}
-              <div className="plan-card" style={{ background: 'white', border: '2px solid #d97706' }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Premium</p>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 119</span>
-                  <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
-                </div>
-                <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para professores de alta demanda</p>
-                <button onClick={() => router.push('/signup')} style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px', display: 'flex', alignItems: 'center', background: '#d97706', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
-                  Assinar Premium
-                </button>
-                <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {['240 avaliações/mês', '10 perfis de professor', 'Exercícios ilimitados', '30 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (300 msg)', 'Filtros avançados', 'Suporte prioritário'].map(item => (
-                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
-                      <CheckMark color="#d97706" /> {item}
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
+
+            {/* PLANOS INDIVIDUAIS */}
+            {planTab === 'individual' && (
+              <div className="grid-plans" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, alignItems: 'start' }}>
+
+                {/* GRATUITO */}
+                <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Gratuito</p>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
+                    <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 0</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para experimentar a plataforma</p>
+                  <button onClick={() => router.push('/signup')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px' }}>
+                    Criar conta grátis
+                  </button>
+                  <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {['5 avaliações/mês', '1 perfil de avaliação', '3 exercícios salvos', 'Avaliação individual', 'PDF individual', 'Histórico de avaliações'].map(item => (
+                      <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
+                        <CheckMark /> {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ESSENCIAL */}
+                <div className="plan-card" style={{ background: '#00173f', border: '1px solid #00173f', position: 'relative', transform: 'scale(1.03)' }}>
+                  <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#810cfa', color: 'white', padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: 0.5 }}>
+                    MAIS POPULAR
+                  </div>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Essencial</p>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
+                    <span style={{ fontSize: 40, fontWeight: 800, color: 'white', letterSpacing: '-1px', lineHeight: 1 }}>R$ 29</span>
+                    <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)' }}>/mês</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 28 }}>Para professores ativos</p>
+                  <button onClick={() => router.push('/signup')} className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px', background: '#0081f0' }}>
+                    Assinar Essencial
+                  </button>
+                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {['120 avaliações/mês', '4 perfis de avaliação', 'Exercícios ilimitados', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (50 msg)', 'Histórico completo'].map(item => (
+                      <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
+                        <CheckMark color="#66b3ff" /> {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* PRO */}
+                <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Pro</p>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
+                    <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 59</span>
+                    <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para quem avalia turmas inteiras</p>
+                  <button onClick={() => router.push('/signup')} className="btn-secondary" style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px' }}>
+                    Assinar Pro
+                  </button>
+                  <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {['180 avaliações/mês', '6 perfis de avaliação', 'Exercícios ilimitados', '10 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (150 msg)', 'Filtros avançados'].map(item => (
+                      <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
+                        <CheckMark /> {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* PREMIUM */}
+                <div className="plan-card" style={{ background: 'white', border: '2px solid #d97706' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Premium</p>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
+                    <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 119</span>
+                    <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Para professores de alta demanda</p>
+                  <button onClick={() => router.push('/signup')} style={{ width: '100%', justifyContent: 'center', marginBottom: 28, padding: '13px', display: 'flex', alignItems: 'center', background: '#d97706', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
+                    Assinar Premium
+                  </button>
+                  <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {['240 avaliações/mês', '10 perfis de avaliação', 'Exercícios ilimitados', '30 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (300 msg)', 'Filtros avançados', 'Suporte prioritário'].map(item => (
+                      <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
+                        <CheckMark color="#d97706" /> {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PLANOS INSTITUCIONAIS */}
+            {planTab === 'institucional' && (
+              <>
+                <p style={{ textAlign: 'center', fontSize: 14, color: '#6B7280', marginBottom: 40 }}>
+                  Gerencie toda a sua equipe em um só lugar. Um coordenador distribui avaliações, relatórios e permissões para cada usuário.
+                </p>
+                <div className="grid-plans" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, alignItems: 'start' }}>
+
+                  {/* STARTER */}
+                  <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Starter</p>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
+                      <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 1.090</span>
+                    </div>
+                    <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
+                    <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para pequenas equipes</p>
+                    <a href="mailto:contato@avalia.education?subject=Plano Institucional Starter" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: 'transparent', color: '#00173f', border: '2px solid #00173f', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
+                      Solicitar proposta
+                    </a>
+                    <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {['10 usuários', '2.400 avaliações/mês', 'Perfis de avaliação ilimitados', '300 relatórios/mês (IA)', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte prioritário'].map(item => (
+                        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
+                          <CheckMark /> {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* MÉDIO */}
+                  <div className="plan-card" style={{ background: '#00173f', border: '1px solid #00173f', position: 'relative', transform: 'scale(1.03)' }}>
+                    <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#810cfa', color: 'white', padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: 0.5 }}>
+                      MAIS POPULAR
+                    </div>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Médio</p>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
+                      <span style={{ fontSize: 40, fontWeight: 800, color: 'white', letterSpacing: '-1px', lineHeight: 1 }}>R$ 2.150</span>
+                    </div>
+                    <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)' }}>/mês</span>
+                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 28, marginTop: 6 }}>Para escolas e cursos</p>
+                    <a href="mailto:contato@avalia.education?subject=Plano Institucional Médio" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
+                      Solicitar proposta
+                    </a>
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {['20 usuários', '4.800 avaliações/mês', 'Perfis de avaliação ilimitados', '600 relatórios/mês (IA)', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte prioritário'].map(item => (
+                        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
+                          <CheckMark color="#66b3ff" /> {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* PLUS */}
+                  <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Plus</p>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
+                      <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 4.190</span>
+                    </div>
+                    <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
+                    <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para faculdades e institutos</p>
+                    <a href="mailto:contato@avalia.education?subject=Plano Institucional Plus" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: 'transparent', color: '#00173f', border: '2px solid #00173f', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
+                      Solicitar proposta
+                    </a>
+                    <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {['40 usuários', '9.600 avaliações/mês', 'Perfis de avaliação ilimitados', '1.200 relatórios/mês (IA)', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte prioritário'].map(item => (
+                        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
+                          <CheckMark /> {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* PERSONALIZADO */}
+                  <div className="plan-card" style={{ background: 'white', border: '2px solid #d97706' }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Personalizado</p>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
+                      <span style={{ fontSize: 32, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>Sob consulta</span>
+                    </div>
+                    <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para grandes instituições</p>
+                    <a href="mailto:contato@avalia.education?subject=Plano Institucional Personalizado" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: '#d97706', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
+                      Fale conosco
+                    </a>
+                    <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {['+40 usuários', 'Volume personalizado', 'Perfis de avaliação ilimitados', 'Relatórios ilimitados', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte dedicado'].map(item => (
+                        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
+                          <CheckMark color="#d97706" /> {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
