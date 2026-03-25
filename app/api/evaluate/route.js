@@ -116,68 +116,76 @@ Regras:
 - Peso do gabarito na correção: ${{ livre: 'REFERÊNCIA LIVRE — use o gabarito apenas como orientação geral; valorize criatividade e interpretações pessoais', parcial: 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes', estrito: 'ESTRITO — o aluno deve seguir o gabarito de perto; penalize desvios significativos' }[referenceWeight] || 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes'}
 - O gabarito é uma ferramenta interna do professor. Jamais mencione sua existência no feedback ao aluno` : ''}`;
 
+  // Helper: parse JSON from model response text
+  function parseJson(text) {
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('no_json');
+    try { return JSON.parse(jsonMatch[0]); } catch {
+      return JSON.parse(jsonMatch[0].replace(/[\u0000-\u001F\u007F]/g, ' '));
+    }
+  }
+
+  // Helper: call Gemini with prompt + file parts
+  async function callGemini(promptText, files) {
+    if (!process.env.GEMINI_API_KEY) throw new Error('no_gemini_key');
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const geminiModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const parts = [
+      { text: promptText },
+      ...(files || []).flatMap(img => [
+        { text: img.label || 'Arquivo:' },
+        { inlineData: { mimeType: img.mediaType, data: img.data } },
+      ]),
+    ];
+    const result = await geminiModel.generateContent(parts);
+    return parseJson(result.response.text());
+  }
+
+  // Helper: call Claude with prompt + optional image blocks
+  async function callClaude(promptText, files, modelOverride) {
+    const { model, maxTokens } = modelOverride || selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
+    const messageContent = files?.length > 0
+      ? [
+          { type: 'text', text: promptText },
+          ...files.flatMap(img => [
+            { type: 'text', text: img.label || 'Imagem:' },
+            { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } },
+          ]),
+        ]
+      : promptText;
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const message = await client.messages.create({
+      model, max_tokens: maxTokens,
+      messages: [{ role: 'user', content: messageContent }],
+    });
+    return parseJson(message.content[0]?.text || '');
+  }
+
   try {
     const hasVideoOrAudio = images?.some(img =>
       img.mediaType?.startsWith('video/') || img.mediaType?.startsWith('audio/')
     );
+    const hasImages = images?.some(img => img.mediaType?.startsWith('image/'));
+
+    // Use Sonnet only for complex text-only evaluations (no files, high complexity)
+    const { model: selectedModel, maxTokens: selectedMaxTokens } = selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
+    const isComplexText = !images?.length && selectedModel === 'claude-sonnet-4-6';
 
     let parsed;
 
-    if (hasVideoOrAudio) {
-      // Route to Gemini for video/audio evaluation
-      if (!process.env.GEMINI_API_KEY) {
-        return NextResponse.json({ error: 'GEMINI_API_KEY não configurada.' }, { status: 503 });
-      }
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      const geminiModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
-      const parts = [
-        { text: prompt },
-        ...images.flatMap(img => [
-          { text: img.label || 'Arquivo:' },
-          { inlineData: { mimeType: img.mediaType, data: img.data } },
-        ]),
-      ];
-
-      const result = await geminiModel.generateContent(parts);
-      const text = result.response.text();
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA. Tente novamente.' }, { status: 500 });
-      try { parsed = JSON.parse(jsonMatch[0]); } catch {
-        // Try stripping control characters that break JSON.parse
-        parsed = JSON.parse(jsonMatch[0].replace(/[\u0000-\u001F\u007F]/g, ' '));
-      }
+    if (isComplexText) {
+      // Complex text → Claude Sonnet for best reasoning quality
+      parsed = await callClaude(prompt, null, { model: 'claude-sonnet-4-6', maxTokens: selectedMaxTokens });
     } else {
-      // Use Sonnet when images are present (better vision quality); otherwise use adaptive selection
-      const { model, maxTokens } = images?.length > 0
-        ? { model: 'claude-sonnet-4-6', maxTokens: 3000 }
-        : selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
-
-      // Build message content: text prompt + vision blocks if images present
-      // Each image is preceded by a text label so the AI knows what it represents
-      const messageContent = images?.length > 0
-        ? [
-            { type: 'text', text: prompt },
-            ...images.flatMap(img => [
-              { type: 'text', text: img.label || 'Imagem:' },
-              { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } },
-            ]),
-          ]
-        : prompt;
-
-      const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-      const message = await client.messages.create({
-        model,
-        max_tokens: maxTokens,
-        messages: [{ role: 'user', content: messageContent }],
-      });
-
-      const text = message.content[0]?.text || '';
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA. Tente novamente.' }, { status: 500 });
-      try { parsed = JSON.parse(jsonMatch[0]); } catch {
-        // Try stripping control characters that break JSON.parse
-        parsed = JSON.parse(jsonMatch[0].replace(/[\u0000-\u001F\u007F]/g, ' '));
+      // Everything else (images, video, audio, simple text) → Gemini first, Claude as fallback
+      try {
+        parsed = await callGemini(prompt, images?.length > 0 ? images : null);
+      } catch (geminiErr) {
+        console.warn('Gemini failed, falling back to Claude:', geminiErr.message);
+        const fallback = hasImages
+          ? { model: 'claude-sonnet-4-6', maxTokens: 3000 }
+          : { model: selectedModel, maxTokens: selectedMaxTokens };
+        parsed = await callClaude(prompt, images?.length > 0 ? images : null, fallback);
       }
     }
 
