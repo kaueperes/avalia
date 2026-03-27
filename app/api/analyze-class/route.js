@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
-import { PLANS } from '@/lib/types';
+import { PLANS, TYPES } from '@/lib/types';
 import Anthropic from '@anthropic-ai/sdk';
 
 export async function POST(request) {
@@ -28,6 +28,8 @@ export async function POST(request) {
   const { evaluations, turma, exerciseName } = await request.json();
   const institution = evaluations[0]?.institution || '';
   const profileName = evaluations[0]?.profileName || '';
+  const disciplina = evaluations[0]?.disciplina || '';
+  const tipoTrabalho = TYPES[evaluations[0]?.type]?.label || '';
   if (!evaluations || evaluations.length === 0) {
     return NextResponse.json({ error: 'Nenhuma avaliação para analisar.' }, { status: 400 });
   }
@@ -220,10 +222,10 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
       exercise_name: isMultiActivity ? '' : (exerciseName || evaluations[0]?.exerciseName || ''),
       institution: institution,
       profile_name: profileName,
-      content: { ...analysis, stats },
+      content: { ...analysis, disciplina, tipoTrabalho, stats },
     });
 
-    return NextResponse.json({ ...analysis, stats });
+    return NextResponse.json({ ...analysis, disciplina, tipoTrabalho, stats });
   } catch (err) {
     console.error('analyze-class error:', err);
     return NextResponse.json({ error: 'Erro ao chamar a IA. Verifique sua chave ANTHROPIC_API_KEY.' }, { status: 500 });

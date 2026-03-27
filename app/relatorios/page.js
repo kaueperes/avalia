@@ -260,6 +260,8 @@ export default function RelatoriosPage() {
       <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f1f5f9">
         <h1 style="font-size:24px;font-weight:900;color:#0f172a;margin-bottom:8px">${esc(r.turma || 'Turma')}</h1>
         <div style="display:flex;flex-wrap:wrap;gap:12px 24px">
+          ${c.disciplina ? `<div><div style="font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Disciplina</div><div style="font-size:14px;font-weight:700;color:#0f172a">${esc(c.disciplina)}</div></div>` : ''}
+          ${c.tipoTrabalho ? `<div><div style="font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Tipo de Trabalho</div><div style="font-size:13px;color:#374151">${esc(c.tipoTrabalho)}</div></div>` : ''}
           ${r.exerciseName ? `<div><div style="font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Atividade</div><div style="font-size:13px;color:#374151">${esc(r.exerciseName)}</div></div>` : ''}
           ${r.profileName ? `<div><div style="font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Professor(a)</div><div style="font-size:13px;color:#374151">${esc(r.profileName)}</div></div>` : ''}
         </div>
@@ -347,7 +349,10 @@ export default function RelatoriosPage() {
       ${pdfHeader(logoMarkup, date)}
       <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f1f5f9">
         <h1 style="font-size:24px;font-weight:900;color:#0f172a;margin-bottom:6px">${esc(r.turma || 'Turma')} — Evolução</h1>
-        ${r.profileName ? `<div style="font-size:13px;color:#374151"><strong style="color:#6b7280">Professor(a):</strong> ${esc(r.profileName)}</div>` : ''}
+        <div style="display:flex;flex-wrap:wrap;gap:12px 24px;margin-top:6px">
+          ${c.disciplina ? `<div><div style="font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Disciplina</div><div style="font-size:14px;font-weight:700;color:#0f172a">${esc(c.disciplina)}</div></div>` : ''}
+          ${r.profileName ? `<div><div style="font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Professor(a)</div><div style="font-size:13px;color:#374151">${esc(r.profileName)}</div></div>` : ''}
+        </div>
       </div>
       ${atividades.length > 0 ? `<div style="margin-bottom:20px;padding:14px 16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:12px">Atividades Avaliadas</div>
@@ -430,6 +435,8 @@ export default function RelatoriosPage() {
         <div style="flex:1">
           <h1 style="font-size:26px;font-weight:900;color:#0f172a;margin-bottom:10px">${esc(r.subject)}</h1>
           <div style="display:flex;flex-wrap:wrap;gap:12px 24px">
+            ${c.disciplina ? `<div><div style="font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Disciplina</div><div style="font-size:14px;font-weight:700;color:#0f172a">${esc(c.disciplina)}</div></div>` : ''}
+            ${c.tipoTrabalho ? `<div><div style="font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Tipo de Trabalho</div><div style="font-size:13px;color:#374151">${esc(c.tipoTrabalho)}</div></div>` : ''}
             ${r.turma ? `<div><div style="font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Turma</div><div style="font-size:13px;color:#374151">${esc(r.turma)}</div></div>` : ''}
             ${r.profileName ? `<div><div style="font-size:10px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Professor(a)</div><div style="font-size:13px;color:#374151">${esc(r.profileName)}</div></div>` : ''}
           </div>
@@ -709,7 +716,7 @@ export default function RelatoriosPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-content)' }}>
-                    {['Tipo', 'Aluno / Turma', 'Professor · Instituição', 'Exercício', 'Data', ''].map(h => (
+                    {['Tipo', 'Aluno / Turma', 'Professor · Instituição', 'Disciplina · Atividade', 'Data', ''].map(h => (
                       <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
@@ -744,7 +751,11 @@ export default function RelatoriosPage() {
                         {r.institution && <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 1 }}>{r.institution}</div>}
                         {!r.profileName && !r.institution && <span style={{ color: 'var(--text-muted)' }}>—</span>}
                       </td>
-                      <td style={{ padding: '13px 16px', color: 'var(--text-sub)', fontSize: 13 }}>{r.exerciseName || '—'}</td>
+                      <td style={{ padding: '13px 16px', fontSize: 13 }}>
+                        {r.content?.disciplina && <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>{r.content.disciplina}</div>}
+                        {r.exerciseName && <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: r.content?.disciplina ? 2 : 0 }}>{r.exerciseName}</div>}
+                        {!r.content?.disciplina && !r.exerciseName && <span style={{ color: 'var(--text-muted)' }}>—</span>}
+                      </td>
                       <td style={{ padding: '13px 16px', color: 'var(--text-muted)', fontSize: 13, whiteSpace: 'nowrap' }}>
                         {new Date(r.createdAt).toLocaleDateString('pt-BR')}
                       </td>
@@ -809,8 +820,11 @@ export default function RelatoriosPage() {
                 <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>
                   {detail.type === 'aluno' ? detail.subject : (detail.turma || 'Turma')}
                 </span>
+                {detail.content?.disciplina && (
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#7c3aed', marginLeft: 8, background: '#f5f3ff', padding: '2px 8px', borderRadius: 6 }}>{detail.content.disciplina}</span>
+                )}
                 {detail.exerciseName && (
-                  <span style={{ fontSize: 13, color: 'var(--text-muted)', marginLeft: 8 }}>· {detail.exerciseName}</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-muted)', marginLeft: 6 }}>· {detail.exerciseName}</span>
                 )}
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
