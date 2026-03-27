@@ -357,15 +357,11 @@ export default function InicioPage() {
                 </>
               )}
 
-              {allDisciplinas.length > 0 && (
-                <>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-sub)', flexShrink: 0 }}>Disciplina:</span>
-                  <select value={selectedDisciplina} onChange={e => setSelectedDisciplina(e.target.value)} style={inpStyle}>
-                    <option value="">Todas</option>
-                    {allDisciplinas.map(d => <option key={d} value={d}>{d}</option>)}
-                  </select>
-                </>
-              )}
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-sub)', flexShrink: 0 }}>Disciplina:</span>
+              <select value={selectedDisciplina} onChange={e => setSelectedDisciplina(e.target.value)} style={inpStyle}>
+                <option value="">Todas</option>
+                {allDisciplinas.map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
 
               {(selectedTurma || selectedDisciplina) && (
                 <>
