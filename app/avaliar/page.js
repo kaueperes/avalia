@@ -128,6 +128,7 @@ export default function AvaliarPage() {
   const [selectedType, setSelectedType] = useState('modelagem');
   const [selectedExerciseId, setSelectedExerciseId] = useState('');
   const [exerciseName, setExerciseName] = useState('');
+  const [exerciseDisciplina, setExerciseDisciplina] = useState('');
   const [exerciseContext, setExerciseContext] = useState('');
   const [showAiPrompt, setShowAiPrompt] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
@@ -211,6 +212,7 @@ export default function AvaliarPage() {
     setSelectedType(ex.type);
     setActiveCat(TYPES[ex.type]?.cat || '3d');
     setExerciseName(ex.name || '');
+    setExerciseDisciplina(ex.disciplina || '');
     setExerciseContext(ex.context || '');
     setCriteria(ex.criteria?.map(c => ({ name: c.name, weight: c.weight || 1 })) || (TYPES[ex.type]?.criteria || []).map(c => ({ name: c.name, weight: c.w })));
   }
@@ -362,6 +364,7 @@ export default function AvaliarPage() {
           turma: profTurma || '',
           exerciseName: exerciseName || '',
           institution: profInstitution || '',
+          disciplina: exerciseDisciplina || '',
         }),
       });
       if (r.ok) setSaved(true);

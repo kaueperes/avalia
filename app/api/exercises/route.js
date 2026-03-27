@@ -4,7 +4,7 @@ import { getUserFromRequest } from '@/lib/auth';
 import { PLANS } from '@/lib/types';
 
 function fmt(e) {
-  return { id: e.id, userId: e.user_id, name: e.name, type: e.type, context: e.context, criteria: e.criteria, createdAt: e.created_at };
+  return { id: e.id, userId: e.user_id, name: e.name, type: e.type, disciplina: e.disciplina || '', context: e.context, criteria: e.criteria, createdAt: e.created_at };
 }
 
 export async function GET(request) {
@@ -25,7 +25,7 @@ export async function POST(request) {
   const user = getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  const { name, type, context, criteria } = await request.json();
+  const { name, type, disciplina, context, criteria } = await request.json();
   if (!name || !type) {
     return NextResponse.json({ error: 'Nome e tipo são obrigatórios' }, { status: 400 });
   }
@@ -41,7 +41,7 @@ export async function POST(request) {
   }
 
   const { data: e, error } = await supabase.from('exercises')
-    .insert({ user_id: user.userId, name, type, context: context || '', criteria: criteria || [] })
+    .insert({ user_id: user.userId, name, type, disciplina: disciplina || '', context: context || '', criteria: criteria || [] })
     .select().single();
 
   if (error) return NextResponse.json({ error: 'Erro ao salvar' }, { status: 500 });

@@ -138,6 +138,7 @@ export default function InicioPage() {
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('Professor');
   const [selectedTurma, setSelectedTurma] = useState('');
+  const [selectedDisciplina, setSelectedDisciplina] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -159,16 +160,22 @@ export default function InicioPage() {
 
   const firstName = userName.split(' ')[0];
 
-  // Turma list
+  // Turma + disciplina lists
   const allTurmas = useMemo(
     () => [...new Set(evaluations.map(e => e.turma).filter(Boolean))].sort(),
     [evaluations]
   );
+  const allDisciplinas = useMemo(
+    () => [...new Set(evaluations.map(e => e.disciplina).filter(Boolean))].sort(),
+    [evaluations]
+  );
 
-  // Filtered evaluations
+  // Filtered evaluations (turma + disciplina)
   const filteredEvals = useMemo(
-    () => selectedTurma ? evaluations.filter(e => e.turma === selectedTurma) : evaluations,
-    [evaluations, selectedTurma]
+    () => evaluations
+      .filter(e => !selectedTurma || e.turma === selectedTurma)
+      .filter(e => !selectedDisciplina || e.disciplina === selectedDisciplina),
+    [evaluations, selectedTurma, selectedDisciplina]
   );
 
   // Global KPI stats (always all evaluations)
@@ -333,34 +340,55 @@ export default function InicioPage() {
 
       {!loading && evaluations.length > 0 && (
         <>
-          {/* ── Filtro global de turma ── */}
-          {allTurmas.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, padding: '12px 16px', background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-card)' }}>
+          {/* ── Filtros ── */}
+          {(allTurmas.length > 0 || allDisciplinas.length > 0) && (
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 14, padding: '12px 16px', background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-card)' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
                 <path d="M3 4h18M7 12h10M11 20h2" stroke="#6b7280" strokeWidth="2" strokeLinecap="round"/>
               </svg>
-              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-sub)', flexShrink: 0 }}>Filtrar por turma:</span>
-              <select
-                value={selectedTurma}
-                onChange={e => setSelectedTurma(e.target.value)}
-                style={inpStyle}
-              >
-                <option value="">Todas as turmas</option>
-                {allTurmas.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-              {selectedTurma && (() => {
-                const tc = getTurmaColor(selectedTurma, allTurmas);
-                return (
-                  <>
-                    <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700, background: tc.bg, color: tc.color, border: `1px solid ${tc.color}33` }}>
-                      {selectedTurma} · {filteredEvals.length} avaliações
+
+              {allTurmas.length > 0 && (
+                <>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-sub)', flexShrink: 0 }}>Turma:</span>
+                  <select value={selectedTurma} onChange={e => setSelectedTurma(e.target.value)} style={inpStyle}>
+                    <option value="">Todas</option>
+                    {allTurmas.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </>
+              )}
+
+              {allDisciplinas.length > 0 && (
+                <>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-sub)', flexShrink: 0 }}>Disciplina:</span>
+                  <select value={selectedDisciplina} onChange={e => setSelectedDisciplina(e.target.value)} style={inpStyle}>
+                    <option value="">Todas</option>
+                    {allDisciplinas.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </>
+              )}
+
+              {(selectedTurma || selectedDisciplina) && (
+                <>
+                  {selectedTurma && (() => {
+                    const tc = getTurmaColor(selectedTurma, allTurmas);
+                    return (
+                      <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700, background: tc.bg, color: tc.color, border: `1px solid ${tc.color}33` }}>
+                        {selectedTurma}
+                      </span>
+                    );
+                  })()}
+                  {selectedDisciplina && (
+                    <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700, background: '#f5f3ff', color: '#7c3aed', border: '1px solid #7c3aed33' }}>
+                      {selectedDisciplina}
                     </span>
-                    <button onClick={() => setSelectedTurma('')} style={{ fontSize: 12, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px', fontFamily: 'inherit' }}>
-                      × Limpar
-                    </button>
-                  </>
-                );
-              })()}
+                  )}
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>{filteredEvals.length} avaliações</span>
+                  <button onClick={() => { setSelectedTurma(''); setSelectedDisciplina(''); }} style={{ fontSize: 12, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px', fontFamily: 'inherit' }}>
+                    × Limpar filtros
+                  </button>
+                </>
+              )}
+
               <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>
                 Os gráficos abaixo refletem a seleção
               </span>
@@ -381,7 +409,7 @@ export default function InicioPage() {
                     </span>
                   )}
                   <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>
-                    {selectedTurma || 'todas as turmas'}
+                    {[selectedTurma, selectedDisciplina].filter(Boolean).join(' · ') || 'todas as turmas'}
                   </span>
                 </div>
               </div>
@@ -416,7 +444,9 @@ export default function InicioPage() {
                 </span>
               </div>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 20 }}>
-                {selectedTurma ? `Faixas de desempenho · ${selectedTurma}` : 'Faixas de desempenho · todas as turmas'}
+                {[selectedTurma, selectedDisciplina].filter(Boolean).length > 0
+                  ? `Faixas de desempenho · ${[selectedTurma, selectedDisciplina].filter(Boolean).join(' · ')}`
+                  : 'Faixas de desempenho · todas as turmas'}
               </p>
               <DistChart data={distData} />
               <div style={{ marginTop: 16, display: 'flex', gap: 8, flexWrap: 'wrap' }}>

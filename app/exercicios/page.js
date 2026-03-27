@@ -5,7 +5,7 @@ import { TYPES, CATEGORIES } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
 
-const BLANK = { name: '', type: 'modelagem', context: '', criteria: [] };
+const BLANK = { name: '', type: 'modelagem', disciplina: '', context: '', criteria: [] };
 
 const inputStyle = {
   width: '100%', padding: '10px 12px',
@@ -80,7 +80,7 @@ export default function ExerciciosPage() {
   }
 
   function startEdit(ex) {
-    setForm({ name: ex.name, type: ex.type, context: ex.context || '', criteria: ex.criteria || [] });
+    setForm({ name: ex.name, type: ex.type, disciplina: ex.disciplina || '', context: ex.context || '', criteria: ex.criteria || [] });
     setEditingId(ex.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -146,7 +146,7 @@ export default function ExerciciosPage() {
                     <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                       <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ex.name}</p>
                       <p style={{ fontSize: 12, color: 'var(--text-sub)' }}>
-                        {TYPES[ex.type]?.label || ex.type} · {ex.criteria?.length || 0} critérios
+                        {TYPES[ex.type]?.label || ex.type} · {ex.criteria?.length || 0} critérios{ex.disciplina ? ` · ${ex.disciplina}` : ''}
                       </p>
                       {ex.context && (
                         <p style={{ fontSize: 11, color: 'var(--text-sub)', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -195,6 +195,10 @@ export default function ExerciciosPage() {
               </select>
             </Field>
           </div>
+
+          <Field label="Disciplina" hint="(opcional)" tooltip="Matéria escolar deste exercício. Usado para filtrar na página inicial. Ex: Português, Matemática, Modelagem 3D.">
+            <input style={inputStyle} value={form.disciplina} onChange={e => setForm(f => ({ ...f, disciplina: e.target.value }))} placeholder="Ex: Português, Matemática, Modelagem 3D..." />
+          </Field>
 
           <div className="form-grid">
             <div style={{ marginBottom: 20 }}>
