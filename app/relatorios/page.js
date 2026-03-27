@@ -883,21 +883,13 @@ export default function RelatoriosPage() {
                   </>
                 )}
                 {editing && (
-                  <>
-                    <button
-                      onClick={cancelEditing}
-                      style={{ padding: '7px 14px', border: '1px solid var(--border)', borderRadius: 8, background: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--text-muted)', fontFamily: 'inherit' }}
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      onClick={saveReport}
-                      disabled={saving}
-                      style={{ padding: '7px 16px', border: 'none', borderRadius: 8, background: '#0081f0', cursor: saving ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, color: 'white', fontFamily: 'inherit', opacity: saving ? 0.7 : 1 }}
-                    >
-                      {saving ? 'Salvando…' : 'Salvar'}
-                    </button>
-                  </>
+                  <button
+                    onClick={saveReport}
+                    disabled={saving}
+                    style={{ padding: '7px 16px', border: 'none', borderRadius: 8, background: '#0081f0', cursor: saving ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, color: 'white', fontFamily: 'inherit', opacity: saving ? 0.7 : 1 }}
+                  >
+                    {saving ? 'Salvando…' : 'Salvar'}
+                  </button>
                 )}
                 <button
                   onClick={() => { if (!editing) { setDetail(null); setDraft(null); } else cancelEditing(); }}
