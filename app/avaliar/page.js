@@ -1049,7 +1049,7 @@ export default function AvaliarPage() {
         {/* COLUNA DIREITA — Resultado */}
         <div ref={resultPanelRef} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 16, overflow: 'hidden', minHeight: 480 }}>
 
-          {!result && !generating && (
+          {!result && !generating && batchResults.length === 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '64px 40px', textAlign: 'center' }}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--border)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5L12 3z"/></svg>
               <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Nenhuma avaliação gerada</h2>
@@ -1057,7 +1057,7 @@ export default function AvaliarPage() {
             </div>
           )}
 
-          {generating && (
+          {generating && evalMode === 'individual' && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '64px 40px' }}>
               <div style={{ width: 44, height: 44, border: '3px solid var(--border)', borderTop: '3px solid #0081f0', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
               <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>A IA está avaliando o trabalho...</p>
