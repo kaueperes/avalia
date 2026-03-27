@@ -361,7 +361,8 @@ export function AlunoEvolucaoReport({ data }) {
         <a href="/relatorio-turma-evolucao-preview" style={{ padding: '10px 24px', background: '#fff', color: '#374151', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>Ver evolução da turma</a>
       </div>
 
-      <style>{`@media print { .no-print { display: none !important; } body { background: white !important; } }`}</style>
+      <div className="print-pg" />
+      <style>{`@page { margin: 0; } @media print { .no-print { display: none !important; } body { background: white !important; } } .print-pg { display: none; position: fixed; bottom: 12px; right: 16px; font-size: 10px; color: #94a3b8; font-family: sans-serif; } .print-pg::after { content: counter(page); } @media print { .print-pg { display: block; } }`}</style>
     </div>
   );
 }
