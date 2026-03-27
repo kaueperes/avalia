@@ -1,11 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { EvaluationReport } from '../relatorio-preview/page';
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
-export default function RelatorioIndividualPage() {
+function RelatorioIndividualInner() {
   const params = useSearchParams();
   const id = params.get('id');
   const autoPrint = params.get('print') === '1';
@@ -57,4 +57,8 @@ export default function RelatorioIndividualPage() {
   );
 
   return <EvaluationReport data={data} />;
+}
+
+export default function RelatorioIndividualPage() {
+  return <Suspense fallback={null}><RelatorioIndividualInner /></Suspense>;
 }

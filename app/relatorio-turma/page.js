@@ -1,11 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { TurmaReport } from '../relatorio-turma-preview/page';
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
-export default function RelatorioTurmaPage() {
+function RelatorioTurmaInner() {
   const params = useSearchParams();
   const id = params.get('id');
   const autoPrint = params.get('print') === '1';
@@ -49,4 +49,8 @@ export default function RelatorioTurmaPage() {
   if (!data) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}><div style={{ width: 36, height: 36, border: '3px solid #e5e7eb', borderTop: '3px solid #0081f0', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>;
 
   return <TurmaReport data={data} />;
+}
+
+export default function RelatorioTurmaPage() {
+  return <Suspense fallback={null}><RelatorioTurmaInner /></Suspense>;
 }
