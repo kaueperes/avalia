@@ -630,6 +630,13 @@ export default function RelatoriosPage() {
     return r.type === 'turma' ? 'Turma' : 'Aluno';
   }
 
+  function reportRoute(r) {
+    const t = r.content?.stats?.reportTemplate;
+    if (r.type === 'aluno') return `/relatorio-aluno-evolucao?id=${r.id}`;
+    if (t === 'turma-evolucao') return `/relatorio-turma-evolucao?id=${r.id}`;
+    return `/relatorio-turma?id=${r.id}`;
+  }
+
   return (
     <AppLayout userName={userName}>
       {/* Header */}
@@ -762,16 +769,16 @@ export default function RelatoriosPage() {
                       <td style={{ padding: '13px 16px' }} onClick={e => e.stopPropagation()}>
                         <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
                           <button
-                            onClick={() => setDetail(r)}
+                            onClick={() => window.open(reportRoute(r), '_blank')}
                             title="Ver relatório"
-                            style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--text-sub)', fontFamily: 'inherit' }}
+                            style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 12, color: '#0081f0', fontFamily: 'inherit' }}
                             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-content)'}
                             onMouseLeave={e => e.currentTarget.style.background = 'none'}
                           >
                             Ver
                           </button>
                           <button
-                            onClick={() => generatePDF(r)}
+                            onClick={() => window.open(reportRoute(r) + '&print=1', '_blank')}
                             title="Exportar PDF"
                             style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--text-sub)', fontFamily: 'inherit' }}
                             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-content)'}

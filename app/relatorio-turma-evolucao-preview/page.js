@@ -244,8 +244,8 @@ function CriteriaBar({ name, avg: a }) {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-export default function RelatorioTurmaEvolucaoPreviewPage() {
-  const d = mock;
+export function TurmaEvolucaoReport({ data }) {
+  const d = data || mock;
   const n = d.atividades.length;
 
   // Médias por atividade
@@ -555,4 +555,8 @@ export default function RelatorioTurmaEvolucaoPreviewPage() {
       <style>{`@media print { .no-print { display: none !important; } body { background: white !important; } }`}</style>
     </div>
   );
+}
+
+export default function RelatorioTurmaEvolucaoPreviewPage() {
+  return <TurmaEvolucaoReport data={mock} />;
 }

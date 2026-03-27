@@ -181,8 +181,8 @@ function CriteriaBar({ name, score }) {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-export default function RelatorioAlunoEvolucaoPreviewPage() {
-  const d = mock;
+export function AlunoEvolucaoReport({ data }) {
+  const d = data || mock;
   const scores = d.atividades.map(a => a.score);
   const n = d.atividades.length;
   const scoreAtual = scores[n - 1];
@@ -360,4 +360,8 @@ export default function RelatorioAlunoEvolucaoPreviewPage() {
       <style>{`@media print { .no-print { display: none !important; } body { background: white !important; } }`}</style>
     </div>
   );
+}
+
+export default function RelatorioAlunoEvolucaoPreviewPage() {
+  return <AlunoEvolucaoReport data={mock} />;
 }

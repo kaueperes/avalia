@@ -190,8 +190,8 @@ function DistributionChart({ data, total }) {
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-export default function RelatorioTurmaPreviewPage() {
-  const d = mock;
+export function TurmaReport({ data }) {
+  const d = data || mock;
   const stats = computeStats(d.alunos);
   const rankingOrdenado = [...d.alunos].sort((a, b) => b.score - a.score);
   const alunosAtencao = rankingOrdenado.filter(a => a.score < 6);
@@ -437,4 +437,8 @@ export default function RelatorioTurmaPreviewPage() {
       `}</style>
     </div>
   );
+}
+
+export default function RelatorioTurmaPreviewPage() {
+  return <TurmaReport data={mock} />;
 }
