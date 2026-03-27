@@ -162,6 +162,8 @@ export default function AvaliarPage() {
   const [evalError, setEvalError] = useState('');
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [batchResults, setBatchResults] = useState([]);
+  const [batchProgress, setBatchProgress] = useState(null);
 
   // Cota
   const [quotaCiclo, setQuotaCiclo] = useState(null);
@@ -231,12 +233,89 @@ export default function AvaliarPage() {
     return nameParts.join(' ').trim();
   }
 
-  async function runEvaluation() {
-    if (!exerciseName.trim()) return;
+  async function runBatchEvaluation() {
+    if (!batchFiles.length) { setEvalError('Adicione arquivos para avaliar.'); return; }
     setGenerating(true);
     setEvalError('');
     setResult(null);
     setSaved(false);
+    setBatchResults([]);
+    setBatchProgress({ current: 0, total: batchFiles.length });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => resultPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+
+    const toBase64 = (file) => new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result.split(',')[1]);
+      reader.onerror = rej;
+      reader.readAsDataURL(file);
+    });
+
+    const results = [];
+    for (let i = 0; i < batchFiles.length; i++) {
+      const file = batchFiles[i];
+      setBatchProgress({ current: i + 1, total: batchFiles.length });
+      const studentNameResolved = extractNameFromFile(file);
+      const images = [];
+      let workContent = '';
+
+      if (file.type.startsWith('image/')) {
+        images.push({ data: await toBase64(file), mediaType: file.type, label: `Trabalho do aluno: ${file.name}` });
+      } else if (file.name.endsWith('.obj')) {
+        try { workContent = await file.text(); } catch { workContent = `[Arquivo: ${file.name}]`; }
+      } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+        try { workContent = await file.text(); } catch {}
+      }
+
+      try {
+        const r = await fetch('/api/evaluate', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName: studentNameResolved, studentWork: workContent, tone, profName, profDisc, profInstitution, writingSample, images: images.length > 0 ? images : undefined }),
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          results.push({ name: studentNameResolved, file: file.name, error: data.error || 'Erro ao gerar avaliação.' });
+          setBatchResults([...results]);
+          continue;
+        }
+        // Auto-save
+        let wasSaved = false;
+        try {
+          const sr = await fetch('/api/evaluations', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ studentName: studentNameResolved, type: selectedType, score: data.score, feedback: data.feedback, criteria: data.criteriaScores, profileName: profName || '', turma: profTurma || '', exerciseName: exerciseName || '', institution: profInstitution || '', disciplina: exerciseDisciplina || profDisc || '' }),
+          });
+          wasSaved = sr.ok;
+        } catch {}
+        // Decrement quota
+        try {
+          const u = JSON.parse(localStorage.getItem('user') || '{}');
+          if (typeof u.quota_ciclo === 'number' && u.quota_ciclo > 0) { u.quota_ciclo -= 1; setQuotaCiclo(u.quota_ciclo); }
+          else if (typeof u.quota_extra === 'number' && u.quota_extra > 0) { u.quota_extra -= 1; setQuotaExtra(u.quota_extra); }
+          localStorage.setItem('user', JSON.stringify(u));
+          window.dispatchEvent(new Event('storage'));
+        } catch {}
+        results.push({ name: studentNameResolved, file: file.name, score: data.score, criteriaScores: data.criteriaScores, feedback: data.feedback, saved: wasSaved });
+        setBatchResults([...results]);
+      } catch {
+        results.push({ name: studentNameResolved, file: file.name, error: 'Erro de conexão.' });
+        setBatchResults([...results]);
+      }
+    }
+    setGenerating(false);
+    setBatchProgress(null);
+  }
+
+  async function runEvaluation() {
+    if (!exerciseName.trim()) return;
+    if (evalMode === 'lote') return runBatchEvaluation();
+    setGenerating(true);
+    setEvalError('');
+    setResult(null);
+    setSaved(false);
+    setBatchResults([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => resultPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     try {
@@ -983,6 +1062,72 @@ export default function AvaliarPage() {
               <div style={{ width: 44, height: 44, border: '3px solid var(--border)', borderTop: '3px solid #0081f0', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
               <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>A IA está avaliando o trabalho...</p>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Analisando critérios e gerando feedback personalizado</p>
+            </div>
+          )}
+
+          {/* Batch results */}
+          {(batchResults.length > 0 || (generating && evalMode === 'lote')) && !result && (
+            <div style={{ padding: 28 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 4 }}>Resultado em Lote</p>
+                  <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-main)', marginBottom: 2 }}>{exerciseName}</h2>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                    {generating && batchProgress ? `Avaliando ${batchProgress.current} de ${batchProgress.total}...` : `${batchResults.length} avaliação${batchResults.length !== 1 ? 'ões' : ''} gerada${batchResults.length !== 1 ? 's' : ''}`}
+                  </p>
+                </div>
+                {!generating && (
+                  <button onClick={() => { novaAvaliacao(); setBatchResults([]); }} style={{ padding: '9px 16px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-muted)' }}>↺ Nova</button>
+                )}
+              </div>
+              <div style={{ border: '1px solid var(--border-card)', borderRadius: 12, overflow: 'hidden' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: 'var(--bg-content)' }}>
+                      {['Aluno', 'Nota', 'Conceito', 'Status'].map(h => (
+                        <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {batchResults.map((r, i) => {
+                      const sc = r.score != null ? scoreColor(r.score) : null;
+                      return (
+                        <tr key={i} style={{ borderTop: '1px solid var(--border)' }}>
+                          <td style={{ padding: '12px 14px', fontWeight: 600, fontSize: 14, color: 'var(--text-main)' }}>{r.name || r.file}</td>
+                          <td style={{ padding: '12px 14px', fontSize: 14, fontWeight: 700, color: sc ? sc.text : '#ef4444' }}>
+                            {r.error ? '—' : r.score?.toFixed(1)}
+                          </td>
+                          <td style={{ padding: '12px 14px' }}>
+                            {sc && !r.error ? (
+                              <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 13, fontWeight: 800, background: sc.bg, color: sc.text }}>{scoreToGrade(r.score)}</span>
+                            ) : '—'}
+                          </td>
+                          <td style={{ padding: '12px 14px', fontSize: 12 }}>
+                            {r.error ? (
+                              <span style={{ color: '#ef4444' }}>{r.error}</span>
+                            ) : r.saved ? (
+                              <span style={{ color: '#16a34a', fontWeight: 600 }}>✓ Salvo</span>
+                            ) : (
+                              <span style={{ color: '#d97706' }}>Não salvo</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {generating && batchProgress && batchResults.length < batchProgress.total && (
+                      <tr style={{ borderTop: '1px solid var(--border)' }}>
+                        <td colSpan={4} style={{ padding: '12px 14px', fontSize: 13, color: 'var(--text-muted)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div style={{ width: 14, height: 14, border: '2px solid var(--border)', borderTop: '2px solid #0081f0', borderRadius: '50%', animation: 'spin 0.8s linear infinite', flexShrink: 0 }} />
+                            Avaliando próximo aluno...
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
