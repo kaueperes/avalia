@@ -231,7 +231,6 @@ export default function AvaliacoesPage() {
       });
       const data = await r.json();
       if (!r.ok) { setReportError(data.error || 'Erro ao gerar relatório.'); return; }
-      setClassReport(data);
       try {
         const u = JSON.parse(localStorage.getItem('user') || '{}');
         if (typeof u.quota_relatorios_ciclo === 'number' && u.quota_relatorios_ciclo > 0) {
@@ -242,6 +241,7 @@ export default function AvaliacoesPage() {
         localStorage.setItem('user', JSON.stringify(u));
         window.dispatchEvent(new Event('storage'));
       } catch {}
+      router.push('/relatorios');
     } catch { setReportError('Erro de conexão. Tente novamente.'); }
     finally { setReportLoading(false); }
   }
@@ -422,7 +422,6 @@ export default function AvaliacoesPage() {
       });
       const data = await r.json();
       if (!r.ok) { setStudentReportError(data.error || 'Erro ao gerar parecer.'); return; }
-      setStudentReport(data);
       try {
         const u = JSON.parse(localStorage.getItem('user') || '{}');
         if (typeof u.quota_relatorios_ciclo === 'number' && u.quota_relatorios_ciclo > 0) {
@@ -433,6 +432,7 @@ export default function AvaliacoesPage() {
         localStorage.setItem('user', JSON.stringify(u));
         window.dispatchEvent(new Event('storage'));
       } catch {}
+      router.push('/relatorios');
     } catch { setStudentReportError('Erro de conexão. Tente novamente.'); }
     finally { setStudentReportLoading(false); }
   }
