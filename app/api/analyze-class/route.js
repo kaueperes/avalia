@@ -32,11 +32,11 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Nenhuma avaliação para analisar.' }, { status: 400 });
   }
 
-  // Build summary for Claude
-  const avgScore = (evaluations.reduce((s, e) => s + e.score, 0) / evaluations.length).toFixed(1);
-  const passing = evaluations.filter(e => e.score >= 5).length;
+  // Detect single vs multi-activity
+  const uniqueExercises = [...new Set(evaluations.map(e => (e.exerciseName || '').trim()).filter(Boolean))];
+  const isMultiActivity = uniqueExercises.length >= 2;
 
-  // Criteria aggregation
+  // Common: criteria aggregation across all evals
   const criteriaMap = {};
   for (const e of evaluations) {
     for (const c of (e.criteria || [])) {
@@ -45,25 +45,109 @@ export async function POST(request) {
       criteriaMap[c.name].count += 1;
     }
   }
-  const criteriaAvg = Object.entries(criteriaMap).map(([name, d]) => ({
-    name,
-    avg: (d.total / d.count).toFixed(1),
-  })).sort((a, b) => b.avg - a.avg);
+  const criteriaAvg = Object.entries(criteriaMap)
+    .map(([name, d]) => ({ name, avg: parseFloat((d.total / d.count).toFixed(1)) }))
+    .sort((a, b) => b.avg - a.avg);
 
-  const stats = {
-    total: evaluations.length,
-    media: parseFloat(avgScore),
-    aprovados: passing,
-    melhorNota: parseFloat(Math.max(...evaluations.map(e => e.score)).toFixed(1)),
-    piorNota: parseFloat(Math.min(...evaluations.map(e => e.score)).toFixed(1)),
-    distribuicao: [
-      { label: '0–4', count: evaluations.filter(e => e.score < 5).length },
-      { label: '5–6', count: evaluations.filter(e => e.score >= 5 && e.score < 7).length },
-      { label: '7–8', count: evaluations.filter(e => e.score >= 7 && e.score < 9).length },
-      { label: '9–10', count: evaluations.filter(e => e.score >= 9).length },
-    ],
-    criteriaAverages: criteriaAvg.map(c => ({ name: c.name, avg: parseFloat(c.avg) })),
-  };
+  const avgScore = (evaluations.reduce((s, e) => s + e.score, 0) / evaluations.length).toFixed(1);
+  const passing = evaluations.filter(e => e.score >= 6).length;
+
+  let stats;
+
+  if (isMultiActivity) {
+    // ── Multi-activity: evolution template ──────────────────────────────────────
+    const exerciseGroups = {};
+    for (const e of evaluations) {
+      const name = (e.exerciseName || 'Exercício').trim();
+      if (!exerciseGroups[name]) exerciseGroups[name] = [];
+      exerciseGroups[name].push(e);
+    }
+
+    // Sort activities by earliest evaluation date for that activity
+    const atividades = Object.entries(exerciseGroups).map(([name, evals]) => {
+      const minDate = Math.min(...evals.map(e => new Date(e.createdAt).getTime()));
+      const media = parseFloat((evals.reduce((s, e) => s + e.score, 0) / evals.length).toFixed(1));
+      return { exerciseName: name, date: new Date(minDate).toISOString(), media, total: evals.length };
+    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // For each student, gather score per activity (take most recent if duplicates)
+    const studentNames = [...new Set(evaluations.map(e => e.studentName))];
+    const alunos = studentNames.map(studentName => {
+      const scores = atividades.map(a => {
+        const matches = exerciseGroups[a.exerciseName].filter(e => e.studentName === studentName);
+        if (!matches.length) return null;
+        matches.sort((x, y) => new Date(y.createdAt) - new Date(x.createdAt));
+        return matches[0].score;
+      });
+      const valid = scores.filter(s => s !== null);
+      return {
+        studentName,
+        scores,
+        scorePrimeiro: valid.length > 0 ? valid[0] : null,
+        scoreUltimo: valid.length > 0 ? valid[valid.length - 1] : null,
+        evolucao: valid.length >= 2 ? parseFloat((valid[valid.length - 1] - valid[0]).toFixed(1)) : 0,
+      };
+    }).sort((a, b) => (b.scoreUltimo ?? -1) - (a.scoreUltimo ?? -1));
+
+    // Last activity stats
+    const lastActivity = atividades[atividades.length - 1];
+    const lastEvals = exerciseGroups[lastActivity.exerciseName];
+    const lastAprovados = lastEvals.filter(e => e.score >= 6).length;
+
+    const lastCriteriaMap = {};
+    for (const e of lastEvals) {
+      for (const c of (e.criteria || [])) {
+        if (!lastCriteriaMap[c.name]) lastCriteriaMap[c.name] = { total: 0, count: 0 };
+        lastCriteriaMap[c.name].total += c.score || 0;
+        lastCriteriaMap[c.name].count += 1;
+      }
+    }
+    const criteriaRecente = Object.entries(lastCriteriaMap)
+      .map(([name, d]) => ({ name, avg: parseFloat((d.total / d.count).toFixed(1)) }))
+      .sort((a, b) => b.avg - a.avg);
+
+    const distribuicao = [
+      { label: '0–4', count: lastEvals.filter(e => e.score < 5).length },
+      { label: '5–6', count: lastEvals.filter(e => e.score >= 5 && e.score < 7).length },
+      { label: '7–8', count: lastEvals.filter(e => e.score >= 7 && e.score < 9).length },
+      { label: '9–10', count: lastEvals.filter(e => e.score >= 9).length },
+    ];
+
+    stats = {
+      reportTemplate: 'turma-evolucao',
+      total: studentNames.length,
+      atividades,
+      alunos,
+      mediaInicial: atividades[0].media,
+      mediaAtual: atividades[atividades.length - 1].media,
+      aprovados: lastAprovados,
+      melhorNota: parseFloat(Math.max(...lastEvals.map(e => e.score)).toFixed(1)),
+      piorNota: parseFloat(Math.min(...lastEvals.map(e => e.score)).toFixed(1)),
+      distribuicao,
+      criteriaAverages: criteriaAvg,
+      criteriaRecente,
+    };
+  } else {
+    // ── Single activity: standard turma template ─────────────────────────────
+    stats = {
+      reportTemplate: 'turma',
+      total: evaluations.length,
+      media: parseFloat(avgScore),
+      aprovados: passing,
+      melhorNota: parseFloat(Math.max(...evaluations.map(e => e.score)).toFixed(1)),
+      piorNota: parseFloat(Math.min(...evaluations.map(e => e.score)).toFixed(1)),
+      distribuicao: [
+        { label: '0–4', count: evaluations.filter(e => e.score < 5).length },
+        { label: '5–6', count: evaluations.filter(e => e.score >= 5 && e.score < 7).length },
+        { label: '7–8', count: evaluations.filter(e => e.score >= 7 && e.score < 9).length },
+        { label: '9–10', count: evaluations.filter(e => e.score >= 9).length },
+      ],
+      criteriaAverages: criteriaAvg,
+      alunos: evaluations
+        .map(e => ({ studentName: e.studentName, score: e.score }))
+        .sort((a, b) => b.score - a.score),
+    };
+  }
 
   const criteriaText = criteriaAvg.length > 0
     ? criteriaAvg.map(c => `- ${c.name}: média ${c.avg}`).join('\n')
@@ -78,13 +162,14 @@ export async function POST(request) {
     profileName ? `Professor(a): ${profileName}` : null,
     turma ? `Turma: ${turma}` : null,
     exerciseName ? `Exercício filtrado: ${exerciseName}` : null,
+    isMultiActivity ? `Análise evolutiva: ${stats.atividades?.length} atividades` : null,
   ].filter(Boolean).join(' | ');
 
   const prompt = `Você é um assistente pedagógico especialista em educação. Analise o desempenho desta turma com base nas avaliações abaixo e forneça uma análise pedagógica construtiva.
 
 ${context ? `Contexto: ${context}\n` : ''}Total de alunos avaliados: ${evaluations.length}
 Média da turma: ${avgScore}
-Aprovados (nota ≥ 5): ${passing} de ${evaluations.length}
+Aprovados (nota ≥ 6): ${passing} de ${evaluations.length}
 
 Desempenho por critério:
 ${criteriaText}
@@ -114,7 +199,6 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
     });
 
     const text = message.content[0]?.text || '';
-    // Extract JSON (in case the model wraps it in code blocks)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA. Tente novamente.' }, { status: 500 });
 
@@ -133,7 +217,7 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
       type: 'turma',
       subject: '',
       turma: turma || '',
-      exercise_name: exerciseName || '',
+      exercise_name: isMultiActivity ? '' : (exerciseName || evaluations[0]?.exerciseName || ''),
       institution: institution,
       profile_name: profileName,
       content: { ...analysis, stats },

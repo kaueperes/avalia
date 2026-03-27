@@ -57,10 +57,29 @@ export async function POST(request) {
       criteriaMap2[c.name].count += 1;
     }
   }
+  const criteriaAverages = Object.entries(criteriaMap2)
+    .map(([name, d]) => ({ name, avg: parseFloat((d.total / d.count).toFixed(1)) }))
+    .sort((a, b) => b.avg - a.avg);
+
+  const lastEval = sorted[sorted.length - 1];
+  const criteriaRecente = (lastEval.criteria || [])
+    .map(c => ({ name: c.name, avg: c.score ?? 0 }))
+    .sort((a, b) => b.avg - a.avg);
+
+  const atividades = sorted.map(e => ({
+    exerciseName: e.exerciseName || 'Exercício',
+    score: e.score,
+    date: e.createdAt,
+    criteria: e.criteria || [],
+  }));
+
   const stats = {
+    reportTemplate: 'aluno-evolucao',
     media: parseFloat(avgScore),
     timeline: sorted.map(e => ({ exerciseName: e.exerciseName || 'Exercício', score: e.score, date: e.createdAt })),
-    criteriaAverages: Object.entries(criteriaMap2).map(([name, d]) => ({ name, avg: parseFloat((d.total / d.count).toFixed(1)) })).sort((a, b) => b.avg - a.avg),
+    criteriaAverages,
+    atividades,
+    criteriaRecente,
   };
 
   const prompt = `Você é um assistente pedagógico especialista em educação. Analise o histórico individual de avaliações do aluno abaixo e gere um parecer pedagógico formal e construtivo.
