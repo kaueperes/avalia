@@ -125,10 +125,10 @@ export function EvaluationReport({ data }) {
         }}>
           {/* Logo da instituição */}
           {d.institutionLogo ? (
-            <img src={d.institutionLogo} alt="Logo" style={{ width: 72, height: 72, borderRadius: 12, objectFit: 'contain', flexShrink: 0 }} />
+            <img src={d.institutionLogo} alt="Logo" style={{ width: 96, height: 96, borderRadius: 12, objectFit: 'contain', flexShrink: 0 }} />
           ) : (
           <div style={{
-            width: 72, height: 72, borderRadius: 12,
+            width: 96, height: 96, borderRadius: 12,
             background: '#e2e8f0',
             border: '1px dashed #cbd5e1',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
