@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protótipo — Categorias Vertical</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f5f7; color: #111; display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; min-height: 100vh; }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      width: 100%;
+      max-width: 780px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .card-header p { font-size: 11px; font-weight: 700; color: #810cfa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+    .card-header h2 { font-size: 18px; font-weight: 800; color: #111; }
+
+    .card-body {
+      display: flex;
+      min-height: 420px;
+    }
+
+    /* Coluna esquerda — categorias */
+    .categories {
+      width: 160px;
+      flex-shrink: 0;
+      border-right: 1px solid #e5e7eb;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: #fafafa;
+    }
+
+    .cat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #6b7280;
+      transition: all .15s;
+      border: 1px solid transparent;
+    }
+
+    .cat-item:hover { background: #f0f0f0; color: #111; }
+
+    .cat-item.active {
+      background: #eff6ff;
+      color: #0081f0;
+      font-weight: 700;
+      border-color: #bfdbfe;
+    }
+
+    .cat-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    /* Coluna direita — tipos */
+    .types-panel {
+      flex: 1;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .types-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 7px;
+    }
+
+    .type-item {
+      padding: 12px 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 9px;
+      background: #f9fafb;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #6b7280;
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.35;
+      transition: all .15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .type-item:hover { border-color: #0081f0; color: #0081f0; background: #eff6ff; }
+
+    .type-item.active {
+      border-color: #0081f0;
+      background: #eff6ff;
+      color: #0081f0;
+      font-weight: 700;
+    }
+
+    .type-item svg { opacity: 0.7; }
+    .type-item.active svg { opacity: 1; }
+
+    .hint-box {
+      font-size: 12px;
+      color: #6b7280;
+      padding: 8px 10px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      line-height: 1.5;
+    }
+
+    /* Comparação — layout atual */
+    .comparison {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 780px;
+    }
+    .comparison h3 { font-size: 13px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
+    .old-card {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      padding: 20px 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .old-cats {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .old-cat {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      color: #6b7280;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .old-cat.active { background: #eff6ff; color: #0081f0; border-color: #bfdbfe; }
+
+    .old-types {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+
+    .old-type {
+      padding: 10px 4px;
+      border: 1px solid #e5e7eb;
+      border-radius: 9px;
+      font-size: 11.5px;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    .label { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 5px; margin-bottom: 16px; }
+    .label.new { background: #dcfce7; color: #16a34a; }
+    .label.old { background: #fee2e2; color: #dc2626; }
+
+    .wrapper { display: flex; flex-direction: column; align-items: center; gap: 32px; width: 100%; max-width: 780px; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- NOVO -->
+    <div style="width:100%">
+      <span class="label new">NOVA PROPOSTA — Layout vertical</span>
+      <div class="card">
+        <div class="card-header">
+          <p>Avaliação</p>
+          <h2>Tipo de trabalho</h2>
+        </div>
+        <div class="card-body">
+          <!-- Categorias verticais -->
+          <div class="categories">
+            <div class="cat-item active" onclick="selectCat('3d')">
+              <div class="cat-icon">⬡</div> 3D e Animação
+            </div>
+            <div class="cat-item" onclick="selectCat('audiovisual')">
+              <div class="cat-icon">🎬</div> Audiovisual
+            </div>
+            <div class="cat-item" onclick="selectCat('design')">
+              <div class="cat-icon">◼</div> Design
+            </div>
+            <div class="cat-item" onclick="selectCat('musica')">
+              <div class="cat-icon">🎵</div> Música
+            </div>
+            <div class="cat-item" onclick="selectCat('texto')">
+              <div class="cat-icon">📝</div> Texto e Código
+            </div>
+            <div class="cat-item" onclick="selectCat('outros')">
+              <div class="cat-icon">📐</div> Outros
+            </div>
+          </div>
+
+          <!-- Tipos -->
+          <div class="types-panel">
+            <div class="types-grid" id="types-grid"></div>
+            <div class="hint-box" id="hint-box">Selecione um tipo para ver a descrição.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ATUAL -->
+    <div style="width:100%">
+      <span class="label old">LAYOUT ATUAL — Menu horizontal</span>
+      <div class="old-card">
+        <div class="old-cats">
+          <div class="old-cat active">3D</div>
+          <div class="old-cat">Visual</div>
+          <div class="old-cat">Texto</div>
+          <div class="old-cat">Código</div>
+          <div class="old-cat">Outros</div>
+        </div>
+        <div class="old-types">
+          <div class="old-type">Modelagem 3D</div>
+          <div class="old-type">Animação 3D</div>
+          <div class="old-type">Rigging</div>
+          <div class="old-type">Texturização</div>
+          <div class="old-type">Iluminação 3D</div>
+          <div class="old-type">Render</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const CATS = {
+      '3d': {
+        types: [
+          { label: 'Modelagem 3D', hint: 'Envie o arquivo .obj e/ou imagens do trabalho.' },
+          { label: 'Animação 3D', hint: 'Envie o vídeo da animação (MP4, MOV) e/ou frames-chave.' },
+          { label: 'Animação 2D', hint: 'Envie o vídeo da animação 2D ou frames exportados.' },
+          { label: 'Rigging', hint: 'Envie vídeo do rig em movimento, imagens de poses-chave, ou ambos.' },
+          { label: 'Texturização', hint: 'Envie renders com os materiais aplicados.' },
+          { label: 'Iluminação 3D', hint: 'Envie o render com a iluminação aplicada.' },
+          { label: 'Render', hint: 'Envie a imagem do render final.' },
+        ]
+      },
+      audiovisual: {
+        types: [
+          { label: 'Storyboard', hint: 'Envie as pranchas do storyboard como imagem.' },
+          { label: 'Edição de Vídeo', hint: 'Envie o vídeo editado para análise de cortes, ritmo e narrativa.' },
+          { label: 'Motion Graphics', hint: 'Envie o vídeo do motion graphics.' },
+          { label: 'Apresentação Oral', hint: 'Envie o vídeo da apresentação para análise de fala, postura e clareza.' },
+          { label: 'Locução', hint: 'Envie o áudio ou vídeo da locução.' },
+        ]
+      },
+      design: {
+        types: [
+          { label: 'Design Gráfico', hint: 'Envie a peça gráfica finalizada.' },
+          { label: 'Ilustração Digital', hint: 'Envie a ilustração finalizada.' },
+          { label: 'UX/UI Design', hint: 'Envie prints das telas ou protótipo.' },
+          { label: 'Design de Moda', hint: 'Envie o croqui ou ficha técnica digitalizada.' },
+          { label: 'Concept Art', hint: 'Envie as artes conceituais do personagem, cenário ou objeto.' },
+          { label: 'Identidade Visual', hint: 'Envie as peças da identidade: logo, paleta, tipografia e aplicações.' },
+        ]
+      },
+      musica: {
+        types: [
+          { label: 'Partitura', hint: 'Envie a partitura digitalizada como imagem.' },
+          { label: 'Composição em Áudio', hint: 'Envie o áudio da composição para análise de harmonia, ritmo e melodia.' },
+          { label: 'Produção Musical', hint: 'Envie o áudio da produção finalizada.' },
+        ]
+      },
+      texto: {
+        types: [
+          { label: 'Redação / Artigo', hint: 'Cole o texto ou envie como .docx.' },
+          { label: 'Roteiro', hint: 'Cole o roteiro formatado.' },
+          { label: 'TCC / Monografia', hint: 'Cole o texto ou envie como .docx. Para ABNT, envie prints das páginas-chave.' },
+          { label: 'Game Design Doc', hint: 'Cole o documento de game design.' },
+          { label: 'Programação', hint: 'Cole o código-fonte.' },
+          { label: 'HTML/CSS/JS', hint: 'Cole o código HTML, CSS e/ou JavaScript.' },
+          { label: 'Shader', hint: 'Cole o código do shader.' },
+        ]
+      },
+      outros: {
+        types: [
+          { label: 'Prancha Arquitetônica', hint: 'Envie a prancha como imagem.' },
+          { label: 'Maquete Física', hint: 'Envie fotos da maquete de diferentes ângulos.' },
+          { label: 'Design de Produto', hint: 'Envie renders ou fotos do produto.' },
+          { label: 'Libras', hint: 'Envie o vídeo da sinalização.' },
+        ]
+      },
+    };
+
+    let selectedCat = '3d';
+    let selectedType = null;
+
+    function selectCat(cat) {
+      selectedCat = cat;
+      selectedType = null;
+      document.querySelectorAll('.cat-item').forEach((el, i) => {
+        el.classList.toggle('active', Object.keys(CATS)[i] === cat);
+      });
+      renderTypes();
+    }
+
+    function selectType(label, hint) {
+      selectedType = label;
+      document.querySelectorAll('.type-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.label === label);
+      });
+      document.getElementById('hint-box').textContent = hint;
+    }
+
+    function renderTypes() {
+      const grid = document.getElementById('types-grid');
+      const types = CATS[selectedCat].types;
+      grid.innerHTML = types.map(t => `
+        <div class="type-item" data-label="${t.label}" onclick="selectType('${t.label}', '${t.hint}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          ${t.label}
+        </div>
+      `).join('');
+      document.getElementById('hint-box').textContent = 'Selecione um tipo para ver a descrição.';
+    }
+
+    renderTypes();
+  </script>
+</body>
+</html>

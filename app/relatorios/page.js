@@ -762,6 +762,15 @@ export default function RelatoriosPage() {
                       <td style={{ padding: '13px 16px' }} onClick={e => e.stopPropagation()}>
                         <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
                           <button
+                            onClick={() => setDetail(r)}
+                            title="Ver relatório"
+                            style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--text-sub)', fontFamily: 'inherit' }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-content)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                          >
+                            Ver
+                          </button>
+                          <button
                             onClick={() => generatePDF(r)}
                             title="Exportar PDF"
                             style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--text-sub)', fontFamily: 'inherit' }}
@@ -769,6 +778,28 @@ export default function RelatoriosPage() {
                             onMouseLeave={e => e.currentTarget.style.background = 'none'}
                           >
                             PDF
+                          </button>
+                          <button
+                            onClick={() => {
+                              const c = r.content;
+                              setDetail(r);
+                              setDraft({
+                                resumo: c.resumo || '',
+                                pontosFortes: (c.pontosFortes || []).slice(),
+                                pontosAtencao: (c.pontosAtencao || []).slice(),
+                                pontosDesenvolver: (c.pontosDesenvolver || []).slice(),
+                                analiseDetalhada: c.analiseDetalhada || '',
+                                parecer: c.parecer || '',
+                                sugestoes: (c.sugestoes || []).map(s => ({ ...s })),
+                              });
+                              setEditing(true);
+                            }}
+                            title="Editar relatório"
+                            style={{ padding: '5px 10px', border: '1px solid #0081f0', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 12, color: '#0081f0', fontFamily: 'inherit' }}
+                            onMouseEnter={e => e.currentTarget.style.background = '#eff6ff'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                          >
+                            Editar
                           </button>
                           <button
                             onClick={() => del(r.id)}

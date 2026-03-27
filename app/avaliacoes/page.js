@@ -255,6 +255,22 @@ export default function AvaliacoesPage() {
     const exerciseTitle = exerciseFilter ? ` · ${exerciseFilter}` : '';
     const date = new Date().toLocaleDateString('pt-BR');
 
+    // Build chart data from evaluations
+    const dist = [
+      { label: '0–4', count: evalsForPDF.filter(e=>e.score<5).length },
+      { label: '5–6', count: evalsForPDF.filter(e=>e.score>=5&&e.score<7).length },
+      { label: '7–8', count: evalsForPDF.filter(e=>e.score>=7&&e.score<9).length },
+      { label: '9–10', count: evalsForPDF.filter(e=>e.score>=9).length },
+    ];
+    const cMap = {};
+    for (const e of evalsForPDF) for (const c of (e.criteria||[])) {
+      if (!cMap[c.name]) cMap[c.name] = { total: 0, count: 0 };
+      cMap[c.name].total += c.score||0; cMap[c.name].count += 1;
+    }
+    const cAvg = Object.entries(cMap).map(([name,d])=>({ name, avg: parseFloat((d.total/d.count).toFixed(1)) })).sort((a,b)=>b.avg-a.avg);
+    const histSvg = _histSVG(dist);
+    const barsSvg = _barsSVG(cAvg, 460);
+
     const suggestionsHtml = (report.sugestoes || []).map((s, i) => `
       <div style="margin-bottom:16px;padding:16px 20px;background:#f9fafb;border-radius:10px;border-left:3px solid #0081f0">
         <div style="font-size:13px;font-weight:700;color:#111;margin-bottom:4px">${i+1}. ${s.titulo}</div>
@@ -292,6 +308,18 @@ export default function AvaliacoesPage() {
           <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;margin-top:4px">Total avaliados</div>
         </div>
       </div>
+
+      ${histSvg || barsSvg ? `
+      <div style="display:grid;grid-template-columns:${histSvg && barsSvg ? '1fr 1fr' : '1fr'};gap:24px;margin-bottom:32px;align-items:start">
+        ${histSvg ? `<div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Distribuição de Notas</div>
+          ${histSvg}
+        </div>` : ''}
+        ${barsSvg ? `<div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Média por Critério</div>
+          ${barsSvg}
+        </div>` : ''}
+      </div>` : ''}
 
       <div style="margin-bottom:28px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Resumo Geral</div>
