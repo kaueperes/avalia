@@ -364,7 +364,7 @@ export default function AvaliarPage() {
           turma: profTurma || '',
           exerciseName: exerciseName || '',
           institution: profInstitution || '',
-          disciplina: exerciseDisciplina || '',
+          disciplina: exerciseDisciplina || profDisc || '',
         }),
       });
       if (r.ok) setSaved(true);
