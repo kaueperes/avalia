@@ -12,7 +12,7 @@ export async function GET() {
 
   return NextResponse.json({
     enabled: s.chatbot_enabled !== 'false',
-    name: s.chatbot_name || '',  // vazio = frontend sorteia o nome
+    name: (s.chatbot_name && !s.chatbot_name.includes('{')) ? s.chatbot_name : '',  // vazio = frontend sorteia o nome
     welcome: s.chatbot_welcome || '',
   });
 }

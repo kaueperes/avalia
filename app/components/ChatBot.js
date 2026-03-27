@@ -57,7 +57,7 @@ export default function ChatBot({ darkMode }) {
       .then(r => r.json())
       .then(data => {
         setEnabled(data.enabled ?? true);
-        if (data.name) setBotName(data.name); // só sobrescreve se tiver nome configurado
+        if (data.name && !data.name.includes('{')) setBotName(data.name); // só sobrescreve se for nome real
         if (data.welcome) setWelcome(data.welcome);
       })
       .catch(() => {});
