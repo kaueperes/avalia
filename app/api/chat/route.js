@@ -19,7 +19,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'O assistente virtual não está disponível no seu plano. Faça upgrade para acessar.' }, { status: 402 });
   }
 
-  const { messages } = await request.json();
+  const { messages, botName: clientBotName } = await request.json();
   if (!messages?.length) {
     return NextResponse.json({ error: 'Mensagens inválidas.' }, { status: 400 });
   }
@@ -35,7 +35,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'O assistente está temporariamente desabilitado.' }, { status: 503 });
   }
 
-  const botName = (s.chatbot_name && !s.chatbot_name.includes('{')) ? s.chatbot_name : 'Luca';
+  const botName = (s.chatbot_name && !s.chatbot_name.includes('{')) ? s.chatbot_name : (clientBotName || 'Luca');
   const systemPrompt = (s.chatbot_system_prompt || DEFAULT_SYSTEM_PROMPT).replace(/\{nome\}/g, botName);
   const model = s.chatbot_model || DEFAULT_MODEL;
 
