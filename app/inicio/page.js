@@ -518,7 +518,9 @@ export default function InicioPage() {
                         style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', background: isSelected ? t.bg : 'var(--bg-content)', borderRadius: 10, border: `1px solid ${isSelected ? t.color + '44' : 'var(--border)'}`, cursor: 'pointer', transition: 'all 0.15s' }}
                       >
                         <div style={{ width: 36, height: 36, borderRadius: 10, background: t.bg, border: `1px solid ${t.color}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <span style={{ fontSize: 11, fontWeight: 800, color: t.color, lineHeight: 1, textAlign: 'center' }}>{t.name}</span>
+                          <span style={{ fontSize: t.name.length > 5 ? 8 : t.name.length > 3 ? 10 : 11, fontWeight: 800, color: t.color, lineHeight: 1.1, textAlign: 'center', wordBreak: 'break-all' }}>
+                            {t.name.length > 6 ? t.name.substring(0, 5) + '…' : t.name}
+                          </span>
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
