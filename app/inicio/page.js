@@ -334,7 +334,7 @@ export default function InicioPage() {
       {!loading && evaluations.length > 0 && (
         <>
           {/* ── Filtro global de turma ── */}
-          {allTurmas.length > 1 && (
+          {allTurmas.length > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, padding: '12px 16px', background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border-card)' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
                 <path d="M3 4h18M7 12h10M11 20h2" stroke="#6b7280" strokeWidth="2" strokeLinecap="round"/>
