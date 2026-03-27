@@ -14,13 +14,16 @@ function RelatorioIndividualInner() {
 
   useEffect(() => {
     if (!id) { setError('ID não informado.'); return; }
-    fetch(`/api/evaluations/${id}`, { headers: { Authorization: `Bearer ${token()}` } })
-      .then(r => r.ok ? r.json() : Promise.reject(r))
-      .then(e => {
+    Promise.all([
+      fetch(`/api/evaluations/${id}`, { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : Promise.reject(r)),
+      fetch('/api/profiles', { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
+    ]).then(([e, profiles]) => {
+        const profile = (profiles || []).find(p => p.name === e.profileName);
         setData({
           studentName: e.studentName || 'Aluno',
           turma: e.turma || '',
           institution: e.institution || '',
+          institutionLogo: profile?.institutionLogo || '',
           profileName: e.profileName || '',
           exerciseName: e.exerciseName || '',
           disciplina: e.disciplina || '',

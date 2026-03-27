@@ -14,16 +14,19 @@ function RelatorioAlunoEvolucaoInner() {
 
   useEffect(() => {
     if (!id) { setError('ID não informado.'); return; }
-    fetch(`/api/reports/${id}`, { headers: { Authorization: `Bearer ${token()}` } })
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(r => {
+    Promise.all([
+      fetch(`/api/reports/${id}`, { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : Promise.reject()),
+      fetch('/api/profiles', { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
+    ]).then(([r, profiles]) => {
         const c = r.content || {};
         const s = c.stats || {};
+        const profile = (profiles || []).find(p => p.name === r.profileName);
         setData({
           studentName: r.subject || 'Aluno',
           turma: r.turma || '',
           disciplina: c.disciplina || '',
           institution: r.institution || '',
+          institutionLogo: profile?.institutionLogo || '',
           profileName: r.profileName || '',
           date: new Date(r.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }),
           // atividades: [{name, score, date}]
@@ -42,6 +45,7 @@ function RelatorioAlunoEvolucaoInner() {
       })
       .catch(() => setError('Não foi possível carregar o relatório.'));
   }, [id]);
+
 
   useEffect(() => {
     if (data && autoPrint) {

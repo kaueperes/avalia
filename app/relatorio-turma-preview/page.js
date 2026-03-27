@@ -208,6 +208,9 @@ export function TurmaReport({ data }) {
 
         {/* ── Header ── */}
         <div style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)', borderBottom: '1px solid #e2e8f0', padding: '24px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {d.institutionLogo ? (
+            <img src={d.institutionLogo} alt="Logo" style={{ width: 72, height: 72, borderRadius: 12, objectFit: 'contain', flexShrink: 0 }} />
+          ) : (
           <div style={{ width: 72, height: 72, borderRadius: 12, background: '#e2e8f0', border: '1px dashed #cbd5e1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <rect x="3" y="3" width="18" height="18" rx="3" stroke="#94a3b8" strokeWidth="1.5"/>
@@ -215,6 +218,7 @@ export function TurmaReport({ data }) {
             </svg>
             <span style={{ fontSize: 9, color: '#94a3b8', fontWeight: 600, letterSpacing: '0.05em' }}>LOGO</span>
           </div>
+          )}
           <div style={{ textAlign: 'right' }}>
             <p style={{ fontSize: 10, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 4px', fontWeight: 600 }}>Data de Emissão</p>
             <p style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: 0 }}>{d.date}</p>

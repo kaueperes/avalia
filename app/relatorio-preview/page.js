@@ -124,6 +124,9 @@ export function EvaluationReport({ data }) {
           alignItems: 'center',
         }}>
           {/* Logo da instituição */}
+          {d.institutionLogo ? (
+            <img src={d.institutionLogo} alt="Logo" style={{ width: 72, height: 72, borderRadius: 12, objectFit: 'contain', flexShrink: 0 }} />
+          ) : (
           <div style={{
             width: 72, height: 72, borderRadius: 12,
             background: '#e2e8f0',
@@ -137,6 +140,7 @@ export function EvaluationReport({ data }) {
             </svg>
             <span style={{ fontSize: 9, color: '#94a3b8', fontWeight: 600, letterSpacing: '0.05em' }}>LOGO</span>
           </div>
+          )}
 
           {/* Data */}
           <div style={{ textAlign: 'right' }}>
