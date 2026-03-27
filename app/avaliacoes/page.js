@@ -162,17 +162,30 @@ export default function AvaliacoesPage() {
     const grade = scoreToGrade(e.score);
     const scoreNum = typeof e.score === 'number' ? e.score.toFixed(1) : e.score;
     const scoreHex = e.score >= 7 ? '#16a34a' : e.score >= 5 ? '#ca8a04' : '#dc2626';
+    const scoreBg = e.score >= 7 ? '#dcfce7' : e.score >= 5 ? '#fef9c3' : '#fee2e2';
+    const disciplina = e.disciplina || '';
+    const tipoTrabalho = TYPES[e.type]?.label || e.type || '';
+
+    const metaItems = [
+      disciplina && `<div style="display:inline-block;background:#f5f3ff;color:#7c3aed;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;margin-right:6px">${disciplina}</div>`,
+      tipoTrabalho && `<span style="font-size:13px;color:#374151;font-weight:600">${tipoTrabalho}</span>`,
+      e.exerciseName && `<span style="font-size:13px;color:#6b7280"> · ${e.exerciseName}</span>`,
+    ].filter(Boolean).join('');
+
     const criteriaRows = (e.criteria || []).map(c => {
       const pct = Math.round((c.score || 0) * 10);
       const color = c.score >= 7 ? '#16a34a' : c.score >= 5 ? '#ca8a04' : '#dc2626';
+      const bg = c.score >= 7 ? '#dcfce7' : c.score >= 5 ? '#fef9c3' : '#fee2e2';
       return `<tr>
-        <td style="padding:8px 0;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6">${c.name}</td>
-        <td style="padding:8px 0;border-bottom:1px solid #f3f4f6;width:120px">
+        <td style="padding:10px 0;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;width:55%">${c.name}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #f3f4f6;width:35%">
           <div style="background:#e5e7eb;border-radius:99px;height:6px;overflow:hidden">
             <div style="width:${pct}%;height:100%;background:${color};border-radius:99px"></div>
           </div>
         </td>
-        <td style="padding:8px 0 8px 12px;font-size:13px;font-weight:700;color:${color};text-align:right;border-bottom:1px solid #f3f4f6">${c.score?.toFixed(1) ?? '—'}</td>
+        <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;text-align:right;width:10%">
+          <span style="background:${bg};color:${color};font-size:12px;font-weight:700;padding:2px 8px;border-radius:6px">${c.score?.toFixed(1) ?? '—'}</span>
+        </td>
       </tr>`;
     }).join('');
 
@@ -180,36 +193,43 @@ export default function AvaliacoesPage() {
     <title>Avaliação — ${e.studentName}</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 720px; margin: 0 auto; }
+      body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 740px; margin: 0 auto; }
       @media print { body { padding: 24px; } @page { margin: 1.5cm; } }
     </style></head><body>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:24px;border-bottom:2px solid #e5e7eb">
-        <div>
-          ${logo ? `<img src="${logo}" style="max-height:52px;max-width:180px;object-fit:contain;margin-bottom:10px;display:block" />` : ''}
-          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-weight:600;margin-bottom:4px">Avaliação Individual</div>
-          <div style="font-size:22px;font-weight:800;color:#111">${e.studentName}</div>
-          <div style="font-size:13px;color:#6b7280;margin-top:4px">
-            ${TYPES[e.type]?.label || e.type}${e.exerciseName ? ` · ${e.exerciseName}` : ''}${e.turma ? ` · ${e.turma}` : ''}
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #e5e7eb">
+        <div style="flex:1">
+          ${logo ? `<img src="${logo}" style="max-height:44px;max-width:160px;object-fit:contain;margin-bottom:10px;display:block" />` : ''}
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:#7c3aed;font-weight:700;margin-bottom:6px">Avaliação Individual</div>
+          <div style="font-size:26px;font-weight:800;color:#111;margin-bottom:6px">${e.studentName}</div>
+          <div style="margin-bottom:4px">${metaItems}</div>
+          <div style="font-size:12px;color:#9ca3af;margin-top:6px">
+            ${e.turma ? `Turma ${e.turma}` : ''}${e.turma && e.profileName ? ' · ' : ''}${e.profileName ? `Prof. ${e.profileName}` : ''}${(e.turma || e.profileName) && e.institution ? ' · ' : ''}${e.institution || ''}
           </div>
-          <div style="font-size:12px;color:#9ca3af;margin-top:2px">
-            ${new Date(e.createdAt).toLocaleDateString('pt-BR')}${e.profileName ? ` · Prof. ${e.profileName}` : ''}
-          </div>
+          <div style="font-size:12px;color:#9ca3af;margin-top:2px">${new Date(e.createdAt).toLocaleDateString('pt-BR')}</div>
         </div>
-        <div style="text-align:right;flex-shrink:0;margin-left:24px">
-          <div style="font-size:56px;font-weight:800;color:${scoreHex};line-height:1">${scoreNum}</div>
-          <div style="font-size:16px;font-weight:700;color:${scoreHex};margin-top:4px">${grade}</div>
+        <div style="text-align:center;flex-shrink:0;margin-left:32px;background:${scoreBg};border-radius:16px;padding:16px 24px">
+          <div style="font-size:52px;font-weight:800;color:${scoreHex};line-height:1">${scoreNum}</div>
+          <div style="font-size:11px;color:${scoreHex};margin-top:2px">/ 10</div>
+          <div style="font-size:18px;font-weight:800;color:${scoreHex};margin-top:6px">${grade}</div>
         </div>
       </div>
+      <!-- Critérios -->
       ${criteriaRows ? `
       <div style="margin-bottom:28px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:12px">Critérios de Avaliação</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;margin-bottom:12px">Critérios de Avaliação</div>
         <table style="width:100%;border-collapse:collapse">${criteriaRows}</table>
       </div>` : ''}
+      <!-- Feedback -->
       ${e.feedback ? `
       <div>
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:12px">Feedback</div>
-        <div style="background:#f9fafb;border-radius:10px;padding:20px;font-size:14px;line-height:1.8;color:#374151;white-space:pre-wrap">${e.feedback}</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;margin-bottom:12px">Feedback</div>
+        <div style="background:#f9fafb;border-radius:12px;padding:20px 24px;font-size:14px;line-height:1.85;color:#374151;white-space:pre-wrap;border-left:3px solid #7c3aed">${e.feedback}</div>
       </div>` : ''}
+      <!-- Footer -->
+      <div style="margin-top:40px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center">
+        Gerado pela AvaliA · avalia.education
+      </div>
     </body></html>`;
 
     const w = window.open('', '_blank');
@@ -688,8 +708,8 @@ export default function AvaliacoesPage() {
                     <td style={{ padding: '13px 16px', color: 'var(--text-sub)' }}>{new Date(e.createdAt).toLocaleDateString('pt-BR')}</td>
                     <td style={{ padding: '13px 16px', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-                        <button onClick={() => setDetail(e)} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: '#0081f0' }}>Ver</button>
-                        <button onClick={() => generatePDF(e)} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>PDF</button>
+                        <button onClick={() => window.open(`/relatorio-individual?id=${e.id}`, '_blank')} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: '#0081f0' }}>Ver</button>
+                        <button onClick={() => window.open(`/relatorio-individual?id=${e.id}&print=1`, '_blank')} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>PDF</button>
                         <button onClick={() => { setDetail(e); setDetailDraft(JSON.parse(JSON.stringify(e))); }} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>Editar</button>
                         <button onClick={() => del(e.id)} style={{ padding: '5px 9px', border: '1px solid #EF444433', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center' }}>
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
