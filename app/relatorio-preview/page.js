@@ -105,7 +105,7 @@ export function EvaluationReport({ data }) {
       minHeight: '100vh',
       padding: '40px 20px',
     }}>
-      <div style={{
+      <div className="rpt-card" style={{
         maxWidth: 780,
         margin: '0 auto',
         background: '#fff',
@@ -307,6 +307,7 @@ export function EvaluationReport({ data }) {
         @media print {
           .no-print { display: none !important; }
           body { background: white !important; }
+          .rpt-card { overflow: visible !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding-top: 24px; padding-bottom: 24px; }
         }
         .print-pg { display: none; position: fixed; bottom: 12px; right: 16px; font-size: 10px; color: #94a3b8; font-family: sans-serif; }
         .print-pg::after { content: counter(page); }

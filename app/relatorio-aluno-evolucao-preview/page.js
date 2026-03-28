@@ -196,7 +196,7 @@ export function AlunoEvolucaoReport({ data }) {
 
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: '#f1f5f9', minHeight: '100vh', padding: '40px 20px' }}>
-      <div style={{ maxWidth: 820, margin: '0 auto', background: '#fff', borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 40px rgba(0,0,0,0.10)' }}>
+      <div className="rpt-card" style={{ maxWidth: 820, margin: '0 auto', background: '#fff', borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 40px rgba(0,0,0,0.10)' }}>
 
         {/* ── Header ── */}
         <div style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)', borderBottom: '1px solid #e2e8f0', padding: '24px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -362,7 +362,7 @@ export function AlunoEvolucaoReport({ data }) {
       </div>
 
       <div className="print-pg" />
-      <style>{`@page { margin: 0; } @media print { .no-print { display: none !important; } body { background: white !important; } } .print-pg { display: none; position: fixed; bottom: 12px; right: 16px; font-size: 10px; color: #94a3b8; font-family: sans-serif; } .print-pg::after { content: counter(page); } @media print { .print-pg { display: block; } }`}</style>
+      <style>{`@page { margin: 0; } @media print { .no-print { display: none !important; } body { background: white !important; } .rpt-card { overflow: visible !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding-top: 24px; padding-bottom: 24px; } } .print-pg { display: none; position: fixed; bottom: 12px; right: 16px; font-size: 10px; color: #94a3b8; font-family: sans-serif; } .print-pg::after { content: counter(page); } @media print { .print-pg { display: block; } }`}</style>
     </div>
   );
 }
