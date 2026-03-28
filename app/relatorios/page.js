@@ -768,54 +768,11 @@ export default function RelatoriosPage() {
                       </td>
                       <td style={{ padding: '13px 16px' }} onClick={e => e.stopPropagation()}>
                         <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-                          <button
-                            onClick={() => window.open(reportRoute(r), '_blank')}
-                            title="Ver relatório"
-                            style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 12, color: '#0081f0', fontFamily: 'inherit' }}
-                            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-content)'}
-                            onMouseLeave={e => e.currentTarget.style.background = 'none'}
-                          >
-                            Ver
-                          </button>
-                          <button
-                            onClick={() => window.open(reportRoute(r) + '&print=1', '_blank')}
-                            title="Exportar PDF"
-                            style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--text-sub)', fontFamily: 'inherit' }}
-                            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-content)'}
-                            onMouseLeave={e => e.currentTarget.style.background = 'none'}
-                          >
-                            PDF
-                          </button>
-                          <button
-                            onClick={() => {
-                              const c = r.content;
-                              setDetail(r);
-                              setDraft({
-                                resumo: c.resumo || '',
-                                pontosFortes: (c.pontosFortes || []).slice(),
-                                pontosAtencao: (c.pontosAtencao || []).slice(),
-                                pontosDesenvolver: (c.pontosDesenvolver || []).slice(),
-                                analiseDetalhada: c.analiseDetalhada || '',
-                                parecer: c.parecer || '',
-                                sugestoes: (c.sugestoes || []).map(s => ({ ...s })),
-                              });
-                              setEditing(true);
-                            }}
-                            title="Editar relatório"
-                            style={{ padding: '5px 10px', border: '1px solid #0081f0', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 12, color: '#0081f0', fontFamily: 'inherit' }}
-                            onMouseEnter={e => e.currentTarget.style.background = '#eff6ff'}
-                            onMouseLeave={e => e.currentTarget.style.background = 'none'}
-                          >
-                            Editar
-                          </button>
-                          <button
-                            onClick={() => del(r.id)}
-                            title="Excluir"
-                            style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 12, color: '#ef4444', fontFamily: 'inherit' }}
-                            onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
-                            onMouseLeave={e => e.currentTarget.style.background = 'none'}
-                          >
-                            Excluir
+                          <button onClick={() => window.open(reportRoute(r), '_blank')} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: '#0081f0', fontFamily: 'inherit' }}>Ver</button>
+                          <button onClick={() => window.open(reportRoute(r) + '&print=1', '_blank')} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit' }}>PDF</button>
+                          <button onClick={() => { const c = r.content; setDetail(r); setDraft({ resumo: c.resumo || '', pontosFortes: (c.pontosFortes || []).slice(), pontosAtencao: (c.pontosAtencao || []).slice(), pontosDesenvolver: (c.pontosDesenvolver || []).slice(), analiseDetalhada: c.analiseDetalhada || '', parecer: c.parecer || '', sugestoes: (c.sugestoes || []).map(s => ({ ...s })) }); setEditing(true); }} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit' }}>Editar</button>
+                          <button onClick={() => del(r.id)} style={{ padding: '5px 9px', border: '1px solid #EF444433', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center', fontFamily: 'inherit' }}>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                           </button>
                         </div>
                       </td>
