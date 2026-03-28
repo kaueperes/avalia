@@ -552,8 +552,6 @@ export function TurmaEvolucaoReport({ data }) {
       {/* ── Controles ── */}
       <div style={{ maxWidth: 860, margin: '24px auto 0', display: 'flex', gap: 10, justifyContent: 'center' }} className="no-print">
         <button onClick={() => window.print()} style={{ padding: '10px 24px', background: 'linear-gradient(135deg, #0f172a, #0081f0)', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Imprimir / Exportar PDF</button>
-        <a href="/relatorio-turma-multi-preview" style={{ padding: '10px 24px', background: '#fff', color: '#374151', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>Ver 2 atividades</a>
-        <a href="/relatorio-turma-preview" style={{ padding: '10px 24px', background: '#fff', color: '#374151', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>Ver 1 atividade</a>
       </div>
 
       <div className="print-pg" />

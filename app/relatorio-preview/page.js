@@ -289,16 +289,6 @@ export function EvaluationReport({ data }) {
         >
           Imprimir / Exportar PDF
         </button>
-        <a
-          href="/relatorios"
-          style={{
-            padding: '10px 24px', background: '#fff', color: '#374151',
-            border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontWeight: 600,
-            cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center',
-          }}
-        >
-          ← Voltar aos relatórios
-        </a>
       </div>
 
       <div className="print-pg" />

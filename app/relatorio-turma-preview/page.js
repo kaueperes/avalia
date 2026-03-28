@@ -419,18 +419,6 @@ export function TurmaReport({ data }) {
         >
           Imprimir / Exportar PDF
         </button>
-        <a
-          href="/relatorio-preview"
-          style={{ padding: '10px 24px', background: '#fff', color: '#374151', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
-        >
-          Ver relatório individual
-        </a>
-        <a
-          href="/relatorios"
-          style={{ padding: '10px 24px', background: '#fff', color: '#374151', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
-        >
-          ← Voltar
-        </a>
       </div>
 
       <div className="print-pg" />
