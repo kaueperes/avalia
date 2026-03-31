@@ -161,7 +161,7 @@ export default function Home() {
         }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-              <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 36, width: 'auto' }} />
+              <img src="/imagens/logo_kriteria.svg" alt="KriterIA" style={{ height: 36, width: 'auto' }} />
             </div>
             <div className="nav-links" style={{ display: 'flex', gap: 32 }}>
               <a href="#funcionalidades" className="nav-link nav-link-light">Funcionalidades</a>
@@ -202,7 +202,7 @@ export default function Home() {
             </h1>
 
             <p className="hero-sub" style={{ fontSize: 20, color: '#94A3B8', lineHeight: 1.65, maxWidth: 560, margin: '0 auto 44px', fontWeight: 400 }}>
-              Você gasta horas avaliando redações, vídeos, projetos e códigos — e ainda se pergunta se está sendo consistente. O AvaliA avalia com seus critérios, no seu estilo, em qualquer disciplina.
+              Você gasta horas avaliando redações, vídeos, projetos e códigos — e ainda se pergunta se está sendo consistente. O KriterIA avalia com seus critérios, no seu estilo, em qualquer disciplina.
             </p>
 
             <div className="hero-ctas" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
@@ -275,7 +275,7 @@ export default function Home() {
         <section id="funcionalidades" style={{ padding: '96px 32px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 64 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Por que AvaliA</p>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Por que KriterIA</p>
               <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', marginBottom: 16 }}>O que muda na sua rotina</h2>
               <p style={{ fontSize: 18, color: '#6B7280', maxWidth: 440, margin: '0 auto' }}>Menos tempo corrigindo. Mais tempo ensinando.</p>
             </div>
@@ -305,7 +305,7 @@ export default function Home() {
               {
                 tag: '01 — Perfil',
                 title: 'Configure uma vez,\nuse para sempre',
-                desc: 'Defina sua disciplina, critérios e tom de voz. O AvaliA mantém exatamente esse padrão — mesmo quando você estiver avaliando o 40º trabalho da semana.',
+                desc: 'Defina sua disciplina, critérios e tom de voz. O KriterIA mantém exatamente esse padrão — mesmo quando você estiver avaliando o 40º trabalho da semana.',
                 points: ['Perfil personalizado por disciplina', 'Tom de voz configurável', 'Critérios salvos e reutilizáveis'],
                 right: false,
                 visual: (
@@ -522,7 +522,7 @@ export default function Home() {
                 <p style={{ fontSize: 12, fontWeight: 600, color: '#810cfa', letterSpacing: 1, marginBottom: 16, textTransform: 'uppercase' }}>Para coordenadores e gestores</p>
                 <h2 style={{ fontSize: 38, fontWeight: 800, color: '#00173f', lineHeight: 1.15, letterSpacing: '-1px', marginBottom: 20 }}>Dados pedagógicos reais para decisões assertivas</h2>
                 <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, marginBottom: 32 }}>
-                  O AvaliA não é só uma ferramenta de correção — é uma plataforma de inteligência pedagógica. Coordenadores e gestores têm acesso a dados consolidados que antes exigiam horas de tabulação manual.
+                  O KriterIA não é só uma ferramenta de correção — é uma plataforma de inteligência pedagógica. Coordenadores e gestores têm acesso a dados consolidados que antes exigiam horas de tabulação manual.
                 </p>
                 <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {[
@@ -601,7 +601,7 @@ export default function Home() {
             </div>
             <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
               {[
-                { name: 'Ana Lima', role: 'Professora de Português · UFMG', quote: 'Eu corrigia 30 redações todo fim de semana. Hoje faço o mesmo em menos de 1 hora — e o feedback ficou ainda mais preciso. Não consigo mais imaginar minha rotina sem o AvaliA.' },
+                { name: 'Ana Lima', role: 'Professora de Português · UFMG', quote: 'Eu corrigia 30 redações todo fim de semana. Hoje faço o mesmo em menos de 1 hora — e o feedback ficou ainda mais preciso. Não consigo mais imaginar minha rotina sem o KriterIA.' },
                 { name: 'Carlos Santos', role: 'Professor de Programação · UNIP', quote: 'O que mais me surpreendeu foi a consistência. Antes eu era claramente mais rigoroso nas últimas avaliações do que nas primeiras. Agora o padrão é sempre o mesmo.' },
                 { name: 'Maria Oliveira', role: 'Coordenadora Pedagógica · Colégio São Paulo', quote: 'Os relatórios de turma mudaram nossa forma de trabalhar. Em minutos vejo quais critérios estão abaixo da média, apresento os dados nas reuniões de equipe e tomamos decisões pedagógicas com base real. Toda a escola aderiu.' },
               ].map(t => (
@@ -888,7 +888,7 @@ export default function Home() {
             <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 48, marginBottom: 48 }}>
               <div>
                 <div style={{ marginBottom: 14 }}>
-                  <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 30, width: 'auto', filter: 'brightness(0) invert(1)' }} />
+                  <img src="/imagens/logo_kriteria.svg" alt="KriterIA" style={{ height: 30, width: 'auto', filter: 'brightness(0) invert(1)' }} />
                 </div>
                 <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.75, maxWidth: 260 }}>
                   Avaliação inteligente para educadores. Economize tempo e ofereça feedback de qualidade com IA.
@@ -923,7 +923,7 @@ export default function Home() {
               </div>
             </div>
             <div style={{ borderTop: '1px solid #001025', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-              <span style={{ fontSize: 13, color: '#4B5563' }}>© 2026 AvaliA · avalia.education</span>
+              <span style={{ fontSize: 13, color: '#4B5563' }}>© 2026 KriterIA · avalia.education</span>
               <span style={{ fontSize: 13, color: '#4B5563' }}>Todos os direitos reservados</span>
             </div>
           </div>

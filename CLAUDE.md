@@ -1,4 +1,4 @@
-# AvaliA — Guia para o Claude Code
+# KriterIA — Guia para o Claude Code
 
 SaaS educacional brasileiro para professores avaliarem trabalhos de alunos com IA.
 - **Produção:** https://www.avalia.education

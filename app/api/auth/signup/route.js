@@ -31,15 +31,15 @@ export async function POST(request) {
     const firstName = name.split(' ')[0];
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     resend.emails.send({
-      from: 'AvaliA <noreply@avalia.education>',
+      from: 'KriterIA <noreply@avalia.education>',
       to: email,
-      subject: 'Bem-vindo ao AvaliA!',
+      subject: 'Bem-vindo ao KriterIA!',
       html: `
         <div style="font-family: 'Inter', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px; background: #ffffff;">
           <p style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 32px; letter-spacing: -0.5px;">Aval<span style="color: #0081f0;">iA</span></p>
           <h2 style="font-size: 22px; font-weight: 800; color: #111827; margin-bottom: 12px;">Olá, ${firstName}! Seja bem-vindo 👋</h2>
           <p style="font-size: 15px; color: #4B5563; line-height: 1.6; margin-bottom: 28px;">
-            Sua conta no AvaliA foi criada com sucesso. Agora você pode avaliar trabalhos de alunos com inteligência artificial — economizando horas de correção.
+            Sua conta no KriterIA foi criada com sucesso. Agora você pode avaliar trabalhos de alunos com inteligência artificial — economizando horas de correção.
           </p>
           <p style="font-size: 14px; color: #4B5563; line-height: 1.6; margin-bottom: 8px;">Com o plano gratuito você pode:</p>
           <ul style="font-size: 14px; color: #4B5563; line-height: 1.8; padding-left: 20px; margin-bottom: 28px;">
@@ -57,7 +57,7 @@ export async function POST(request) {
             </tr>
           </table>
           <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 28px 0;" />
-          <p style="font-size: 12px; color: #D1D5DB;">AvaliA · Plataforma de avaliação educacional com IA</p>
+          <p style="font-size: 12px; color: #D1D5DB;">KriterIA · Plataforma de avaliação educacional com IA</p>
         </div>
       `,
     }).catch(() => {}); // não bloqueia o signup se o email falhar

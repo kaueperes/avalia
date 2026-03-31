@@ -76,7 +76,7 @@ export default function OnboardingPage() {
 
       {/* Logo */}
       <div style={{ position: 'absolute', top: 28, left: 32 }}>
-        <img src="/imagens/logo_branco100.svg" alt="AvaliA" style={{ height: 28 }} />
+        <img src="/imagens/logo_kriteria_branco.svg" alt="KriterIA" style={{ height: 28 }} />
       </div>
 
       {/* Progress */}
@@ -92,10 +92,10 @@ export default function OnboardingPage() {
         <div style={{ maxWidth: 520, width: '100%', textAlign: 'center', animation: 'fadeUp .5s ease both' }}>
           <div style={{ fontSize: 48, marginBottom: 20 }}>👋</div>
           <h1 style={{ fontSize: 30, fontWeight: 800, color: 'white', marginBottom: 12, letterSpacing: '-0.5px' }}>
-            Olá{userName ? `, ${userName}` : ''}! Bem-vindo ao AvaliA
+            Olá{userName ? `, ${userName}` : ''}! Bem-vindo ao KriterIA
           </h1>
           <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, marginBottom: 36 }}>
-            Em menos de 2 minutos você vai ver como o AvaliA avalia um trabalho real com inteligência artificial — sem gastar nenhuma das suas avaliações.
+            Em menos de 2 minutos você vai ver como o KriterIA avalia um trabalho real com inteligência artificial — sem gastar nenhuma das suas avaliações.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
             {[
@@ -164,7 +164,7 @@ export default function OnboardingPage() {
         <div style={{ maxWidth: 680, width: '100%', animation: 'fadeUp .5s ease both' }}>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
             <h2 style={{ fontSize: 24, fontWeight: 800, color: 'white', marginBottom: 8 }}>Resultado da avaliação</h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>É exatamente assim que o AvaliA apresenta os resultados reais.</p>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>É exatamente assim que o KriterIA apresenta os resultados reais.</p>
           </div>
 
           {/* Nota */}
@@ -197,7 +197,7 @@ export default function OnboardingPage() {
 
           <div style={{ background: 'rgba(0,129,240,0.08)', border: '1px solid rgba(0,129,240,0.2)', borderRadius: 12, padding: '14px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 18 }}>💡</span>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>Nas avaliações reais, o AvaliA usa <strong style={{ color: 'rgba(255,255,255,0.85)' }}>seus próprios critérios e exercícios</strong> cadastrados para gerar um feedback personalizado para cada aluno.</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>Nas avaliações reais, o KriterIA usa <strong style={{ color: 'rgba(255,255,255,0.85)' }}>seus próprios critérios e exercícios</strong> cadastrados para gerar um feedback personalizado para cada aluno.</p>
           </div>
 
           <button
@@ -205,7 +205,7 @@ export default function OnboardingPage() {
             disabled={completing}
             style={{ width: '100%', padding: '14px', borderRadius: 12, fontSize: 15, fontWeight: 700, background: completing ? 'rgba(255,255,255,0.08)' : 'linear-gradient(135deg, #0081f0, #810cfa)', color: completing ? 'rgba(255,255,255,0.4)' : 'white', border: 'none', cursor: completing ? 'not-allowed' : 'pointer', boxShadow: '0 4px 20px rgba(0,129,240,0.25)' }}
           >
-            {completing ? 'Entrando...' : 'Ir para o AvaliA →'}
+            {completing ? 'Entrando...' : 'Ir para o KriterIA →'}
           </button>
         </div>
       )}

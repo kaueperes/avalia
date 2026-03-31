@@ -76,7 +76,7 @@ export default function AjudaPage() {
       <div style={{ marginBottom: 36 }}>
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Suporte</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Ajuda</h1>
-        <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Tudo que você precisa saber para usar o AvaliA.</p>
+        <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Tudo que você precisa saber para usar o KriterIA.</p>
       </div>
 
       <div style={{ marginBottom: 48 }}>

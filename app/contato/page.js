@@ -63,7 +63,7 @@ export default function Contato() {
         <style>{`.pub-nav-link { text-decoration: none; font-size: 15px; font-weight: 450; color: #6B7280; transition: color .15s; } .pub-nav-link:hover { color: #111827; }`}</style>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           <div style={{ cursor: 'pointer' }} onClick={() => router.push('/')}>
-            <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 36, width: 'auto' }} />
+            <img src="/imagens/logo_kriteria.svg" alt="KriterIA" style={{ height: 36, width: 'auto' }} />
           </div>
           <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
             <a href="/#funcionalidades" className="pub-nav-link">Funcionalidades</a>
@@ -241,9 +241,9 @@ export default function Contato() {
       {/* Footer simples */}
       <footer style={{ background: '#00173f', padding: '32px', textAlign: 'center' }}>
         <div style={{ cursor: 'pointer', display: 'inline-block', marginBottom: 12 }} onClick={() => router.push('/')}>
-          <img src="/imagens/logo.svg" alt="AvaliA" style={{ height: 28, width: 'auto', filter: 'brightness(0) invert(1)' }} />
+          <img src="/imagens/logo_kriteria.svg" alt="KriterIA" style={{ height: 28, width: 'auto', filter: 'brightness(0) invert(1)' }} />
         </div>
-        <p style={{ fontSize: 13, color: '#4B5563' }}>© 2025 AvaliA · Todos os direitos reservados</p>
+        <p style={{ fontSize: 13, color: '#4B5563' }}>© 2025 KriterIA · Todos os direitos reservados</p>
       </footer>
 
     </div>
