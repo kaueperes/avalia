@@ -54,7 +54,7 @@ export default function LoginPage() {
           <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.6, marginBottom: 40, maxWidth: 360 }}>
             Poupe horas de trabalho com correções detalhadas, feedback personalizado e relatórios automáticos.
           </p>
-          {['Correção automática com IA', 'Feedback individualizado por aluno', 'Relatórios de turma e desempenho'].map(f => (
+          {['Correção automatizada com critérios personalizados', 'Feedback individualizado por aluno', 'Relatórios de turma e desempenho'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
               <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'linear-gradient(135deg, #0081f0, #810cfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <span style={{ color: 'white', fontSize: 11, fontWeight: 700 }}>✓</span>
