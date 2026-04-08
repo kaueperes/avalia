@@ -272,6 +272,27 @@ export default function DisciplinasPage() {
                               </select>
                             </div>
 
+                            {/* Critérios */}
+                            <div style={{ marginBottom: 12 }}>
+                              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 5 }}>
+                                <Tooltip text="Cada critério recebe nota de 0 a 10. O peso define a importância na nota final.">Critérios de Avaliação</Tooltip>
+                              </label>
+                              {exerciseForm.criteria.map((c, i) => (
+                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 10px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, marginBottom: 6 }}>
+                                  <span style={{ fontSize: 10, background: '#0081f022', color: '#0081f0', border: '1px solid #0081f033', borderRadius: 4, padding: '1px 5px', fontWeight: 700, flexShrink: 0 }}>{c.weight}×</span>
+                                  <input style={{ flex: 1, border: 'none', background: 'transparent', fontSize: 13, outline: 'none', color: 'var(--text-main)', fontFamily: 'inherit' }} value={c.name} onChange={e => { const cr = [...exerciseForm.criteria]; cr[i] = { ...cr[i], name: e.target.value }; setExerciseForm(f => ({ ...f, criteria: cr })); }} placeholder="Nome do critério" />
+                                  <select style={{ width: 54, padding: '3px 4px', fontSize: 11, background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 5, color: 'var(--text-main)', outline: 'none', cursor: 'pointer' }} value={c.weight} onChange={e => { const cr = [...exerciseForm.criteria]; cr[i] = { ...cr[i], weight: Number(e.target.value) }; setExerciseForm(f => ({ ...f, criteria: cr })); }}>
+                                    {[1, 2, 3].map(w => <option key={w} value={w}>{w}×</option>)}
+                                  </select>
+                                  <button onClick={() => setExerciseForm(f => ({ ...f, criteria: f.criteria.filter((_, j) => j !== i) }))} style={{ border: 'none', background: 'transparent', color: 'var(--text-sub)', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '0 2px' }}>×</button>
+                                </div>
+                              ))}
+                              <button onClick={() => setExerciseForm(f => ({ ...f, criteria: [...f.criteria, { name: '', weight: 2 }] }))}
+                                style={{ padding: '5px 12px', border: '1px dashed var(--border)', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
+                                + Critério
+                              </button>
+                            </div>
+
                             {/* Enunciado */}
                             <div style={{ marginBottom: 12 }}>
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
@@ -295,27 +316,6 @@ export default function DisciplinasPage() {
                                 </div>
                               )}
                               <textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical', lineHeight: 1.6 }} value={exerciseForm.context} onChange={e => setExerciseForm(f => ({ ...f, context: e.target.value }))} placeholder="Descreva o objetivo e requisitos..." />
-                            </div>
-
-                            {/* Critérios */}
-                            <div style={{ marginBottom: 12 }}>
-                              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 5 }}>
-                                <Tooltip text="Cada critério recebe nota de 0 a 10. O peso define a importância na nota final.">Critérios de Avaliação</Tooltip>
-                              </label>
-                              {exerciseForm.criteria.map((c, i) => (
-                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 10px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, marginBottom: 6 }}>
-                                  <span style={{ fontSize: 10, background: '#0081f022', color: '#0081f0', border: '1px solid #0081f033', borderRadius: 4, padding: '1px 5px', fontWeight: 700, flexShrink: 0 }}>{c.weight}×</span>
-                                  <input style={{ flex: 1, border: 'none', background: 'transparent', fontSize: 13, outline: 'none', color: 'var(--text-main)', fontFamily: 'inherit' }} value={c.name} onChange={e => { const cr = [...exerciseForm.criteria]; cr[i] = { ...cr[i], name: e.target.value }; setExerciseForm(f => ({ ...f, criteria: cr })); }} placeholder="Nome do critério" />
-                                  <select style={{ width: 54, padding: '3px 4px', fontSize: 11, background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 5, color: 'var(--text-main)', outline: 'none', cursor: 'pointer' }} value={c.weight} onChange={e => { const cr = [...exerciseForm.criteria]; cr[i] = { ...cr[i], weight: Number(e.target.value) }; setExerciseForm(f => ({ ...f, criteria: cr })); }}>
-                                    {[1, 2, 3].map(w => <option key={w} value={w}>{w}×</option>)}
-                                  </select>
-                                  <button onClick={() => setExerciseForm(f => ({ ...f, criteria: f.criteria.filter((_, j) => j !== i) }))} style={{ border: 'none', background: 'transparent', color: 'var(--text-sub)', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '0 2px' }}>×</button>
-                                </div>
-                              ))}
-                              <button onClick={() => setExerciseForm(f => ({ ...f, criteria: [...f.criteria, { name: '', weight: 2 }] }))}
-                                style={{ padding: '5px 12px', border: '1px dashed var(--border)', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
-                                + Critério
-                              </button>
                             </div>
 
                             <div style={{ display: 'flex', gap: 8 }}>
