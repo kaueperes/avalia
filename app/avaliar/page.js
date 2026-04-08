@@ -174,6 +174,8 @@ export default function AvaliarPage() {
   const [selectedInstitutionId, setSelectedInstitutionId] = useState('');
   const [disciplinesNew, setDisciplinesNew] = useState([]);
   const [selectedDisciplineId, setSelectedDisciplineId] = useState('');
+  const [disciplineExercises, setDisciplineExercises] = useState([]);
+  const [selectedDisciplineExerciseId, setSelectedDisciplineExerciseId] = useState('');
   const [classes, setClasses] = useState([]);
   const [selectedClassId, setSelectedClassId] = useState('');
   const [students, setStudents] = useState([]);
@@ -261,16 +263,26 @@ export default function AvaliarPage() {
     if (r.ok) setDisciplinesNew(await r.json());
   }
 
-  function loadDiscipline(id) {
+  async function loadDiscipline(id) {
     setSelectedDisciplineId(id);
-    if (!id) return;
+    setSelectedDisciplineExerciseId('');
+    setDisciplineExercises([]);
+    if (!id) { setExerciseDisciplina(''); return; }
     const d = disciplinesNew.find(d => d.id === id);
-    if (!d) return;
-    setExerciseName(d.exerciseName || '');
-    setExerciseDisciplina(d.subject || '');
-    setExerciseContext(d.description || '');
-    switchType(d.exerciseType || 'modelagem');
-    if (d.criteria?.length) setCriteria(d.criteria.map(c => ({ name: c.name, weight: c.weight || 1 })));
+    if (d) setExerciseDisciplina(d.subject || '');
+    const r = await fetch(`/api/exercises?disciplineId=${id}`, { headers: { Authorization: `Bearer ${token()}` } });
+    if (r.ok) setDisciplineExercises(await r.json());
+  }
+
+  function loadDisciplineExercise(id) {
+    setSelectedDisciplineExerciseId(id);
+    if (!id) { setExerciseName(''); setExerciseContext(''); return; }
+    const ex = disciplineExercises.find(e => e.id === id);
+    if (!ex) return;
+    setExerciseName(ex.name || '');
+    setExerciseContext(ex.context || '');
+    switchType(ex.type || 'modelagem');
+    if (ex.criteria?.length) setCriteria(ex.criteria.map(c => ({ name: c.name, weight: c.weight || 1 })));
   }
 
   async function loadStudentsForClass(classId) {
@@ -608,9 +620,26 @@ export default function AvaliarPage() {
               </div>
               <select style={inp} value={selectedDisciplineId} onChange={e => loadDiscipline(e.target.value)}>
                 <option value="">— Selecione uma disciplina —</option>
-                {disciplinesNew.map(d => <option key={d.id} value={d.id}>{d.subject} · {d.exerciseName}</option>)}
+                {disciplinesNew.map(d => <option key={d.id} value={d.id}>{d.subject}</option>)}
               </select>
             </div>
+
+            {/* Exercício da disciplina */}
+            {selectedDisciplineId && (
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <label style={{ ...lbl, marginBottom: 0 }}>Exercício <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>(opcional)</span></label>
+                  <Link href="/disciplinas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Novo exercício</Link>
+                </div>
+                <select style={inp} value={selectedDisciplineExerciseId} onChange={e => loadDisciplineExercise(e.target.value)}>
+                  <option value="">— Selecione um exercício —</option>
+                  {disciplineExercises.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+                </select>
+                {disciplineExercises.length === 0 && (
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Nenhum exercício cadastrado nesta disciplina. <Link href="/disciplinas" style={{ color: '#0081f0', textDecoration: 'none' }}>Adicionar →</Link></p>
+                )}
+              </div>
+            )}
 
             {/* Turma */}
             <div style={{ marginBottom: 12 }}>
@@ -681,15 +710,17 @@ export default function AvaliarPage() {
           {/* 3. EXERCÍCIO */}
           <div style={section}>
             <div style={secLabel}><Tooltip text="Defina o exercício a ser avaliado e os critérios que a IA vai usar para pontuar o trabalho.">Exercício & Critérios</Tooltip></div>
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <select style={{ ...inp, flex: 1 }} value={selectedExerciseId} onChange={e => loadExercise(e.target.value)}>
-                  <option value="">— Exercício livre —</option>
-                  {exercises.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-                </select>
-                <Link href="/exercicios" style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textDecoration: 'none', fontSize: 18, background: 'var(--bg-content)', flexShrink: 0 }}>+</Link>
+            {!selectedDisciplineId && (
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <select style={{ ...inp, flex: 1 }} value={selectedExerciseId} onChange={e => loadExercise(e.target.value)}>
+                    <option value="">— Exercício livre —</option>
+                    {exercises.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+                  </select>
+                  <Link href="/exercicios" style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textDecoration: 'none', fontSize: 18, background: 'var(--bg-content)', flexShrink: 0 }}>+</Link>
+                </div>
               </div>
-            </div>
+            )}
             <div style={{ marginBottom: 12 }}>
               <label style={lbl}><Tooltip text="Nome obrigatório do exercício. Aparece no relatório de avaliação gerado.">Nome do Exercício *</Tooltip></label>
               <input style={inp} value={exerciseName} onChange={e => setExerciseName(e.target.value)} placeholder="Ex: Exercício 3 — Modelagem de Personagem" />
