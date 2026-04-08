@@ -5,7 +5,7 @@ import { TYPES, CATEGORIES } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
 
-const BLANK = { institutionId: '', subject: '', exerciseName: '', exerciseType: 'modelagem', criteria: [], description: '' };
+const BLANK = { subject: '', exerciseName: '', exerciseType: 'modelagem', criteria: [], description: '' };
 
 const inputStyle = {
   width: '100%', padding: '10px 12px',
@@ -29,7 +29,6 @@ export default function DisciplinasPage() {
   const router = useRouter();
   const [userName, setUserName] = useState('Professor');
   const [disciplines, setDisciplines] = useState([]);
-  const [institutions, setInstitutions] = useState([]);
   const [form, setForm] = useState(BLANK);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -46,17 +45,11 @@ export default function DisciplinasPage() {
     const def = (TYPES['modelagem']?.criteria || []).map(c => ({ name: c.name, weight: c.w }));
     setForm(f => ({ ...f, criteria: def }));
     load();
-    loadInstitutions();
   }, [router]);
 
   async function load() {
     const r = await fetch('/api/disciplines', { headers: { Authorization: `Bearer ${token()}` } });
     if (r.ok) setDisciplines(await r.json());
-  }
-
-  async function loadInstitutions() {
-    const r = await fetch('/api/institutions', { headers: { Authorization: `Bearer ${token()}` } });
-    if (r.ok) setInstitutions(await r.json());
   }
 
   function onTypeChange(type) {
@@ -87,7 +80,7 @@ export default function DisciplinasPage() {
   }
 
   function startEdit(d) {
-    setForm({ institutionId: d.institutionId || '', subject: d.subject, exerciseName: d.exerciseName, exerciseType: d.exerciseType, criteria: d.criteria || [], description: d.description || '' });
+    setForm({ subject: d.subject, exerciseName: d.exerciseName, exerciseType: d.exerciseType, criteria: d.criteria || [], description: d.description || '' });
     setEditingId(d.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -140,7 +133,6 @@ export default function DisciplinasPage() {
                       <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.exerciseName}</p>
                       <p style={{ fontSize: 12, color: 'var(--text-sub)' }}>
                         {d.subject} · {TYPES[d.exerciseType]?.label || d.exerciseType} · {d.criteria?.length || 0} critérios
-                        {d.institutionId && institutions.find(i => i.id === d.institutionId) ? ` · ${institutions.find(i => i.id === d.institutionId).name}` : ''}
                       </p>
                     </div>
                     <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 12 }}>
@@ -171,27 +163,17 @@ export default function DisciplinasPage() {
             </Field>
           </div>
 
-          <div className="form-grid">
-            <Field label="Tipo do Exercício" tooltip="Define a categoria do trabalho. A avaliação usa isso para adaptar os critérios.">
-              <select style={inputStyle} value={form.exerciseType} onChange={e => onTypeChange(e.target.value)}>
-                {Object.entries(CATEGORIES).map(([catKey, cat]) => (
-                  <optgroup key={catKey} label={cat.label}>
-                    {Object.entries(TYPES).filter(([, v]) => v.cat === catKey).map(([k, v]) => (
-                      <option key={k} value={k}>{v.label}</option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-            </Field>
-            {institutions.length > 0 && (
-              <Field label="Instituição" hint="(opcional)">
-                <select style={inputStyle} value={form.institutionId} onChange={e => setForm(f => ({ ...f, institutionId: e.target.value }))}>
-                  <option value="">Sem vínculo</option>
-                  {institutions.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
-                </select>
-              </Field>
-            )}
-          </div>
+          <Field label="Tipo do Exercício" tooltip="Define a categoria do trabalho. A avaliação usa isso para adaptar os critérios.">
+            <select style={inputStyle} value={form.exerciseType} onChange={e => onTypeChange(e.target.value)}>
+              {Object.entries(CATEGORIES).map(([catKey, cat]) => (
+                <optgroup key={catKey} label={cat.label}>
+                  {Object.entries(TYPES).filter(([, v]) => v.cat === catKey).map(([k, v]) => (
+                    <option key={k} value={k}>{v.label}</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </Field>
 
           <div className="form-grid">
             {/* Enunciado */}
