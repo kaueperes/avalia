@@ -125,13 +125,15 @@ const EditIcon = () => (
 // ── Nav Items ────────────────────────────────────────────────────────────────
 
 const navItems = [
-  { Icon: HomeIcon,      label: 'Início',                href: '/inicio' },
-  { Icon: PlusIcon,      label: 'Nova Avaliação',         href: '/avaliar',   highlight: true },
-  { Icon: ClipboardIcon, label: 'Gerenciar Avaliações',   href: '/avaliacoes' },
-  { Icon: ReportIcon,    label: 'Gerenciar Relatórios',   href: '/relatorios' },
-  { Icon: BookIcon,      label: 'Gerenciar Exercícios',   href: '/exercicios' },
-  { Icon: UserIcon,      label: 'Perfil do Professor',    href: '/perfis' },
-  { Icon: HelpIcon,      label: 'Ajuda',                  href: '/ajuda' },
+  { Icon: HomeIcon,      label: 'Início',                    href: '/inicio' },
+  { Icon: UserIcon,      label: 'Perfil do Professor',       href: '/perfis' },
+  { Icon: BookIcon,      label: 'Cadastro de Instituição',   href: '/instituicao' },
+  { Icon: ClipboardIcon, label: 'Cadastro de Disciplinas',   href: '/disciplinas' },
+  { Icon: ReportIcon,    label: 'Cadastro de Turmas',        href: '/turmas' },
+  { Icon: PlusIcon,      label: 'Nova Avaliação',            href: '/avaliar',   highlight: true },
+  { Icon: ClipboardIcon, label: 'Gerenciar Avaliações',      href: '/avaliacoes' },
+  { Icon: ReportIcon,    label: 'Gerenciar Relatórios',      href: '/relatorios' },
+  { Icon: HelpIcon,      label: 'Ajuda',                     href: '/ajuda' },
 ];
 
 // ── Layout ───────────────────────────────────────────────────────────────────
