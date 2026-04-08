@@ -56,7 +56,10 @@ export default function TurmasPage() {
 
   async function loadStudents(classId) {
     const r = await fetch(`/api/students?classId=${classId}`, { headers: { Authorization: `Bearer ${token()}` } });
-    if (r.ok) setStudentsByClass(prev => ({ ...prev, [classId]: await r.json() }));
+    if (r.ok) {
+      const data = await r.json();
+      setStudentsByClass(prev => ({ ...prev, [classId]: data }));
+    }
   }
 
   async function toggleExpand(classId) {
