@@ -34,6 +34,11 @@ export default function TurmasPage() {
   const [newStudentName, setNewStudentName] = useState('');
   const [loadingStudent, setLoadingStudent] = useState(false);
 
+  // Importar lista
+  const [importingClassId, setImportingClassId] = useState(null);
+  const [importText, setImportText] = useState('');
+  const [loadingImport, setLoadingImport] = useState(false);
+
   const [msg, setMsg] = useState({ text: '', ok: true });
 
   function token() { return localStorage.getItem('token'); }
@@ -114,6 +119,32 @@ export default function TurmasPage() {
     await loadStudents(classId);
   }
 
+  function parseNames(text) {
+    return text
+      .split(/[\n;,]+/)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+  }
+
+  async function importStudents(classId) {
+    const names = parseNames(importText);
+    if (names.length === 0) return;
+    setLoadingImport(true);
+    try {
+      for (const name of names) {
+        await fetch('/api/students', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, classId }),
+        });
+      }
+      flash(`${names.length} aluno${names.length !== 1 ? 's' : ''} adicionado${names.length !== 1 ? 's' : ''}!`);
+      setImportingClassId(null);
+      setImportText('');
+      await loadStudents(classId);
+    } finally { setLoadingImport(false); }
+  }
+
   return (
     <AppLayout userName={userName}>
       <div style={{ marginBottom: 32 }}>
@@ -188,20 +219,52 @@ export default function TurmasPage() {
                           <p style={{ fontSize: 13, color: 'var(--text-sub)', marginBottom: 12, fontStyle: 'italic' }}>Nenhum aluno cadastrado ainda.</p>
                         )}
 
-                        {/* Adicionar aluno */}
-                        <div style={{ display: 'flex', gap: 8 }}>
-                          <input
-                            style={{ ...inputStyle, flex: 1, padding: '8px 12px', fontSize: 13 }}
-                            value={newStudentName}
-                            onChange={e => setNewStudentName(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && addStudent(cls.id)}
-                            placeholder="Nome do aluno..."
-                          />
-                          <button onClick={() => addStudent(cls.id)} disabled={loadingStudent || !newStudentName.trim()}
-                            style={{ padding: '8px 16px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: loadingStudent ? 'wait' : 'pointer', opacity: !newStudentName.trim() ? 0.5 : 1, flexShrink: 0, whiteSpace: 'nowrap' }}>
-                            + Adicionar
-                          </button>
-                        </div>
+                        {/* Importar lista */}
+                        {importingClassId === cls.id ? (
+                          <div style={{ marginBottom: 10 }}>
+                            <p style={{ fontSize: 12, color: 'var(--text-sub)', marginBottom: 6 }}>
+                              Cole os nomes — um por linha, ou separados por vírgula/ponto-e-vírgula. Também aceita colunas copiadas de planilha.
+                            </p>
+                            <textarea
+                              style={{ ...inputStyle, minHeight: 110, resize: 'vertical', fontSize: 13, lineHeight: 1.6, marginBottom: 8 }}
+                              value={importText}
+                              onChange={e => setImportText(e.target.value)}
+                              placeholder={"João Silva\nMaria Oliveira\nPedro Santos"}
+                              autoFocus
+                            />
+                            <div style={{ display: 'flex', gap: 8 }}>
+                              <button onClick={() => importStudents(cls.id)} disabled={loadingImport || !importText.trim()}
+                                style={{ padding: '8px 18px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: loadingImport ? 'wait' : 'pointer', opacity: !importText.trim() ? 0.5 : 1 }}>
+                                {loadingImport ? 'Importando...' : `Importar ${parseNames(importText).length > 0 ? `(${parseNames(importText).length})` : ''}`}
+                              </button>
+                              <button onClick={() => { setImportingClassId(null); setImportText(''); }}
+                                style={{ padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            {/* Adicionar aluno */}
+                            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                              <input
+                                style={{ ...inputStyle, flex: 1, padding: '8px 12px', fontSize: 13 }}
+                                value={newStudentName}
+                                onChange={e => setNewStudentName(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && addStudent(cls.id)}
+                                placeholder="Nome do aluno..."
+                              />
+                              <button onClick={() => addStudent(cls.id)} disabled={loadingStudent || !newStudentName.trim()}
+                                style={{ padding: '8px 16px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: loadingStudent ? 'wait' : 'pointer', opacity: !newStudentName.trim() ? 0.5 : 1, flexShrink: 0, whiteSpace: 'nowrap' }}>
+                                + Adicionar
+                              </button>
+                            </div>
+                            <button onClick={() => { setImportingClassId(cls.id); setImportText(''); }}
+                              style={{ padding: '5px 12px', border: '1px dashed var(--border)', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
+                              Importar lista
+                            </button>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
