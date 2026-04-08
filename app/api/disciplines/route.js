@@ -29,7 +29,7 @@ export async function GET(request) {
     .eq('user_id', user.userId)
     .order('created_at', { ascending: false });
 
-  if (institutionId) query = query.eq('institution_id', institutionId);
+  if (institutionId) query = query.or(`institution_id.eq.${institutionId},institution_id.is.null`);
 
   const { data } = await query;
   return NextResponse.json((data || []).map(fmt));
