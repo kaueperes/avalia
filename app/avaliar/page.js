@@ -169,6 +169,16 @@ export default function AvaliarPage() {
   const [quotaCiclo, setQuotaCiclo] = useState(null);
   const [quotaExtra, setQuotaExtra] = useState(null);
 
+  // Nova estrutura de cadastros
+  const [institutions, setInstitutions] = useState([]);
+  const [selectedInstitutionId, setSelectedInstitutionId] = useState('');
+  const [disciplinesNew, setDisciplinesNew] = useState([]);
+  const [selectedDisciplineId, setSelectedDisciplineId] = useState('');
+  const [classes, setClasses] = useState([]);
+  const [selectedClassId, setSelectedClassId] = useState('');
+  const [students, setStudents] = useState([]);
+  const [selectedStudentId, setSelectedStudentId] = useState('');
+
   useEffect(() => {
     if (!token()) { router.push('/login'); return; }
     try {
@@ -179,11 +189,29 @@ export default function AvaliarPage() {
     } catch {}
     setCriteria((TYPES['modelagem']?.criteria || []).map(c => ({ name: c.name, weight: c.w })));
     Promise.all([
-      fetch('/api/profiles', { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('/api/exercises', { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
-    ]).then(([p, e]) => {
-      setProfiles(Array.isArray(p) ? p : []);
+      fetch('/api/profiles',     { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/exercises',    { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/institutions', { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/classes',      { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/disciplines',  { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
+    ]).then(([p, e, inst, cls, disc]) => {
+      const profileList = Array.isArray(p) ? p : [];
+      setProfiles(profileList);
       setExercises(Array.isArray(e) ? e : []);
+      setInstitutions(Array.isArray(inst) ? inst : []);
+      setClasses(Array.isArray(cls) ? cls : []);
+      setDisciplinesNew(Array.isArray(disc) ? disc : []);
+      // Auto-seleciona perfil padrão
+      const def = profileList.find(pr => pr.isDefault) || profileList[0];
+      if (def) {
+        setSelectedProfileId(def.id);
+        setProfName(def.name || '');
+        setProfDisc(def.discipline || '');
+        setProfTurma(def.turma || '');
+        setProfInstitution(def.institution || '');
+        setWritingSample(def.writingSample || '');
+        if (def.tone) setTone(def.tone);
+      }
     }).catch(() => {});
   }, [router]);
 
@@ -223,6 +251,41 @@ export default function AvaliarPage() {
     if (!newCritName.trim()) return;
     setCriteria(prev => [...prev, { name: newCritName.trim(), weight: newCritWeight }]);
     setNewCritName(''); setNewCritWeight(2);
+  }
+
+  async function loadDisciplinesForInstitution(institutionId) {
+    setSelectedInstitutionId(institutionId);
+    setSelectedDisciplineId('');
+    const url = institutionId ? `/api/disciplines?institutionId=${institutionId}` : '/api/disciplines';
+    const r = await fetch(url, { headers: { Authorization: `Bearer ${token()}` } });
+    if (r.ok) setDisciplinesNew(await r.json());
+  }
+
+  function loadDiscipline(id) {
+    setSelectedDisciplineId(id);
+    if (!id) return;
+    const d = disciplinesNew.find(d => d.id === id);
+    if (!d) return;
+    setExerciseName(d.exerciseName || '');
+    setExerciseDisciplina(d.subject || '');
+    setExerciseContext(d.description || '');
+    switchType(d.exerciseType || 'modelagem');
+    if (d.criteria?.length) setCriteria(d.criteria.map(c => ({ name: c.name, weight: c.weight || 1 })));
+  }
+
+  async function loadStudentsForClass(classId) {
+    setSelectedClassId(classId);
+    setSelectedStudentId('');
+    setStudentName('');
+    if (!classId) { setStudents([]); return; }
+    const r = await fetch(`/api/students?classId=${classId}`, { headers: { Authorization: `Bearer ${token()}` } });
+    if (r.ok) setStudents(await r.json());
+  }
+
+  function selectStudent(studentId) {
+    setSelectedStudentId(studentId);
+    const s = students.find(s => s.id === studentId);
+    setStudentName(s?.name || '');
   }
 
   function extractNameFromFile(file) {
@@ -285,7 +348,7 @@ export default function AvaliarPage() {
           const sr = await fetch('/api/evaluations', {
             method: 'POST',
             headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ studentName: studentNameResolved, type: selectedType, score: data.score, feedback: data.feedback, criteria: data.criteriaScores, profileName: profName || '', turma: profTurma || '', exerciseName: exerciseName || '', institution: profInstitution || '', disciplina: exerciseDisciplina || profDisc || '' }),
+            body: JSON.stringify({ studentName: studentNameResolved, type: selectedType, score: data.score, feedback: data.feedback, criteria: data.criteriaScores, profileName: profName || '', turma: profTurma || '', exerciseName: exerciseName || '', institution: profInstitution || '', disciplina: exerciseDisciplina || profDisc || '', class_id: selectedClassId || null }),
           });
           wasSaved = sr.ok;
         } catch {}
@@ -444,6 +507,8 @@ export default function AvaliarPage() {
           exerciseName: exerciseName || '',
           institution: profInstitution || '',
           disciplina: exerciseDisciplina || profDisc || '',
+          student_id: selectedStudentId || null,
+          class_id: selectedClassId || null,
         }),
       });
       if (r.ok) setSaved(true);
@@ -501,35 +566,62 @@ export default function AvaliarPage() {
         {/* COLUNA ESQUERDA — Configuração */}
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 16, overflow: 'hidden' }}>
 
-          {/* 1. PERFIL */}
+          {/* 1. PERFIL — auto-selecionado */}
           <div style={section}>
-            <div style={secLabel}><Tooltip text="Selecione um perfil salvo ou preencha manualmente. O perfil define seus dados e critérios padrão.">Perfil do Professor</Tooltip></div>
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <select style={{ ...inp, flex: 1 }} value={selectedProfileId} onChange={e => loadProfile(e.target.value)}>
-                  <option value="">— Selecione um perfil —</option>
-                  {profiles.map(p => <option key={p.id} value={p.id}>{p.name} · {p.discipline}{p.turma ? ` · ${p.turma}` : ''}{p.institution ? ` · ${p.institution}` : ''}</option>)}
+            <div style={secLabel}>Perfil do Professor</div>
+            {profName ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-content)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                <div>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{profName}</span>
+                  {tone && <span style={{ fontSize: 12, color: 'var(--text-sub)', marginLeft: 8 }}>· {TONES.find(t => t.id === tone)?.label || tone}</span>}
+                </div>
+                <Link href="/perfis" style={{ fontSize: 12, color: '#0081f0', textDecoration: 'none', fontWeight: 500, flexShrink: 0 }}>Editar perfil</Link>
+              </div>
+            ) : (
+              <div style={{ padding: '10px 14px', background: '#FEF9EC', border: '1px solid #F59E0B33', borderRadius: 10 }}>
+                <span style={{ fontSize: 13, color: '#92400E' }}>Nenhum perfil configurado. </span>
+                <Link href="/perfis" style={{ fontSize: 13, color: '#0081f0', fontWeight: 600, textDecoration: 'none' }}>Criar perfil →</Link>
+              </div>
+            )}
+          </div>
+
+          {/* 2. SELETORES — Instituição, Disciplina, Turma, Aluno */}
+          <div style={section}>
+            <div style={secLabel}>Configuração da Avaliação</div>
+
+            {/* Instituição */}
+            {institutions.length > 0 && (
+              <div style={{ marginBottom: 12 }}>
+                <label style={lbl}>Instituição <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>(opcional)</span></label>
+                <select style={inp} value={selectedInstitutionId} onChange={e => loadDisciplinesForInstitution(e.target.value)}>
+                  <option value="">Todas as disciplinas</option>
+                  {institutions.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
                 </select>
-                <Link href="/perfis" style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textDecoration: 'none', fontSize: 18, background: 'var(--bg-content)', flexShrink: 0 }}>+</Link>
               </div>
-            </div>
+            )}
+
+            {/* Disciplina */}
             <div style={{ marginBottom: 12 }}>
-              <label style={lbl}><Tooltip text="Seu nome completo que aparecerá nos relatórios e PDFs das avaliações.">Nome do Professor</Tooltip></label>
-              <input style={inp} value={profName} onChange={e => setProfName(e.target.value)} placeholder="Prof. Dr. Fulano de Tal" />
-            </div>
-            <div className="form-grid">
-              <div>
-                <label style={lbl}><Tooltip text="Matéria ou disciplina que você leciona. Ex: Design Gráfico, Animação 3D.">Disciplina</Tooltip></label>
-                <input style={inp} value={profDisc} onChange={e => setProfDisc(e.target.value)} placeholder="Design Gráfico" />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <label style={{ ...lbl, marginBottom: 0 }}>Disciplina</label>
+                <Link href="/disciplinas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Nova disciplina</Link>
               </div>
-              <div>
-                <label style={lbl}><Tooltip text="Identificação da turma. Ex: Turma A, 3º semestre.">Turma</Tooltip></label>
-                <input style={inp} value={profTurma} onChange={e => setProfTurma(e.target.value)} placeholder="Turma B" />
-              </div>
+              <select style={inp} value={selectedDisciplineId} onChange={e => loadDiscipline(e.target.value)}>
+                <option value="">— Selecione uma disciplina —</option>
+                {disciplinesNew.map(d => <option key={d.id} value={d.id}>{d.subject} · {d.exerciseName}</option>)}
+              </select>
             </div>
-            <div style={{ marginTop: 12 }}>
-              <label style={lbl}><Tooltip text="Nome da escola, faculdade ou universidade. Aparece nos relatórios gerados.">Instituição de ensino</Tooltip></label>
-              <input style={inp} value={profInstitution} onChange={e => setProfInstitution(e.target.value)} placeholder="Ex: FAAP, USP, Colégio Estadual..." />
+
+            {/* Turma */}
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <label style={{ ...lbl, marginBottom: 0 }}>Turma <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>(opcional)</span></label>
+                <Link href="/turmas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Nova turma</Link>
+              </div>
+              <select style={inp} value={selectedClassId} onChange={e => loadStudentsForClass(e.target.value)}>
+                <option value="">Sem turma (aluno avulso)</option>
+                {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
             </div>
           </div>
 
@@ -715,15 +807,22 @@ export default function AvaliarPage() {
 
             {evalMode === 'individual' ? (
               <>
-                {/* Nome do Aluno */}
+                {/* Aluno */}
                 <div style={{ marginBottom: 12 }}>
                   <label style={lbl}>
-                    <Tooltip text="Nome do aluno que aparece no relatório. Pode ser deixado vazio se estiver no nome do arquivo.">Nome do Aluno</Tooltip>
-                    {TYPES[selectedType]?.input !== 'text' && (
+                    <Tooltip text="Selecione o aluno da turma ou digite o nome manualmente.">Aluno</Tooltip>
+                    {!selectedClassId && TYPES[selectedType]?.input !== 'text' && (
                       <span style={{ fontSize: 10, fontWeight: 400, color: 'var(--text-sub)', marginLeft: 6 }}>extraído do arquivo se vazio</span>
                     )}
                   </label>
-                  <input style={inp} value={studentName} onChange={e => setStudentName(e.target.value)} placeholder="Ex: João Silva — ou deixe vazio" />
+                  {selectedClassId && students.length > 0 ? (
+                    <select style={inp} value={selectedStudentId} onChange={e => selectStudent(e.target.value)}>
+                      <option value="">— Selecione o aluno —</option>
+                      {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
+                  ) : (
+                    <input style={inp} value={studentName} onChange={e => setStudentName(e.target.value)} placeholder={selectedClassId ? 'Nenhum aluno cadastrado nesta turma' : 'Ex: João Silva — ou deixe vazio'} />
+                  )}
                 </div>
 
                 {/* Matrícula — só para tipos de arquivo */}

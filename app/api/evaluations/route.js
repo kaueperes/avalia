@@ -18,13 +18,13 @@ export async function POST(request) {
   const user = getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  const { studentName, type, score, feedback, criteria, profileName, turma, exerciseName, institution, disciplina } = await request.json();
+  const { studentName, type, score, feedback, criteria, profileName, turma, exerciseName, institution, disciplina, student_id, class_id } = await request.json();
   if (!studentName || !type || score === undefined) {
     return NextResponse.json({ error: 'Campos obrigatórios faltando' }, { status: 400 });
   }
 
   const { data: e, error } = await supabase.from('evaluations')
-    .insert({ user_id: user.userId, student_name: studentName, type, score, feedback: feedback || '', criteria: criteria || [], profile_name: profileName || '', turma: turma || '', exercise_name: exerciseName || '', institution: institution || '', disciplina: disciplina || '' })
+    .insert({ user_id: user.userId, student_name: studentName, type, score, feedback: feedback || '', criteria: criteria || [], profile_name: profileName || '', turma: turma || '', exercise_name: exerciseName || '', institution: institution || '', disciplina: disciplina || '', student_id: student_id || null, class_id: class_id || null })
     .select().single();
 
   if (error) return NextResponse.json({ error: 'Erro ao salvar' }, { status: 500 });
