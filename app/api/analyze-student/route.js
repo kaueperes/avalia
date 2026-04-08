@@ -25,7 +25,32 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Você não tem relatórios disponíveis. Adquira mais para continuar.' }, { status: 402 });
   }
 
-  const { evaluations, studentName } = await request.json();
+  const { evaluations: evalsFromClient, studentName: nameFromClient, student_id } = await request.json();
+  let evaluations = evalsFromClient || [];
+  let studentName = nameFromClient || 'Aluno';
+
+  // Se student_id foi passado, busca avaliações direto do BD — histórico confiável
+  if (student_id) {
+    const { data: dbEvals } = await supabase
+      .from('evaluations')
+      .select('*')
+      .eq('user_id', user.userId)
+      .eq('student_id', student_id)
+      .order('created_at', { ascending: true });
+    if (dbEvals?.length) {
+      evaluations = dbEvals.map(e => ({
+        id: e.id, studentName: e.student_name, type: e.type, score: e.score,
+        feedback: e.feedback, criteria: e.criteria, profileName: e.profile_name,
+        turma: e.turma, exerciseName: e.exercise_name, institution: e.institution,
+        disciplina: e.disciplina, createdAt: e.created_at,
+      }));
+      studentName = evaluations[0]?.studentName || studentName;
+    }
+    // Busca nome do aluno na tabela students se disponível
+    const { data: studentRow } = await supabase.from('students').select('name').eq('id', student_id).single();
+    if (studentRow?.name) studentName = studentRow.name;
+  }
+
   const institution = evaluations[0]?.institution || '';
   const profileName = evaluations[0]?.profileName || '';
   const disciplina = evaluations[0]?.disciplina || '';

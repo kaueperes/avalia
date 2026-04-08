@@ -25,7 +25,41 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Você não tem relatórios disponíveis. Adquira mais para continuar.' }, { status: 402 });
   }
 
-  const { evaluations, turma, exerciseName } = await request.json();
+  const { evaluations: evalsFromClient, turma, exerciseName, class_id } = await request.json();
+  let evaluations = evalsFromClient || [];
+
+  // Se class_id foi passado, busca avaliações direto do BD por class_id
+  if (class_id) {
+    const { data: dbEvals } = await supabase
+      .from('evaluations')
+      .select('*')
+      .eq('user_id', user.userId)
+      .eq('class_id', class_id)
+      .order('created_at', { ascending: true });
+    if (dbEvals?.length) {
+      evaluations = dbEvals.map(e => ({
+        id: e.id, studentName: e.student_name, type: e.type, score: e.score,
+        feedback: e.feedback, criteria: e.criteria, profileName: e.profile_name,
+        turma: e.turma, exerciseName: e.exercise_name, institution: e.institution,
+        disciplina: e.disciplina, studentId: e.student_id, createdAt: e.created_at,
+      }));
+    }
+    // Busca lista completa de alunos da turma para identificar quem não foi avaliado
+    const { data: allStudents } = await supabase
+      .from('students')
+      .select('id, name')
+      .eq('class_id', class_id)
+      .order('name', { ascending: true });
+    if (allStudents?.length) {
+      const evaluatedStudentIds = new Set(evaluations.map(e => e.studentId).filter(Boolean));
+      const notEvaluated = allStudents.filter(s => !evaluatedStudentIds.has(s.id)).map(s => s.name);
+      if (notEvaluated.length) {
+        // Passa lista para o contexto do prompt
+        evaluations._notEvaluated = notEvaluated;
+      }
+    }
+  }
+
   const institution = evaluations[0]?.institution || '';
   const profileName = evaluations[0]?.profileName || '';
   const disciplina = evaluations[0]?.disciplina || '';
@@ -33,6 +67,7 @@ export async function POST(request) {
   if (!evaluations || evaluations.length === 0) {
     return NextResponse.json({ error: 'Nenhuma avaliação para analisar.' }, { status: 400 });
   }
+  const notEvaluatedList = evaluations._notEvaluated || [];
 
   // Detect single vs multi-activity
   const uniqueExercises = [...new Set(evaluations.map(e => (e.exerciseName || '').trim()).filter(Boolean))];
@@ -165,6 +200,7 @@ export async function POST(request) {
     turma ? `Turma: ${turma}` : null,
     exerciseName ? `Exercício filtrado: ${exerciseName}` : null,
     isMultiActivity ? `Análise evolutiva: ${stats.atividades?.length} atividades` : null,
+    notEvaluatedList.length ? `Alunos ainda não avaliados: ${notEvaluatedList.join(', ')}` : null,
   ].filter(Boolean).join(' | ');
 
   const prompt = `Você é um assistente pedagógico especialista em educação. Analise o desempenho desta turma com base nas avaliações abaixo e forneça uma análise pedagógica construtiva.
@@ -222,10 +258,10 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
       exercise_name: isMultiActivity ? '' : (exerciseName || evaluations[0]?.exerciseName || ''),
       institution: institution,
       profile_name: profileName,
-      content: { ...analysis, disciplina, tipoTrabalho, stats },
+      content: { ...analysis, disciplina, tipoTrabalho, stats: { ...stats, notEvaluated: notEvaluatedList } },
     });
 
-    return NextResponse.json({ ...analysis, disciplina, tipoTrabalho, stats });
+    return NextResponse.json({ ...analysis, disciplina, tipoTrabalho, stats: { ...stats, notEvaluated: notEvaluatedList } });
   } catch (err) {
     console.error('analyze-class error:', err);
     return NextResponse.json({ error: 'Erro ao chamar a IA. Verifique sua chave ANTHROPIC_API_KEY.' }, { status: 500 });

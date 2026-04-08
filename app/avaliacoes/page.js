@@ -46,6 +46,8 @@ export default function AvaliacoesPage() {
   const reportMenuRef = useRef(null);
   const [detailDraft, setDetailDraft] = useState(null);
   const [selected, setSelected] = useState(new Set());
+  const [classes, setClasses] = useState([]);
+  const [classIdFilter, setClassIdFilter] = useState('');
 
   function token() { return localStorage.getItem('token'); }
 
@@ -66,12 +68,15 @@ export default function AvaliacoesPage() {
       .catch(() => setLoading(false));
     fetch('/api/profiles', { headers: { Authorization: `Bearer ${token()}` } })
       .then(r => r.json()).then(data => setProfiles(Array.isArray(data) ? data : [])).catch(() => {});
+    fetch('/api/classes', { headers: { Authorization: `Bearer ${token()}` } })
+      .then(r => r.json()).then(data => setClasses(Array.isArray(data) ? data : [])).catch(() => {});
   }, [router]);
 
   const filtered = evaluations.filter(e => {
     if (search && !e.studentName.toLowerCase().includes(search.toLowerCase())) return false;
     if (typeFilter && e.type !== typeFilter) return false;
-    if (turmaFilter && (e.turma || '').toLowerCase() !== turmaFilter.toLowerCase()) return false;
+    if (classIdFilter && e.classId !== classIdFilter) return false;
+    if (!classIdFilter && turmaFilter && (e.turma || '').toLowerCase() !== turmaFilter.toLowerCase()) return false;
     if (exerciseFilter && (e.exerciseName || '') !== exerciseFilter) return false;
     if (institutionFilter && (e.institution || '') !== institutionFilter) return false;
     if (scoreMin !== '' && e.score < Number(scoreMin)) return false;
@@ -113,7 +118,7 @@ export default function AvaliacoesPage() {
     }
   }
 
-  function clearFilters() { setSearch(''); setTypeFilter(''); setTurmaFilter(''); setExerciseFilter(''); setInstitutionFilter(''); setScoreMin(''); setScoreMax(''); }
+  function clearFilters() { setSearch(''); setTypeFilter(''); setTurmaFilter(''); setExerciseFilter(''); setInstitutionFilter(''); setScoreMin(''); setScoreMax(''); setClassIdFilter(''); }
 
   async function saveEdit() {
     if (!detailDraft) return;
@@ -242,12 +247,14 @@ export default function AvaliacoesPage() {
     setReportLoading(true);
     setReportError('');
     setClassReport(null);
-    const turmaCtx = selectedEvals.length === new Set(selectedEvals.map(e => e.turma)).size ? '' : (selectedEvals[0]?.turma || '');
+    const turmaCtx = classIdFilter
+      ? (classes.find(c => c.id === classIdFilter)?.name || selectedEvals[0]?.turma || '')
+      : (selectedEvals[0]?.turma || '');
     try {
       const r = await fetch('/api/analyze-class', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ evaluations: selectedEvals, turma: turmaCtx, exerciseName: '' }),
+        body: JSON.stringify({ evaluations: selectedEvals, turma: turmaCtx, exerciseName: '', class_id: classIdFilter || null }),
       });
       const data = await r.json();
       if (!r.ok) { setReportError(data.error || 'Erro ao gerar relatório.'); return; }
@@ -431,6 +438,9 @@ export default function AvaliacoesPage() {
   async function generateStudentReport() {
     const studentEvals = selectedEvals;
     const studentName = selectedStudents[0] || 'Aluno';
+    // Se todas as avaliações selecionadas têm o mesmo student_id, usa o ID real
+    const studentIds = [...new Set(studentEvals.map(e => e.studentId).filter(Boolean))];
+    const student_id = studentIds.length === 1 ? studentIds[0] : null;
     setStudentReportLoading(true);
     setStudentReportError('');
     setStudentReport(null);
@@ -438,7 +448,7 @@ export default function AvaliacoesPage() {
       const r = await fetch('/api/analyze-student', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ evaluations: studentEvals, studentName }),
+        body: JSON.stringify({ evaluations: studentEvals, studentName, student_id }),
       });
       const data = await r.json();
       if (!r.ok) { setStudentReportError(data.error || 'Erro ao gerar parecer.'); return; }
