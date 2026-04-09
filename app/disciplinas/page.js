@@ -208,7 +208,7 @@ export default function DisciplinasPage() {
                       </div>
                       <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 12 }}>
                         <button onClick={() => toggleExpand(disc.id)}
-                          style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: isExpanded ? 'rgba(0,129,240,0.08)' : 'var(--bg-content)', color: isExpanded ? '#0081f0' : 'var(--text-main)', borderColor: isExpanded ? '#0081f0' : 'var(--border)' }}>
+                          style={{ padding: '5px 12px', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: isExpanded ? 'rgba(0,129,240,0.12)' : 'linear-gradient(135deg, #0081f0, #0033ad)', color: isExpanded ? '#0081f0' : 'white' }}>
                           {isExpanded ? 'Fechar' : 'Exercícios'}
                         </button>
                         <button onClick={() => startEditDisc(disc)}
