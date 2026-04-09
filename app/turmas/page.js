@@ -30,12 +30,7 @@ export default function TurmasPage() {
   const [editingClassId, setEditingClassId] = useState(null);
   const [loadingClass, setLoadingClass] = useState(false);
 
-  // Form aluno
-  const [newStudentName, setNewStudentName] = useState('');
-  const [loadingStudent, setLoadingStudent] = useState(false);
-
-  // Importar lista
-  const [importingClassId, setImportingClassId] = useState(null);
+  // Adicionar alunos
   const [importText, setImportText] = useState('');
   const [loadingImport, setLoadingImport] = useState(false);
 
@@ -104,16 +99,6 @@ export default function TurmasPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async function addStudent(classId) {
-    if (!newStudentName.trim()) return;
-    setLoadingStudent(true);
-    try {
-      const r = await fetch('/api/students', { method: 'POST', headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ name: newStudentName.trim(), classId }) });
-      if (r.ok) { setNewStudentName(''); await loadStudents(classId); }
-      else { const d = await r.json(); flash(d.error || 'Erro ao adicionar aluno', false); }
-    } finally { setLoadingStudent(false); }
-  }
-
   async function deleteStudent(studentId, classId) {
     await fetch(`/api/students/${studentId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token()}` } });
     await loadStudents(classId);
@@ -139,7 +124,6 @@ export default function TurmasPage() {
         });
       }
       flash(`${names.length} aluno${names.length !== 1 ? 's' : ''} adicionado${names.length !== 1 ? 's' : ''}!`);
-      setImportingClassId(null);
       setImportText('');
       await loadStudents(classId);
     } finally { setLoadingImport(false); }
@@ -219,52 +203,26 @@ export default function TurmasPage() {
                           <p style={{ fontSize: 13, color: 'var(--text-sub)', marginBottom: 12, fontStyle: 'italic' }}>Nenhum aluno cadastrado ainda.</p>
                         )}
 
-                        {/* Importar lista */}
-                        {importingClassId === cls.id ? (
-                          <div style={{ marginBottom: 10 }}>
-                            <p style={{ fontSize: 12, color: 'var(--text-sub)', marginBottom: 6 }}>
-                              Cole os nomes — um por linha, ou separados por vírgula/ponto-e-vírgula. Também aceita colunas copiadas de planilha.
-                            </p>
-                            <textarea
-                              style={{ ...inputStyle, minHeight: 110, resize: 'vertical', fontSize: 13, lineHeight: 1.6, marginBottom: 8 }}
-                              value={importText}
-                              onChange={e => setImportText(e.target.value)}
-                              placeholder={"João Silva\nMaria Oliveira\nPedro Santos"}
-                              autoFocus
-                            />
-                            <div style={{ display: 'flex', gap: 8 }}>
-                              <button onClick={() => importStudents(cls.id)} disabled={loadingImport || !importText.trim()}
-                                style={{ padding: '8px 18px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: loadingImport ? 'wait' : 'pointer', opacity: !importText.trim() ? 0.5 : 1 }}>
-                                {loadingImport ? 'Importando...' : `Importar ${parseNames(importText).length > 0 ? `(${parseNames(importText).length})` : ''}`}
-                              </button>
-                              <button onClick={() => { setImportingClassId(null); setImportText(''); }}
-                                style={{ padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
-                                Cancelar
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            {/* Adicionar aluno */}
-                            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                              <input
-                                style={{ ...inputStyle, flex: 1, padding: '8px 12px', fontSize: 13 }}
-                                value={newStudentName}
-                                onChange={e => setNewStudentName(e.target.value)}
-                                onKeyDown={e => e.key === 'Enter' && addStudent(cls.id)}
-                                placeholder="Nome do aluno..."
-                              />
-                              <button onClick={() => addStudent(cls.id)} disabled={loadingStudent || !newStudentName.trim()}
-                                style={{ padding: '8px 16px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: loadingStudent ? 'wait' : 'pointer', opacity: !newStudentName.trim() ? 0.5 : 1, flexShrink: 0, whiteSpace: 'nowrap' }}>
-                                + Adicionar
-                              </button>
-                            </div>
-                            <button onClick={() => { setImportingClassId(cls.id); setImportText(''); }}
-                              style={{ padding: '5px 12px', border: '1px dashed var(--border)', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
-                              Importar lista
-                            </button>
-                          </>
-                        )}
+                        {/* Adicionar alunos */}
+                        <p style={{ fontSize: 12, color: 'var(--text-sub)', marginBottom: 6 }}>
+                          Cole os nomes — um por linha, ou separados por vírgula/ponto-e-vírgula. Também aceita colunas copiadas de planilha.
+                        </p>
+                        <textarea
+                          style={{ ...inputStyle, minHeight: 110, resize: 'vertical', fontSize: 13, lineHeight: 1.6, marginBottom: 8 }}
+                          value={importText}
+                          onChange={e => setImportText(e.target.value)}
+                          placeholder={"João Silva\nMaria Oliveira\nPedro Santos"}
+                        />
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button onClick={() => importStudents(cls.id)} disabled={loadingImport || !importText.trim()}
+                            style={{ padding: '8px 18px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: loadingImport ? 'wait' : 'pointer', opacity: !importText.trim() ? 0.5 : 1 }}>
+                            {loadingImport ? 'Importando...' : `Importar${parseNames(importText).length > 0 ? ` (${parseNames(importText).length})` : ''}`}
+                          </button>
+                          <button onClick={() => setImportText('')}
+                            style={{ padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
+                            Cancelar
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -300,7 +258,7 @@ export default function TurmasPage() {
 
           <div style={{ padding: '12px 14px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 10, marginBottom: 24 }}>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
-              Após criar a turma, clique em <strong>Alunos</strong> para adicionar os alunos um a um.
+              Após criar a turma, clique em <strong>Alunos</strong> para adicionar os alunos à turma.
             </p>
           </div>
 
