@@ -722,7 +722,7 @@ export default function AvaliarPage() {
                     </div>
                   ))}
                   <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
-                    <input style={{ ...inp, flex: 1 }} value={newCritName} onChange={e => setNewCritName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCriteria()} placeholder="Novo critério..." />
+                    <input style={{ ...inp, flex: 1, padding: '7px 12px' }} value={newCritName} onChange={e => setNewCritName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCriteria()} placeholder="Novo critério..." />
                     <select style={{ ...inp, width: 64 }} value={newCritWeight} onChange={e => setNewCritWeight(Number(e.target.value))}>
                       <option value={1}>1×</option><option value={2}>2×</option><option value={3}>3×</option>
                     </select>
