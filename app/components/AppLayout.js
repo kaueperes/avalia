@@ -200,8 +200,9 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
   const bg        = darkMode ? '#0f1117' : '#ffffff';
   const bgContent = darkMode ? '#13161c' : '#F7F8FA';
   const bgCard    = darkMode ? '#1a1e28' : '#ffffff';
-  const border    = darkMode ? '#252a38' : '#E5E7EB';
-  const borderCard= darkMode ? '#252a38' : '#E5E7EB';
+  const border      = darkMode ? '#252a38' : '#E5E7EB';
+  const borderCard  = darkMode ? '#252a38' : '#E5E7EB';
+  const borderInput = darkMode ? '#303650' : '#C9CDD4';
   const textMain  = darkMode ? '#F1F5F9' : '#111827';
   const textMuted = darkMode ? '#8B95A8' : '#6B7280';
   const textSub   = darkMode ? '#5A6478' : '#9CA3AF';
@@ -222,6 +223,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
         '--bg-card': bgCard,
         '--border': border,
         '--border-card': borderCard,
+        '--border-input': borderInput,
         '--text-main': textMain,
         '--text-muted': textMuted,
         '--text-sub': textSub,

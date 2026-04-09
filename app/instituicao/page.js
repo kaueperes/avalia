@@ -15,9 +15,9 @@ const BLANK = { name: '', logoUrl: '', educationLevel: '' };
 
 const inputStyle = {
   width: '100%', padding: '10px 12px',
-  border: '1px solid var(--border)', borderRadius: 10,
+  border: '1px solid var(--border-input)', borderRadius: 10,
   fontSize: 14, outline: 'none',
-  background: 'var(--bg-content)', color: 'var(--text-main)',
+  background: 'var(--bg-card)', color: 'var(--text-main)',
   fontFamily: 'inherit', boxSizing: 'border-box',
   transition: 'border-color .15s',
 };
