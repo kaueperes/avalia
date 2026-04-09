@@ -606,7 +606,7 @@ export default function AvaliarPage() {
               <div style={{ marginBottom: 12 }}>
                 <label style={lbl}>Instituição</label>
                 <select style={inp} value={selectedInstitutionId} onChange={e => loadDisciplinesForInstitution(e.target.value)}>
-                  <option value="">Todas as disciplinas</option>
+                  <option value="">Selecione uma instituição</option>
                   {institutions.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
                 </select>
               </div>
@@ -619,7 +619,7 @@ export default function AvaliarPage() {
                 <Link href="/disciplinas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Nova disciplina</Link>
               </div>
               <select style={inp} value={selectedDisciplineId} onChange={e => loadDiscipline(e.target.value)}>
-                <option value="">— Selecione uma disciplina —</option>
+                <option value="">Selecione uma disciplina</option>
                 {disciplinesNew.map(d => <option key={d.id} value={d.id}>{d.subject}</option>)}
               </select>
             </div>
@@ -631,7 +631,7 @@ export default function AvaliarPage() {
                 <Link href="/disciplinas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Novo exercício</Link>
               </div>
               <select style={inp} value={selectedDisciplineExerciseId} onChange={e => loadDisciplineExercise(e.target.value)} disabled={!selectedDisciplineId}>
-                <option value="">{selectedDisciplineId ? '— Selecione um exercício —' : '— Selecione uma disciplina primeiro —'}</option>
+                <option value="">{selectedDisciplineId ? 'Selecione um exercício' : 'Selecione uma disciplina primeiro'}</option>
                 {disciplineExercises.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
               </select>
               {selectedDisciplineId && disciplineExercises.length === 0 && (
@@ -646,7 +646,7 @@ export default function AvaliarPage() {
                 <Link href="/turmas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Nova turma</Link>
               </div>
               <select style={inp} value={selectedClassId} onChange={e => loadStudentsForClass(e.target.value)}>
-                <option value="">Sem turma (aluno avulso)</option>
+                <option value="">Selecione uma turma</option>
                 {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
