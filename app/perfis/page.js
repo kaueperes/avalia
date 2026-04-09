@@ -164,7 +164,7 @@ export default function PerfisPage() {
             </select>
           </Field>
 
-          <Field label="Amostra de Escrita" hint="(opcional)" tooltip="Cole um trecho do seu jeito de escrever feedback. A avaliação vai imitar seu estilo e vocabulário.">
+          <Field label="Amostra de Escrita" tooltip="Cole um trecho do seu jeito de escrever feedback. A avaliação vai imitar seu estilo e vocabulário.">
             <textarea
               style={{ ...inputStyle, minHeight: 140, resize: 'vertical', lineHeight: 1.6 }}
               value={form.writingSample}

@@ -338,7 +338,7 @@ export default function TurmasPage() {
           {institutions.length > 0 && (
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>
-                <Tooltip text="Vincula esta turma a uma instituição cadastrada. O nome e logo da instituição aparecerão nos relatórios.">Instituição</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>(opcional)</span>
+                <Tooltip text="Vincula esta turma a uma instituição cadastrada. O nome e logo da instituição aparecerão nos relatórios.">Instituição</Tooltip>
               </label>
               <select style={inputStyle} value={formClass.institutionId} onChange={e => setFormClass(f => ({ ...f, institutionId: e.target.value }))}>
                 <option value="">Sem vínculo</option>

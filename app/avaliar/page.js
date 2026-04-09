@@ -604,7 +604,7 @@ export default function AvaliarPage() {
             {/* Instituição */}
             {institutions.length > 0 && (
               <div style={{ marginBottom: 12 }}>
-                <label style={lbl}>Instituição <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>(opcional)</span></label>
+                <label style={lbl}>Instituição</label>
                 <select style={inp} value={selectedInstitutionId} onChange={e => loadDisciplinesForInstitution(e.target.value)}>
                   <option value="">Todas as disciplinas</option>
                   {institutions.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
@@ -644,7 +644,7 @@ export default function AvaliarPage() {
             {/* Turma */}
             <div style={{ marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                <label style={{ ...lbl, marginBottom: 0 }}>Turma <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>(opcional)</span></label>
+                <label style={{ ...lbl, marginBottom: 0 }}>Turma</label>
                 <Link href="/turmas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Nova turma</Link>
               </div>
               <select style={inp} value={selectedClassId} onChange={e => loadStudentsForClass(e.target.value)}>

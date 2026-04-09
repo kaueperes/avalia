@@ -144,7 +144,7 @@ export default function InstituicaoPage() {
             <input style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ex: Colégio Estadual, FAAP, USP..." />
           </Field>
 
-          <Field label="Nível de Ensino" hint="(opcional)" tooltip="Nível de ensino da instituição. Ajuda a contextualizar as avaliações para a faixa etária correta.">
+          <Field label="Nível de Ensino" tooltip="Nível de ensino da instituição. Ajuda a contextualizar as avaliações para a faixa etária correta.">
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {TEACHING_LEVELS.map(({ value, label }) => (
                 <button key={value} type="button" onClick={() => setForm(f => ({ ...f, educationLevel: f.educationLevel === value ? '' : value }))}
@@ -155,7 +155,7 @@ export default function InstituicaoPage() {
             </div>
           </Field>
 
-          <Field label="Logo da Instituição" hint="(opcional — aparece nos PDFs gerados)" tooltip="Imagem exibida no cabeçalho dos relatórios gerados. Use PNG ou SVG com fundo transparente para melhor resultado.">
+          <Field label="Logo da Instituição" tooltip="Imagem exibida no cabeçalho dos relatórios gerados. Use PNG ou SVG com fundo transparente para melhor resultado.">
             <div onClick={() => document.getElementById('logo-upload').click()}
               style={{ border: '2px dashed var(--border)', borderRadius: 10, padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, cursor: 'pointer', background: 'var(--bg-content)', transition: 'border-color .15s' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = '#0081f0'}
