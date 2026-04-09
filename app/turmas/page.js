@@ -275,10 +275,10 @@ export default function TurmasPage() {
         )}
 
         {/* Formulário de turma */}
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 14 }}>
+          {editingClassId ? 'Editar turma' : 'Nova turma'}
+        </h2>
         <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '28px 28px' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>
-            {editingClassId ? 'Editar turma' : 'Nova turma'}
-          </h2>
 
           <div style={{ marginBottom: 20 }}>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>Nome da Turma *</label>

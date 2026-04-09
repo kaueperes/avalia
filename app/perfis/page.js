@@ -148,10 +148,10 @@ export default function PerfisPage() {
         )}
 
         {/* Formulário */}
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 14 }}>
+          {editingId ? 'Editar perfil' : 'Novo perfil'}
+        </h2>
         <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '28px 28px' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 24 }}>
-            {editingId ? 'Editar perfil' : 'Novo perfil'}
-          </h2>
 
           <Field label="Nome do Professor *" tooltip="Seu nome completo. Aparece como assinatura nos relatórios e PDFs gerados.">
             <input style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Prof. Dr. Fulano de Tal" />
