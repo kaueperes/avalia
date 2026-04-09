@@ -56,7 +56,11 @@ export default function TurmasPage() {
       fetch('/api/institutions', { headers: { Authorization: `Bearer ${token()}` } }),
       fetch('/api/classes', { headers: { Authorization: `Bearer ${token()}` } }),
     ]);
-    if (rInst.ok) setInstitutions(await rInst.json());
+    if (rInst.ok) {
+      const inst = await rInst.json();
+      setInstitutions(inst);
+      if (inst.length === 1) setFormClass(f => ({ ...f, institutionId: inst[0].id }));
+    }
     if (rClasses.ok) setClasses(await rClasses.json());
   }
 
