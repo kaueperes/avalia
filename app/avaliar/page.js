@@ -612,53 +612,51 @@ export default function AvaliarPage() {
             <div style={secLabel}>Configuração da Avaliação</div>
 
             {/* Instituição */}
-            {institutions.length > 0 && (
-              <div style={{ marginBottom: 12 }}>
-                <label style={lbl}>Instituição</label>
-                <select style={inp} value={selectedInstitutionId} onChange={e => loadDisciplinesForInstitution(e.target.value)}>
+            <div style={{ marginBottom: 12 }}>
+              <label style={lbl}>Instituição</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <select style={{ ...inp, flex: 1 }} value={selectedInstitutionId} onChange={e => loadDisciplinesForInstitution(e.target.value)}>
                   <option value="">Selecione uma instituição</option>
                   {institutions.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
                 </select>
+                <Link href="/instituicao" style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textDecoration: 'none', fontSize: 18, background: 'var(--bg-content)', flexShrink: 0 }}>+</Link>
               </div>
-            )}
+            </div>
 
             {/* Disciplina */}
             <div style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                <label style={{ ...lbl, marginBottom: 0 }}>Disciplina</label>
-                <Link href="/disciplinas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Nova disciplina</Link>
+              <label style={lbl}>Disciplina</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <select style={{ ...inp, flex: 1 }} value={selectedDisciplineId} onChange={e => loadDiscipline(e.target.value)}>
+                  <option value="">Selecione uma disciplina</option>
+                  {disciplinesNew.map(d => <option key={d.id} value={d.id}>{d.subject}</option>)}
+                </select>
+                <Link href="/disciplinas" style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textDecoration: 'none', fontSize: 18, background: 'var(--bg-content)', flexShrink: 0 }}>+</Link>
               </div>
-              <select style={inp} value={selectedDisciplineId} onChange={e => loadDiscipline(e.target.value)}>
-                <option value="">Selecione uma disciplina</option>
-                {disciplinesNew.map(d => <option key={d.id} value={d.id}>{d.subject}</option>)}
-              </select>
             </div>
 
             {/* Exercício da disciplina */}
             <div style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                <label style={{ ...lbl, marginBottom: 0 }}>Exercício</label>
-                <Link href="/disciplinas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Novo exercício</Link>
+              <label style={lbl}>Exercício</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <select style={{ ...inp, flex: 1 }} value={selectedDisciplineExerciseId} onChange={e => loadDisciplineExercise(e.target.value)} disabled={!selectedDisciplineId}>
+                  <option value="">{selectedDisciplineId ? 'Selecione um exercício' : 'Selecione uma disciplina primeiro'}</option>
+                  {disciplineExercises.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+                </select>
+                <Link href="/disciplinas" style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textDecoration: 'none', fontSize: 18, background: 'var(--bg-content)', flexShrink: 0 }}>+</Link>
               </div>
-              <select style={inp} value={selectedDisciplineExerciseId} onChange={e => loadDisciplineExercise(e.target.value)} disabled={!selectedDisciplineId}>
-                <option value="">{selectedDisciplineId ? 'Selecione um exercício' : 'Selecione uma disciplina primeiro'}</option>
-                {disciplineExercises.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-              </select>
-              {selectedDisciplineId && disciplineExercises.length === 0 && (
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Nenhum exercício cadastrado nesta disciplina. <Link href="/disciplinas" style={{ color: '#0081f0', textDecoration: 'none' }}>Adicionar →</Link></p>
-              )}
             </div>
 
             {/* Turma */}
             <div style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                <label style={{ ...lbl, marginBottom: 0 }}>Turma</label>
-                <Link href="/turmas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Nova turma</Link>
+              <label style={lbl}>Turma</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <select style={{ ...inp, flex: 1 }} value={selectedClassId} onChange={e => loadStudentsForClass(e.target.value)}>
+                  <option value="">Selecione uma turma</option>
+                  {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+                <Link href="/turmas" style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textDecoration: 'none', fontSize: 18, background: 'var(--bg-content)', flexShrink: 0 }}>+</Link>
               </div>
-              <select style={inp} value={selectedClassId} onChange={e => loadStudentsForClass(e.target.value)}>
-                <option value="">Selecione uma turma</option>
-                {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
             </div>
           </div>
 
