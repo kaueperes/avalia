@@ -679,11 +679,25 @@ export default function AvaliarPage() {
             </button>
 
             {showCustomize && (
-              <div style={{ borderTop: '1px solid var(--border-card)' }}>
+              <div style={{ borderTop: '1px solid var(--border-card)', padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                {/* TOM DO FEEDBACK */}
+                <div>
+                  <label style={lbl}><Tooltip text="Define o estilo do texto gerado pela IA — do mais técnico e direto ao mais encorajador e didático.">Tom de Feedback</Tooltip></label>
+                  <select style={inp} value={tone} onChange={e => setTone(e.target.value)}>
+                    {TONES.map(t => <option key={t.id} value={t.id}>{t.label} — {t.desc}</option>)}
+                  </select>
+                </div>
+
+                {/* NOME DO EXERCÍCIO */}
+                <div>
+                  <label style={lbl}><Tooltip text="Nome do exercício. Preenchido automaticamente ao selecionar um exercício acima.">Nome do Exercício</Tooltip></label>
+                  <input style={inp} value={exerciseName} onChange={e => setExerciseName(e.target.value)} placeholder="Ex: Exercício 3 — Modelagem de Personagem" />
+                </div>
 
                 {/* TIPO DE TRABALHO */}
-                <div style={{ ...section, borderBottom: '1px solid var(--border-card)' }}>
-                  <div style={secLabel}><Tooltip text="Selecione o tipo do trabalho enviado pelo aluno. Isso define como a IA vai analisar.">Tipo de Trabalho</Tooltip></div>
+                <div>
+                  <label style={lbl}><Tooltip text="Selecione o tipo do trabalho enviado pelo aluno. Isso define como a IA vai analisar.">Tipo de Trabalho</Tooltip></label>
                   <select style={inp} value={selectedType} onChange={e => switchType(e.target.value)}>
                     {Object.entries(CATEGORIES).map(([catKey, cat]) => (
                       <optgroup key={catKey} label={cat.label}>
@@ -693,92 +707,50 @@ export default function AvaliarPage() {
                       </optgroup>
                     ))}
                   </select>
-                  {TYPES[selectedType] && (
-                    <div style={{ fontSize: 12, color: 'var(--text-sub)', padding: '8px 10px', background: 'var(--bg-content)', borderRadius: 8, border: '1px solid var(--border)', lineHeight: 1.5, marginTop: 8 }}>
-                      {TYPES[selectedType].hint}
-                    </div>
-                  )}
                 </div>
 
-                {/* EXERCÍCIO & CRITÉRIOS */}
-                <div style={{ ...section, borderBottom: '1px solid var(--border-card)' }}>
-                  <div style={secLabel}><Tooltip text="Ajuste o nome, enunciado e critérios para esta avaliação específica.">Exercício & Critérios</Tooltip></div>
-                  <div style={{ marginBottom: 12 }}>
-                    <label style={lbl}><Tooltip text="Nome do exercício. Preenchido automaticamente ao selecionar um exercício acima.">Nome do Exercício</Tooltip></label>
-                    <input style={inp} value={exerciseName} onChange={e => setExerciseName(e.target.value)} placeholder="Ex: Exercício 3 — Modelagem de Personagem" />
-                  </div>
-                  <div style={{ marginBottom: 12 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <label style={lbl}><Tooltip text="Descreva o que foi pedido ao aluno. Quanto mais detalhado, melhor será a avaliação da IA.">Enunciado / Descrição</Tooltip></label>
-                      <button onClick={() => setShowAiPrompt(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 9px', border: '1px solid #0081f033', borderRadius: 7, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2v4h4"/></svg>
-                        Criar com IA
-                      </button>
-                    </div>
-                    {showAiPrompt && (
-                      <div style={{ marginBottom: 8, padding: '10px 12px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 10 }}>
-                        <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6, fontWeight: 500 }}>Descreva o exercício brevemente e a IA gera o enunciado completo:</p>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <input
-                            style={{ ...inp, flex: 1, fontSize: 12, padding: '7px 10px' }}
-                            value={aiPrompt}
-                            onChange={e => setAiPrompt(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && generateContext()}
-                            placeholder="Ex: modelagem de personagem low poly, foco em otimização..."
-                            autoFocus
-                          />
-                          <button onClick={generateContext} disabled={aiLoading || !aiPrompt.trim()} style={{ padding: '7px 14px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: aiLoading ? 'wait' : 'pointer', opacity: !aiPrompt.trim() ? 0.5 : 1, flexShrink: 0 }}>
-                            {aiLoading ? 'Gerando...' : 'Gerar'}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    <textarea style={{ ...inp, minHeight: 64, resize: 'vertical' }} value={exerciseContext} onChange={e => setExerciseContext(e.target.value)} placeholder="Descreva o objetivo e requisitos do exercício..." />
-                  </div>
-                  <div>
-                    <label style={{ ...lbl, marginBottom: 8 }}><Tooltip text="Cada critério recebe nota de 0 a 10. O peso (×) multiplica a importância do critério na nota final.">Critérios</Tooltip></label>
-                    {criteria.map((c, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 9, marginBottom: 6, fontSize: 13 }}>
-                        <input
-                          value={c.name}
-                          onChange={e => { const cr = [...criteria]; cr[i] = { ...cr[i], name: e.target.value }; setCriteria(cr); }}
-                          style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-main)', fontSize: 13, outline: 'none', minWidth: 0 }}
-                        />
-                        <select
-                          value={c.weight}
-                          onChange={e => { const cr = [...criteria]; cr[i] = { ...cr[i], weight: Number(e.target.value) }; setCriteria(cr); }}
-                          style={{ fontSize: 11, background: 'var(--selected-bg)', color: '#0081f0', border: '1px solid #0081f033', borderRadius: 4, padding: '2px 4px', flexShrink: 0, cursor: 'pointer' }}
-                        >
-                          <option value={1}>1×</option><option value={2}>2×</option><option value={3}>3×</option>
-                        </select>
-                        <span onClick={() => setCriteria(criteria.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
-                      </div>
-                    ))}
-                    <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
-                      <input style={{ ...inp, flex: 1 }} value={newCritName} onChange={e => setNewCritName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCriteria()} placeholder="Novo critério..." />
-                      <select style={{ ...inp, width: 64 }} value={newCritWeight} onChange={e => setNewCritWeight(Number(e.target.value))}>
+                {/* CRITÉRIOS */}
+                <div>
+                  <label style={{ ...lbl, marginBottom: 8 }}><Tooltip text="Cada critério recebe nota de 0 a 10. O peso (×) multiplica a importância do critério na nota final.">Critérios de Avaliação</Tooltip></label>
+                  {criteria.map((c, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 9, marginBottom: 6, fontSize: 13 }}>
+                      <input value={c.name} onChange={e => { const cr = [...criteria]; cr[i] = { ...cr[i], name: e.target.value }; setCriteria(cr); }} style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-main)', fontSize: 13, outline: 'none', minWidth: 0 }} />
+                      <select value={c.weight} onChange={e => { const cr = [...criteria]; cr[i] = { ...cr[i], weight: Number(e.target.value) }; setCriteria(cr); }} style={{ fontSize: 11, background: 'var(--selected-bg)', color: '#0081f0', border: '1px solid #0081f033', borderRadius: 4, padding: '2px 4px', flexShrink: 0, cursor: 'pointer' }}>
                         <option value={1}>1×</option><option value={2}>2×</option><option value={3}>3×</option>
                       </select>
-                      <button onClick={addCriteria} style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, background: 'var(--bg-content)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 18, flexShrink: 0 }}>+</button>
+                      <span onClick={() => setCriteria(criteria.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
                     </div>
+                  ))}
+                  <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                    <input style={{ ...inp, flex: 1 }} value={newCritName} onChange={e => setNewCritName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCriteria()} placeholder="Novo critério..." />
+                    <select style={{ ...inp, width: 64 }} value={newCritWeight} onChange={e => setNewCritWeight(Number(e.target.value))}>
+                      <option value={1}>1×</option><option value={2}>2×</option><option value={3}>3×</option>
+                    </select>
+                    <button onClick={addCriteria} style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, background: 'var(--bg-content)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 18, flexShrink: 0 }}>+</button>
                   </div>
                 </div>
 
-                {/* TOM DO FEEDBACK */}
-                <div style={section}>
-                  <div style={secLabel}><Tooltip text="Define o estilo do texto gerado pela IA — do mais técnico e direto ao mais encorajador e didático.">Tom do Feedback</Tooltip></div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                    {TONES.map(t => (
-                      <div key={t.id} onClick={() => setTone(t.id)} style={{
-                        padding: '9px 10px', border: `1px solid ${tone === t.id ? '#0081f0' : 'var(--border)'}`,
-                        borderRadius: 9, background: tone === t.id ? 'var(--selected-bg)' : 'var(--bg-content)',
-                        fontSize: 12, fontWeight: tone === t.id ? 700 : 500,
-                        color: tone === t.id ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center',
-                      }}>
-                        {t.label}
-                      </div>
-                    ))}
+                {/* ENUNCIADO */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <label style={lbl}><Tooltip text="Descreva o que foi pedido ao aluno. Quanto mais detalhado, melhor será a avaliação da IA.">Enunciado</Tooltip></label>
+                    <button onClick={() => setShowAiPrompt(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 9px', border: '1px solid #0081f033', borderRadius: 7, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2v4h4"/></svg>
+                      Gerar automaticamente
+                    </button>
                   </div>
+                  {showAiPrompt && (
+                    <div style={{ marginBottom: 8, padding: '10px 12px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 10 }}>
+                      <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6, fontWeight: 500 }}>Descreva brevemente e a IA gera o enunciado completo:</p>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <input style={{ ...inp, flex: 1, fontSize: 12, padding: '7px 10px' }} value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} onKeyDown={e => e.key === 'Enter' && generateContext()} placeholder="Ex: modelagem de personagem low poly..." autoFocus />
+                        <button onClick={generateContext} disabled={aiLoading || !aiPrompt.trim()} style={{ padding: '7px 14px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: aiLoading ? 'wait' : 'pointer', opacity: !aiPrompt.trim() ? 0.5 : 1, flexShrink: 0 }}>
+                          {aiLoading ? 'Gerando...' : 'Gerar'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  <textarea style={{ ...inp, minHeight: 80, resize: 'vertical' }} value={exerciseContext} onChange={e => setExerciseContext(e.target.value)} placeholder="Descreva o objetivo e requisitos do exercício..." />
                 </div>
 
               </div>
