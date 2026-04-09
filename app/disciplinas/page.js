@@ -93,9 +93,16 @@ export default function DisciplinasPage() {
         : { subject: formDisc.subject, exerciseName: formDisc.subject, exerciseType: 'redacao' };
       const r = await fetch(url, { method, headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       if (r.ok) {
-        flash(editingDiscId ? 'Disciplina atualizada!' : 'Disciplina criada!');
+        const isNew = !editingDiscId;
+        const data = await r.json();
+        flash(isNew ? 'Disciplina criada! Agora adicione um exercício a ela.' : 'Disciplina atualizada!');
         setFormDisc({ subject: '' }); setEditingDiscId(null);
         await loadDisciplines();
+        if (isNew && data?.id) {
+          setExpandedDisc(data.id);
+          setShowExerciseForm(true);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       } else {
         const d = await r.json(); flash(d.error || 'Erro ao salvar', false);
       }
