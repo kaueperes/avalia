@@ -34,6 +34,11 @@ export default function TurmasPage() {
   const [importText, setImportText] = useState('');
   const [loadingImport, setLoadingImport] = useState(false);
 
+  // Editar / selecionar alunos
+  const [editingStudentId, setEditingStudentId] = useState(null);
+  const [editingStudentName, setEditingStudentName] = useState('');
+  const [selectedStudents, setSelectedStudents] = useState(new Set());
+
   const [msg, setMsg] = useState({ text: '', ok: true });
 
   function token() { return localStorage.getItem('token'); }
@@ -63,8 +68,15 @@ export default function TurmasPage() {
   }
 
   async function toggleExpand(classId) {
-    if (expandedClass === classId) { setExpandedClass(null); return; }
+    if (expandedClass === classId) {
+      setExpandedClass(null);
+      setSelectedStudents(new Set());
+      setEditingStudentId(null);
+      return;
+    }
     setExpandedClass(classId);
+    setSelectedStudents(new Set());
+    setEditingStudentId(null);
     if (!studentsByClass[classId]) await loadStudents(classId);
   }
 
@@ -99,9 +111,42 @@ export default function TurmasPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async function deleteStudent(studentId, classId) {
-    await fetch(`/api/students/${studentId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token()}` } });
+  async function updateStudent(classId) {
+    if (!editingStudentName.trim()) return;
+    await fetch(`/api/students/${editingStudentId}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: editingStudentName.trim() }),
+    });
+    setEditingStudentId(null);
+    setEditingStudentName('');
     await loadStudents(classId);
+  }
+
+  async function deleteStudent(studentId, name, classId) {
+    if (!confirm(`Excluir "${name}"?`)) return;
+    await fetch(`/api/students/${studentId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token()}` } });
+    setSelectedStudents(prev => { const next = new Set(prev); next.delete(studentId); return next; });
+    await loadStudents(classId);
+  }
+
+  async function deleteSelectedStudents(classId) {
+    const count = selectedStudents.size;
+    if (!confirm(`Excluir ${count} aluno${count !== 1 ? 's' : ''} selecionado${count !== 1 ? 's' : ''}?`)) return;
+    for (const id of selectedStudents) {
+      await fetch(`/api/students/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token()}` } });
+    }
+    setSelectedStudents(new Set());
+    await loadStudents(classId);
+    flash(`${count} aluno${count !== 1 ? 's' : ''} excluído${count !== 1 ? 's' : ''}!`);
+  }
+
+  function toggleSelect(studentId) {
+    setSelectedStudents(prev => {
+      const next = new Set(prev);
+      if (next.has(studentId)) next.delete(studentId); else next.add(studentId);
+      return next;
+    });
   }
 
   function parseNames(text) {
@@ -187,15 +232,62 @@ export default function TurmasPage() {
                         {/* Lista de alunos */}
                         {students.length > 0 ? (
                           <div style={{ marginBottom: 12 }}>
-                            {students.map((s, idx) => (
-                              <div key={s.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 10px', borderRadius: 8, background: idx % 2 === 0 ? 'var(--bg-card)' : 'transparent' }}>
-                                <span style={{ fontSize: 14, color: 'var(--text-main)' }}>{s.name}</span>
-                                <button onClick={() => deleteStudent(s.id, cls.id)}
-                                  style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-sub)', display: 'flex', alignItems: 'center', padding: '2px 4px', borderRadius: 4 }}
-                                  onMouseEnter={e => e.currentTarget.style.color = '#EF4444'}
-                                  onMouseLeave={e => e.currentTarget.style.color = 'var(--text-sub)'}>
-                                  <TrashIcon />
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, padding: '0 10px' }}>
+                              <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer', userSelect: 'none' }}>
+                                <input type="checkbox"
+                                  checked={students.length > 0 && selectedStudents.size === students.length}
+                                  onChange={e => setSelectedStudents(e.target.checked ? new Set(students.map(s => s.id)) : new Set())}
+                                  style={{ cursor: 'pointer', accentColor: '#0081f0' }}
+                                />
+                                Selecionar todos
+                              </label>
+                              {selectedStudents.size > 0 && (
+                                <button onClick={() => deleteSelectedStudents(cls.id)}
+                                  style={{ padding: '4px 12px', border: '1px solid #EF444433', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'transparent', color: '#EF4444' }}>
+                                  Excluir selecionados ({selectedStudents.size})
                                 </button>
+                              )}
+                            </div>
+                            {students.map((s, idx) => (
+                              <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', borderRadius: 8, background: idx % 2 === 0 ? 'var(--bg-card)' : 'transparent' }}>
+                                <input type="checkbox"
+                                  checked={selectedStudents.has(s.id)}
+                                  onChange={() => toggleSelect(s.id)}
+                                  style={{ cursor: 'pointer', flexShrink: 0, accentColor: '#0081f0' }}
+                                />
+                                {editingStudentId === s.id ? (
+                                  <>
+                                    <input
+                                      style={{ ...inputStyle, flex: 1, padding: '4px 8px', fontSize: 13 }}
+                                      value={editingStudentName}
+                                      onChange={e => setEditingStudentName(e.target.value)}
+                                      onKeyDown={e => e.key === 'Enter' && updateStudent(cls.id)}
+                                      autoFocus
+                                    />
+                                    <button onClick={() => updateStudent(cls.id)}
+                                      style={{ padding: '4px 10px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+                                      Salvar
+                                    </button>
+                                    <button onClick={() => { setEditingStudentId(null); setEditingStudentName(''); }}
+                                      style={{ padding: '4px 10px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)', flexShrink: 0 }}>
+                                      Cancelar
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span style={{ fontSize: 14, color: 'var(--text-main)', flex: 1 }}>{s.name}</span>
+                                    <button onClick={() => { setEditingStudentId(s.id); setEditingStudentName(s.name); }}
+                                      style={{ padding: '3px 9px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)', flexShrink: 0 }}>
+                                      Editar
+                                    </button>
+                                    <button onClick={() => deleteStudent(s.id, s.name, cls.id)}
+                                      style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-sub)', display: 'flex', alignItems: 'center', padding: '2px 4px', borderRadius: 4, flexShrink: 0 }}
+                                      onMouseEnter={e => e.currentTarget.style.color = '#EF4444'}
+                                      onMouseLeave={e => e.currentTarget.style.color = 'var(--text-sub)'}>
+                                      <TrashIcon />
+                                    </button>
+                                  </>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -216,7 +308,7 @@ export default function TurmasPage() {
                         <div style={{ display: 'flex', gap: 8 }}>
                           <button onClick={() => importStudents(cls.id)} disabled={loadingImport || !importText.trim()}
                             style={{ padding: '8px 18px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: loadingImport ? 'wait' : 'pointer', opacity: !importText.trim() ? 0.5 : 1 }}>
-                            {loadingImport ? 'Importando...' : `Importar${parseNames(importText).length > 0 ? ` (${parseNames(importText).length})` : ''}`}
+                            {loadingImport ? 'Adicionando...' : `Adicionar${parseNames(importText).length > 0 ? ` (${parseNames(importText).length})` : ''}`}
                           </button>
                           <button onClick={() => setImportText('')}
                             style={{ padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
