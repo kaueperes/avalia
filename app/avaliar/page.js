@@ -309,6 +309,7 @@ export default function AvaliarPage() {
   }
 
   async function runBatchEvaluation() {
+    if (!validateConfig()) return;
     if (!batchFiles.length) { setEvalError('Adicione arquivos para avaliar.'); return; }
     setGenerating(true);
     setEvalError('');
@@ -383,7 +384,16 @@ export default function AvaliarPage() {
     setBatchProgress(null);
   }
 
+  function validateConfig() {
+    if (institutions.length > 0 && !selectedInstitutionId) { setEvalError('Selecione uma instituição antes de avaliar.'); return false; }
+    if (!selectedDisciplineId) { setEvalError('Selecione uma disciplina antes de avaliar.'); return false; }
+    if (!selectedDisciplineExerciseId) { setEvalError('Selecione um exercício antes de avaliar.'); return false; }
+    if (!selectedClassId) { setEvalError('Selecione uma turma antes de avaliar.'); return false; }
+    return true;
+  }
+
   async function runEvaluation() {
+    if (!validateConfig()) return;
     if (!exerciseName.trim()) return;
     if (evalMode === 'lote') return runBatchEvaluation();
     setGenerating(true);
