@@ -682,54 +682,22 @@ export default function AvaliarPage() {
               <div style={{ borderTop: '1px solid var(--border-card)' }}>
 
                 {/* TIPO DE TRABALHO */}
-                <div style={{ ...section, padding: '18px 0 0 0', borderBottom: '1px solid var(--border-card)' }}>
-                  <div style={{ padding: '0 24px 10px', ...secLabel }}><Tooltip text="Selecione a categoria e o tipo específico do trabalho enviado pelo aluno. Isso define como a IA vai analisar.">Tipo de Trabalho</Tooltip></div>
-                  <div style={{ display: 'flex', borderTop: '1px solid var(--border-card)' }}>
-                    <div style={{ width: 168, flexShrink: 0, borderRight: '1px solid var(--border-card)', padding: '10px 8px', background: 'var(--bg-content)', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {Object.entries(CATEGORIES).map(([catKey, cat]) => (
-                        <div key={catKey} onClick={() => setActiveCat(catKey)} style={{
-                          display: 'flex', alignItems: 'center', gap: 8,
-                          padding: '8px 10px', borderRadius: 8, cursor: 'pointer',
-                          background: activeCat === catKey ? 'var(--selected-bg)' : 'transparent',
-                          border: `1px solid ${activeCat === catKey ? '#0081f033' : 'transparent'}`,
-                          color: activeCat === catKey ? '#0081f0' : 'var(--text-sub)',
-                          fontWeight: activeCat === catKey ? 700 : 500,
-                          fontSize: 12.5, lineHeight: 1.35, transition: 'all .12s',
-                        }}>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>{CAT_ICONS[catKey]}</svg>
-                          <span style={{ display: 'grid' }}>
-                            <span style={{ fontWeight: 700, visibility: 'hidden', gridArea: '1/1', lineHeight: 'inherit' }}>{cat.label}</span>
-                            <span style={{ gridArea: '1/1', lineHeight: 'inherit' }}>{cat.label}</span>
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ flex: 1, padding: '12px 12px 16px', minWidth: 0 }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 10 }}>
-                        {Object.entries(TYPES).filter(([, v]) => v.cat === activeCat).map(([k, v]) => (
-                          <div key={k} onClick={() => switchType(k)} style={{
-                            padding: '11px 5px', border: `1px solid ${selectedType === k ? '#0081f0' : 'var(--border)'}`,
-                            borderRadius: 9, background: selectedType === k ? 'var(--selected-bg)' : 'var(--bg-content)',
-                            fontSize: 11.5, fontWeight: selectedType === k ? 700 : 500,
-                            color: selectedType === k ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', lineHeight: 1.35,
-                            minHeight: 68, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                          }}>
-                            <div style={{ width: 20, height: 20, marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                {TYPE_ICONS[k]}
-                              </svg>
-                            </div>
-                            {v.label}
-                          </div>
+                <div style={{ ...section, borderBottom: '1px solid var(--border-card)' }}>
+                  <div style={secLabel}><Tooltip text="Selecione o tipo do trabalho enviado pelo aluno. Isso define como a IA vai analisar.">Tipo de Trabalho</Tooltip></div>
+                  <select style={inp} value={selectedType} onChange={e => switchType(e.target.value)}>
+                    {Object.entries(CATEGORIES).map(([catKey, cat]) => (
+                      <optgroup key={catKey} label={cat.label}>
+                        {Object.entries(TYPES).filter(([, v]) => v.cat === catKey).map(([k, v]) => (
+                          <option key={k} value={k}>{v.label}</option>
                         ))}
-                      </div>
-                      {TYPES[selectedType] && (
-                        <div style={{ fontSize: 12, color: 'var(--text-sub)', padding: '8px 10px', background: 'var(--bg-content)', borderRadius: 8, border: '1px solid var(--border)', lineHeight: 1.5 }}>
-                          {TYPES[selectedType].hint}
-                        </div>
-                      )}
+                      </optgroup>
+                    ))}
+                  </select>
+                  {TYPES[selectedType] && (
+                    <div style={{ fontSize: 12, color: 'var(--text-sub)', padding: '8px 10px', background: 'var(--bg-content)', borderRadius: 8, border: '1px solid var(--border)', lineHeight: 1.5, marginTop: 8 }}>
+                      {TYPES[selectedType].hint}
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* EXERCÍCIO & CRITÉRIOS */}
