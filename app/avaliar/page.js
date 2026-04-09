@@ -156,6 +156,9 @@ export default function AvaliarPage() {
   const [dragZone, setDragZone] = useState(null);
   const [extraFiles, setExtraFiles] = useState([]);
 
+  // Personalizar
+  const [showCustomize, setShowCustomize] = useState(false);
+
   // Resultado
   const [result, setResult] = useState(null);
   const [generating, setGenerating] = useState(false);
@@ -660,132 +663,158 @@ export default function AvaliarPage() {
             </div>
           </div>
 
-          {/* 2. TIPO */}
-          <div style={{ ...section, padding: '18px 0 0 0' }}>
-            <div style={{ padding: '0 24px 10px', ...secLabel }}><Tooltip text="Selecione a categoria e o tipo específico do trabalho enviado pelo aluno. Isso define como a IA vai analisar.">Tipo de Trabalho</Tooltip></div>
-            <div style={{ display: 'flex', borderTop: '1px solid var(--border-card)' }}>
-              {/* Sidebar de categorias */}
-              <div style={{ width: 168, flexShrink: 0, borderRight: '1px solid var(--border-card)', padding: '10px 8px', background: 'var(--bg-content)', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {Object.entries(CATEGORIES).map(([catKey, cat]) => (
-                  <div key={catKey} onClick={() => setActiveCat(catKey)} style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '8px 10px', borderRadius: 8, cursor: 'pointer',
-                    background: activeCat === catKey ? 'var(--selected-bg)' : 'transparent',
-                    border: `1px solid ${activeCat === catKey ? '#0081f033' : 'transparent'}`,
-                    color: activeCat === catKey ? '#0081f0' : 'var(--text-sub)',
-                    fontWeight: activeCat === catKey ? 700 : 500,
-                    fontSize: 12.5, lineHeight: 1.35, transition: 'all .12s',
-                  }}>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>{CAT_ICONS[catKey]}</svg>
-                    <span style={{ display: 'grid' }}>
-                      <span style={{ fontWeight: 700, visibility: 'hidden', gridArea: '1/1', lineHeight: 'inherit' }}>{cat.label}</span>
-                      <span style={{ gridArea: '1/1', lineHeight: 'inherit' }}>{cat.label}</span>
-                    </span>
-                  </div>
-                ))}
-              </div>
-              {/* Grid de tipos */}
-              <div style={{ flex: 1, padding: '12px 12px 16px', minWidth: 0 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 10 }}>
-                  {Object.entries(TYPES).filter(([, v]) => v.cat === activeCat).map(([k, v]) => (
-                    <div key={k} onClick={() => switchType(k)} style={{
-                      padding: '11px 5px', border: `1px solid ${selectedType === k ? '#0081f0' : 'var(--border)'}`,
-                      borderRadius: 9, background: selectedType === k ? 'var(--selected-bg)' : 'var(--bg-content)',
-                      fontSize: 11.5, fontWeight: selectedType === k ? 700 : 500,
-                      color: selectedType === k ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', lineHeight: 1.35,
-                      minHeight: 68, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <div style={{ width: 20, height: 20, marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          {TYPE_ICONS[k]}
-                        </svg>
-                      </div>
-                      {v.label}
-                    </div>
-                  ))}
-                </div>
-                {TYPES[selectedType] && (
-                  <div style={{ fontSize: 12, color: 'var(--text-sub)', padding: '8px 10px', background: 'var(--bg-content)', borderRadius: 8, border: '1px solid var(--border)', lineHeight: 1.5 }}>
-                    {TYPES[selectedType].hint}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          {/* PERSONALIZAR — collapse */}
+          <div style={{ borderBottom: '1px solid var(--border-card)' }}>
+            <button onClick={() => setShowCustomize(v => !v)} style={{
+              width: '100%', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+            }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Personalizar esta avaliação
+              </span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                style={{ transition: 'transform .2s', transform: showCustomize ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }}>
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
 
-          {/* 3. EXERCÍCIO */}
-          <div style={section}>
-            <div style={secLabel}><Tooltip text="Defina o exercício a ser avaliado e os critérios que a IA vai usar para pontuar o trabalho.">Exercício & Critérios</Tooltip></div>
-            {!selectedDisciplineId && (
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <select style={{ ...inp, flex: 1 }} value={selectedExerciseId} onChange={e => loadExercise(e.target.value)}>
-                    <option value="">— Exercício livre —</option>
-                    {exercises.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-                  </select>
-                  <Link href="/exercicios" style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textDecoration: 'none', fontSize: 18, background: 'var(--bg-content)', flexShrink: 0 }}>+</Link>
+            {showCustomize && (
+              <div style={{ borderTop: '1px solid var(--border-card)' }}>
+
+                {/* TIPO DE TRABALHO */}
+                <div style={{ ...section, padding: '18px 0 0 0', borderBottom: '1px solid var(--border-card)' }}>
+                  <div style={{ padding: '0 24px 10px', ...secLabel }}><Tooltip text="Selecione a categoria e o tipo específico do trabalho enviado pelo aluno. Isso define como a IA vai analisar.">Tipo de Trabalho</Tooltip></div>
+                  <div style={{ display: 'flex', borderTop: '1px solid var(--border-card)' }}>
+                    <div style={{ width: 168, flexShrink: 0, borderRight: '1px solid var(--border-card)', padding: '10px 8px', background: 'var(--bg-content)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {Object.entries(CATEGORIES).map(([catKey, cat]) => (
+                        <div key={catKey} onClick={() => setActiveCat(catKey)} style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '8px 10px', borderRadius: 8, cursor: 'pointer',
+                          background: activeCat === catKey ? 'var(--selected-bg)' : 'transparent',
+                          border: `1px solid ${activeCat === catKey ? '#0081f033' : 'transparent'}`,
+                          color: activeCat === catKey ? '#0081f0' : 'var(--text-sub)',
+                          fontWeight: activeCat === catKey ? 700 : 500,
+                          fontSize: 12.5, lineHeight: 1.35, transition: 'all .12s',
+                        }}>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>{CAT_ICONS[catKey]}</svg>
+                          <span style={{ display: 'grid' }}>
+                            <span style={{ fontWeight: 700, visibility: 'hidden', gridArea: '1/1', lineHeight: 'inherit' }}>{cat.label}</span>
+                            <span style={{ gridArea: '1/1', lineHeight: 'inherit' }}>{cat.label}</span>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ flex: 1, padding: '12px 12px 16px', minWidth: 0 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 10 }}>
+                        {Object.entries(TYPES).filter(([, v]) => v.cat === activeCat).map(([k, v]) => (
+                          <div key={k} onClick={() => switchType(k)} style={{
+                            padding: '11px 5px', border: `1px solid ${selectedType === k ? '#0081f0' : 'var(--border)'}`,
+                            borderRadius: 9, background: selectedType === k ? 'var(--selected-bg)' : 'var(--bg-content)',
+                            fontSize: 11.5, fontWeight: selectedType === k ? 700 : 500,
+                            color: selectedType === k ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', lineHeight: 1.35,
+                            minHeight: 68, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            <div style={{ width: 20, height: 20, marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                {TYPE_ICONS[k]}
+                              </svg>
+                            </div>
+                            {v.label}
+                          </div>
+                        ))}
+                      </div>
+                      {TYPES[selectedType] && (
+                        <div style={{ fontSize: 12, color: 'var(--text-sub)', padding: '8px 10px', background: 'var(--bg-content)', borderRadius: 8, border: '1px solid var(--border)', lineHeight: 1.5 }}>
+                          {TYPES[selectedType].hint}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
+
+                {/* EXERCÍCIO & CRITÉRIOS */}
+                <div style={{ ...section, borderBottom: '1px solid var(--border-card)' }}>
+                  <div style={secLabel}><Tooltip text="Ajuste o nome, enunciado e critérios para esta avaliação específica.">Exercício & Critérios</Tooltip></div>
+                  <div style={{ marginBottom: 12 }}>
+                    <label style={lbl}><Tooltip text="Nome do exercício. Preenchido automaticamente ao selecionar um exercício acima.">Nome do Exercício</Tooltip></label>
+                    <input style={inp} value={exerciseName} onChange={e => setExerciseName(e.target.value)} placeholder="Ex: Exercício 3 — Modelagem de Personagem" />
+                  </div>
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <label style={lbl}><Tooltip text="Descreva o que foi pedido ao aluno. Quanto mais detalhado, melhor será a avaliação da IA.">Enunciado / Descrição</Tooltip></label>
+                      <button onClick={() => setShowAiPrompt(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 9px', border: '1px solid #0081f033', borderRadius: 7, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2v4h4"/></svg>
+                        Criar com IA
+                      </button>
+                    </div>
+                    {showAiPrompt && (
+                      <div style={{ marginBottom: 8, padding: '10px 12px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 10 }}>
+                        <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6, fontWeight: 500 }}>Descreva o exercício brevemente e a IA gera o enunciado completo:</p>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <input
+                            style={{ ...inp, flex: 1, fontSize: 12, padding: '7px 10px' }}
+                            value={aiPrompt}
+                            onChange={e => setAiPrompt(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && generateContext()}
+                            placeholder="Ex: modelagem de personagem low poly, foco em otimização..."
+                            autoFocus
+                          />
+                          <button onClick={generateContext} disabled={aiLoading || !aiPrompt.trim()} style={{ padding: '7px 14px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: aiLoading ? 'wait' : 'pointer', opacity: !aiPrompt.trim() ? 0.5 : 1, flexShrink: 0 }}>
+                            {aiLoading ? 'Gerando...' : 'Gerar'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    <textarea style={{ ...inp, minHeight: 64, resize: 'vertical' }} value={exerciseContext} onChange={e => setExerciseContext(e.target.value)} placeholder="Descreva o objetivo e requisitos do exercício..." />
+                  </div>
+                  <div>
+                    <label style={{ ...lbl, marginBottom: 8 }}><Tooltip text="Cada critério recebe nota de 0 a 10. O peso (×) multiplica a importância do critério na nota final.">Critérios</Tooltip></label>
+                    {criteria.map((c, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 9, marginBottom: 6, fontSize: 13 }}>
+                        <input
+                          value={c.name}
+                          onChange={e => { const cr = [...criteria]; cr[i] = { ...cr[i], name: e.target.value }; setCriteria(cr); }}
+                          style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-main)', fontSize: 13, outline: 'none', minWidth: 0 }}
+                        />
+                        <select
+                          value={c.weight}
+                          onChange={e => { const cr = [...criteria]; cr[i] = { ...cr[i], weight: Number(e.target.value) }; setCriteria(cr); }}
+                          style={{ fontSize: 11, background: 'var(--selected-bg)', color: '#0081f0', border: '1px solid #0081f033', borderRadius: 4, padding: '2px 4px', flexShrink: 0, cursor: 'pointer' }}
+                        >
+                          <option value={1}>1×</option><option value={2}>2×</option><option value={3}>3×</option>
+                        </select>
+                        <span onClick={() => setCriteria(criteria.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
+                      </div>
+                    ))}
+                    <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+                      <input style={{ ...inp, flex: 1 }} value={newCritName} onChange={e => setNewCritName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCriteria()} placeholder="Novo critério..." />
+                      <select style={{ ...inp, width: 64 }} value={newCritWeight} onChange={e => setNewCritWeight(Number(e.target.value))}>
+                        <option value={1}>1×</option><option value={2}>2×</option><option value={3}>3×</option>
+                      </select>
+                      <button onClick={addCriteria} style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, background: 'var(--bg-content)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 18, flexShrink: 0 }}>+</button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* TOM DO FEEDBACK */}
+                <div style={section}>
+                  <div style={secLabel}><Tooltip text="Define o estilo do texto gerado pela IA — do mais técnico e direto ao mais encorajador e didático.">Tom do Feedback</Tooltip></div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                    {TONES.map(t => (
+                      <div key={t.id} onClick={() => setTone(t.id)} style={{
+                        padding: '9px 10px', border: `1px solid ${tone === t.id ? '#0081f0' : 'var(--border)'}`,
+                        borderRadius: 9, background: tone === t.id ? 'var(--selected-bg)' : 'var(--bg-content)',
+                        fontSize: 12, fontWeight: tone === t.id ? 700 : 500,
+                        color: tone === t.id ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center',
+                      }}>
+                        {t.label}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             )}
-            <div style={{ marginBottom: 12 }}>
-              <label style={lbl}><Tooltip text="Nome obrigatório do exercício. Aparece no relatório de avaliação gerado.">Nome do Exercício *</Tooltip></label>
-              <input style={inp} value={exerciseName} onChange={e => setExerciseName(e.target.value)} placeholder="Ex: Exercício 3 — Modelagem de Personagem" />
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                <label style={lbl}><Tooltip text="Descreva o que foi pedido ao aluno. Quanto mais detalhado, melhor será a avaliação da IA.">Enunciado / Descrição</Tooltip></label>
-                <button onClick={() => setShowAiPrompt(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 9px', border: '1px solid #0081f033', borderRadius: 7, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2v4h4"/></svg>
-                  Criar com IA
-                </button>
-              </div>
-              {showAiPrompt && (
-                <div style={{ marginBottom: 8, padding: '10px 12px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 10 }}>
-                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6, fontWeight: 500 }}>Descreva o exercício brevemente e a IA gera o enunciado completo:</p>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <input
-                      style={{ ...inp, flex: 1, fontSize: 12, padding: '7px 10px' }}
-                      value={aiPrompt}
-                      onChange={e => setAiPrompt(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && generateContext()}
-                      placeholder="Ex: modelagem de personagem low poly, foco em otimização..."
-                      autoFocus
-                    />
-                    <button onClick={generateContext} disabled={aiLoading || !aiPrompt.trim()} style={{ padding: '7px 14px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: aiLoading ? 'wait' : 'pointer', opacity: !aiPrompt.trim() ? 0.5 : 1, flexShrink: 0 }}>
-                      {aiLoading ? 'Gerando...' : 'Gerar'}
-                    </button>
-                  </div>
-                </div>
-              )}
-              <textarea style={{ ...inp, minHeight: 64, resize: 'vertical' }} value={exerciseContext} onChange={e => setExerciseContext(e.target.value)} placeholder="Descreva o objetivo e requisitos do exercício..." />
-            </div>
-            <div>
-              <label style={{ ...lbl, marginBottom: 8 }}><Tooltip text="Cada critério recebe nota de 0 a 10. O peso (×) multiplica a importância do critério na nota final.">Critérios</Tooltip></label>
-              {criteria.map((c, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 9, marginBottom: 6, fontSize: 13 }}>
-                  <input
-                    value={c.name}
-                    onChange={e => { const cr = [...criteria]; cr[i] = { ...cr[i], name: e.target.value }; setCriteria(cr); }}
-                    style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-main)', fontSize: 13, outline: 'none', minWidth: 0 }}
-                  />
-                  <select
-                    value={c.weight}
-                    onChange={e => { const cr = [...criteria]; cr[i] = { ...cr[i], weight: Number(e.target.value) }; setCriteria(cr); }}
-                    style={{ fontSize: 11, background: 'var(--selected-bg)', color: '#0081f0', border: '1px solid #0081f033', borderRadius: 4, padding: '2px 4px', flexShrink: 0, cursor: 'pointer' }}
-                  >
-                    <option value={1}>1×</option><option value={2}>2×</option><option value={3}>3×</option>
-                  </select>
-                  <span onClick={() => setCriteria(criteria.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
-                </div>
-              ))}
-              <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
-                <input style={{ ...inp, flex: 1 }} value={newCritName} onChange={e => setNewCritName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCriteria()} placeholder="Novo critério..." />
-                <select style={{ ...inp, width: 64 }} value={newCritWeight} onChange={e => setNewCritWeight(Number(e.target.value))}>
-                  <option value={1}>1×</option><option value={2}>2×</option><option value={3}>3×</option>
-                </select>
-                <button onClick={addCriteria} style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, background: 'var(--bg-content)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 18, flexShrink: 0 }}>+</button>
-              </div>
-            </div>
           </div>
 
           {/* 4. MODO */}
@@ -818,23 +847,6 @@ export default function AvaliarPage() {
                   <div style={{ fontSize: 10, color: 'var(--text-sub)', marginTop: 2 }}>Múltiplos alunos de uma vez</div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* 5. TOM */}
-          <div style={section}>
-            <div style={secLabel}><Tooltip text="Define o estilo do texto gerado pela IA — do mais técnico e direto ao mais encorajador e didático.">Tom do Feedback</Tooltip></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-              {TONES.map(t => (
-                <div key={t.id} onClick={() => setTone(t.id)} style={{
-                  padding: '9px 10px', border: `1px solid ${tone === t.id ? '#0081f0' : 'var(--border)'}`,
-                  borderRadius: 9, background: tone === t.id ? 'var(--selected-bg)' : 'var(--bg-content)',
-                  fontSize: 12, fontWeight: tone === t.id ? 700 : 500,
-                  color: tone === t.id ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center',
-                }}>
-                  {t.label}
-                </div>
-              ))}
             </div>
           </div>
 
