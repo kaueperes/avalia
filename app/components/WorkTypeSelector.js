@@ -1,0 +1,145 @@
+'use client';
+import { useState } from 'react';
+import { TYPES, CATEGORIES } from '@/lib/types';
+
+const CAT_ICONS = {
+  '3d':          <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
+  audiovisual:   <><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></>,
+  design:        <><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></>,
+  musica:        <><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></>,
+  texto:         <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></>,
+  codigo:        <><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></>,
+  arquitetura:   <><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v2z"/><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M4 15v-3a8 8 0 0 1 16 0v3"/></>,
+  arte:          <><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></>,
+  saude:         <><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></>,
+  linguas:       <><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></>,
+  outros:        <><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></>,
+};
+
+const TYPE_ICONS = {
+  modelagem:              <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
+  animacao:               <polygon points="5 3 19 12 5 21 5 3"/>,
+  animacao_2d:            <><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/><circle cx="18" cy="6" r="2"/></>,
+  rigging:                <><path d="M17 10c.7-.7 1.69-.7 2.5 0a1.77 1.77 0 0 1 0 2.5c-.7.7-1.69.7-2.5 0L7 3c-.7-.7-.7-1.69 0-2.5a1.77 1.77 0 0 1 2.5 0c.7.7.7 1.69 0 2.5"/><path d="M7 14c-.7.7-1.69.7-2.5 0a1.77 1.77 0 0 1 0-2.5c.7-.7 1.69-.7 2.5 0L17 21c.7.7.7 1.69 0 2.5a1.77 1.77 0 0 1-2.5 0c-.7-.7-.7-1.69 0-2.5"/></>,
+  texturizacao:           <><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></>,
+  iluminacao:             <><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></>,
+  render:                 <><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></>,
+  vfx:                    <><path d="m4 14 1.5-7.5L2 5l4-3 4 3-3.5 1.5L8 14"/><path d="M16.5 4 19 2l4 3-3.5 1.5L21 14l-5-2-5 2 1.5-7.5"/><path d="M5 18a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M15 18a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/></>,
+  simulacao:              <><path d="M3 6h3a2 2 0 0 1 2 2v10"/><path d="M21 6h-3a2 2 0 0 0-2 2v10"/><path d="M12 6v4"/><path d="M8 18h8"/><path d="M5 3h14"/><circle cx="12" cy="20" r="2"/></>,
+  storyboard:             <><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></>,
+  edicao_video:           <><path d="M2 8h20"/><path d="M2 12h20"/><path d="M2 16h20"/><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m10 9 5 3-5 3V9z" fill="currentColor"/></>,
+  motion_graphics:        <><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h1"/><path d="M14 3h1"/><path d="M14 21h1"/><path d="M3 9v1"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M21 14v1"/><circle cx="12" cy="12" r="3"/></>,
+  colorgrading:           <><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M12 8v8"/><path d="M8 12h8"/></>,
+  apresentacao_oral:      <><path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"/><rect x="3" y="4" width="18" height="12" rx="2"/><circle cx="12" cy="10" r="3"/></>,
+  locucao:                <><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></>,
+  design_grafico:         <><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></>,
+  ilustracao:             <><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></>,
+  ux_ui:                  <><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></>,
+  concept_art:            <><path d="m12 8-9.04 9.06a2.82 2.82 0 1 0 3.98 3.98L16 12"/><circle cx="17" cy="7" r="5"/></>,
+  identidade_visual:      <><circle cx="12" cy="12" r="3"/><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></>,
+  design_embalagem:       <><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></>,
+  tipografia:             <><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></>,
+  fotografia:             <><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></>,
+  moda:                   <><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></>,
+  musica_partitura:       <><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></>,
+  composicao_audio:       <><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></>,
+  producao_musical:       <><circle cx="12" cy="12" r="2"/><path d="M4.93 4.93c-1.3 1.3-2.13 2.96-2.38 4.74C2.3 11.45 2.3 12.55 2.55 14.33c.25 1.78 1.08 3.44 2.38 4.74"/><path d="M19.07 4.93c1.3 1.3 2.13 2.96 2.38 4.74.25 1.78.25 2.88 0 4.66-.25 1.78-1.08 3.44-2.38 4.74"/><path d="M7.76 7.76c-.78.78-1.28 1.77-1.44 2.84-.16 1.07-.16 2.16 0 3.23.16 1.07.66 2.06 1.44 2.84"/><path d="M16.24 7.76c.78.78 1.28 1.77 1.44 2.84.16 1.07.16 2.16 0 3.23-.16 1.07-.66 2.06-1.44 2.84"/></>,
+  arranjo_musical:        <><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></>,
+  sound_design:           <><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></>,
+  trilha_sonora:          <><rect x="2" y="2" width="20" height="20" rx="2.18"/><path d="M7 2v20"/><path d="M2 12h5"/><path d="M2 7h5"/><path d="M2 17h5"/><polygon points="11 8 20 12 11 16 11 8"/></>,
+  redacao:                <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></>,
+  roteiro:                <><path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4"/><path d="M19 3H8.5a2.5 2.5 0 0 0 0 5H12"/></>,
+  tcc:                    <><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></>,
+  game_design:            <><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></>,
+  copywriting:            <><path d="M17 6.1H3"/><path d="M21 12.1H3"/><path d="M15.1 18H3"/></>,
+  poesia:                 <><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10"/><path d="M13 22c-1.5-2-3-5-3-10s1.5-8 3-10"/><path d="M2 12h10"/><path d="M12 12h10"/><path d="M18 16l4 4-4 4"/></>,
+  critica:                <><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></>,
+  programacao:            <><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></>,
+  web:                    <><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></>,
+  mobile:                 <><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></>,
+  banco_dados:            <><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></>,
+  shader:                 <><path d="M12 3 9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5L12 3z"/><path d="M5 3v4M19 17v4M3 5h4M17 19h4"/></>,
+  game_dev:               <><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M7 12h.01"/><path d="M17 12h.01"/><path d="M12 8v8"/></>,
+  arquitetura_img:        <><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v2z"/><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M4 15v-3a8 8 0 0 1 16 0v3"/></>,
+  bim:                    <><path d="m2 7 10-5 10 5v10l-10 5L2 17V7z"/><path d="M12 22V12"/><path d="m2 7 10 5 10-5"/><path d="M7 4.5v5"/><path d="M17 4.5v5"/></>,
+  maquete:                <><path d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5z"/><path d="m9 9 5 5"/><path d="M14 9h1"/><path d="M14 12h1"/><path d="M14 15h1"/></>,
+  maquete_digital:        <><path d="M12 3 2 7.5l10 4.5 10-4.5L12 3z"/><path d="M2 7.5v9l10 4.5 10-4.5v-9"/><path d="M12 12v9"/></>,
+  desenho_tecnico:        <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><path d="M8 9h1"/></>,
+  interiores:             <><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></>,
+  paisagismo:             <><path d="M17 8c.7 1.5 1 3 1 5a6 6 0 0 1-12 0c0-2 .3-3.5 1-5"/><path d="M12 2v6"/><path d="M8 6c.5.5 1 1.5 1 3"/><path d="M16 6c-.5.5-1 1.5-1 3"/></>,
+  engenharia_civil:       <><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></>,
+  pintura:                <><path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/><path d="M14.5 17.5 4.5 15"/></>,
+  escultura:              <><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m8 12 2 2 4-4"/></>,
+  ceramica:               <><path d="M8.5 2h7l1 5H7.5l1-5z"/><path d="M3 7h18l-2 13H5L3 7z"/><path d="M9 11v4"/><path d="M12 11v4"/><path d="M15 11v4"/></>,
+  gravura:                <><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18"/><path d="M3 7h4"/><path d="M3 12h4"/><path d="M3 17h4"/><path d="M11 8l6 4-6 4V8z" fill="currentColor"/></>,
+  arte_textil:            <><path d="M10 3a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5z"/><path d="M19 3a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5z"/><path d="M10 9a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1h5z"/><path d="M19 9a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1h5z"/><path d="M10 15a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1h5z"/><path d="M19 15a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1h5z"/></>,
+  exercicio:              <><path d="M6.5 6.5a4.5 4.5 0 1 0 6.364 6.364"/><path d="m20 20-6.36-6.36"/><path d="M2 2l20 20"/></>,
+  danca:                  <><circle cx="12" cy="4" r="2"/><path d="m10.7 10.7-3.5 6.1 3.9-1.5 1.6 3.2 2.2-5.5"/><path d="m14 7-2 3-1.5-1 3-2.5"/></>,
+  tecnica_esportiva:      <><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v4"/><path d="m16.24 7.76-2.83 2.83"/><path d="M22 2 12 12"/></>,
+  libras:                 <><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></>,
+  traducao:               <><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></>,
+  producao_oral:          <><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><circle cx="18" cy="6" r="3"/><path d="M18 9v1"/></>,
+  produto:                <><path d="m12.89 1.45 8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4a2 2 0 0 1-1.1-1.8V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"/><polyline points="2.32 6.16 12 11 21.68 6.16"/><line x1="12" y1="22.76" x2="12" y2="11"/></>,
+  gastronomia:            <><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></>,
+  projeto_interdisciplinar:<><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></>,
+};
+
+function getCatForType(typeKey) {
+  return TYPES[typeKey]?.cat || Object.keys(CATEGORIES)[0];
+}
+
+export default function WorkTypeSelector({ value, onChange }) {
+  const [activeCat, setActiveCat] = useState(() => getCatForType(value));
+
+  return (
+    <div style={{ display: 'flex', borderTop: '1px solid var(--border-card)' }}>
+      {/* Sidebar de categorias */}
+      <div style={{ width: 168, flexShrink: 0, borderRight: '1px solid var(--border-card)', padding: '10px 8px', background: 'var(--bg-content)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {Object.entries(CATEGORIES).map(([catKey, cat]) => (
+          <div key={catKey} onClick={() => setActiveCat(catKey)} style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '8px 10px', borderRadius: 8, cursor: 'pointer',
+            background: activeCat === catKey ? 'var(--selected-bg)' : 'transparent',
+            border: `1px solid ${activeCat === catKey ? '#0081f033' : 'transparent'}`,
+            color: activeCat === catKey ? '#0081f0' : 'var(--text-sub)',
+            fontWeight: activeCat === catKey ? 700 : 500,
+            fontSize: 12.5, lineHeight: 1.35, transition: 'all .12s',
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>{CAT_ICONS[catKey]}</svg>
+            <span style={{ display: 'grid' }}>
+              <span style={{ fontWeight: 700, visibility: 'hidden', gridArea: '1/1', lineHeight: 'inherit' }}>{cat.label}</span>
+              <span style={{ gridArea: '1/1', lineHeight: 'inherit' }}>{cat.label}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Grid de tipos */}
+      <div style={{ flex: 1, padding: '12px 12px 16px', minWidth: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 10 }}>
+          {Object.entries(TYPES).filter(([, v]) => v.cat === activeCat).map(([k, v]) => (
+            <div key={k} onClick={() => onChange(k)} style={{
+              padding: '11px 5px', border: `1px solid ${value === k ? '#0081f0' : 'var(--border)'}`,
+              borderRadius: 9, background: value === k ? 'var(--selected-bg)' : 'var(--bg-content)',
+              fontSize: 11.5, fontWeight: value === k ? 700 : 500,
+              color: value === k ? '#0081f0' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', lineHeight: 1.35,
+              minHeight: 68, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <div style={{ width: 20, height: 20, marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  {TYPE_ICONS[k]}
+                </svg>
+              </div>
+              {v.label}
+            </div>
+          ))}
+        </div>
+        {TYPES[value] && activeCat === TYPES[value].cat && (
+          <div style={{ fontSize: 12, color: 'var(--text-sub)', padding: '8px 10px', background: 'var(--bg-content)', borderRadius: 8, border: '1px solid var(--border)', lineHeight: 1.5 }}>
+            {TYPES[value].hint}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
