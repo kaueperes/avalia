@@ -625,21 +625,19 @@ export default function AvaliarPage() {
             </div>
 
             {/* Exercício da disciplina */}
-            {selectedDisciplineId && (
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <label style={{ ...lbl, marginBottom: 0 }}>Exercício <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>(opcional)</span></label>
-                  <Link href="/disciplinas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Novo exercício</Link>
-                </div>
-                <select style={inp} value={selectedDisciplineExerciseId} onChange={e => loadDisciplineExercise(e.target.value)}>
-                  <option value="">— Selecione um exercício —</option>
-                  {disciplineExercises.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-                </select>
-                {disciplineExercises.length === 0 && (
-                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Nenhum exercício cadastrado nesta disciplina. <Link href="/disciplinas" style={{ color: '#0081f0', textDecoration: 'none' }}>Adicionar →</Link></p>
-                )}
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <label style={{ ...lbl, marginBottom: 0 }}>Exercício</label>
+                <Link href="/disciplinas" style={{ fontSize: 11, color: '#0081f0', textDecoration: 'none' }}>+ Novo exercício</Link>
               </div>
-            )}
+              <select style={inp} value={selectedDisciplineExerciseId} onChange={e => loadDisciplineExercise(e.target.value)} disabled={!selectedDisciplineId}>
+                <option value="">{selectedDisciplineId ? '— Selecione um exercício —' : '— Selecione uma disciplina primeiro —'}</option>
+                {disciplineExercises.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+              </select>
+              {selectedDisciplineId && disciplineExercises.length === 0 && (
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Nenhum exercício cadastrado nesta disciplina. <Link href="/disciplinas" style={{ color: '#0081f0', textDecoration: 'none' }}>Adicionar →</Link></p>
+              )}
+            </div>
 
             {/* Turma */}
             <div style={{ marginBottom: 12 }}>
