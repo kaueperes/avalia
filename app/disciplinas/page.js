@@ -258,12 +258,12 @@ export default function DisciplinasPage() {
                             </p>
 
                             <div style={{ marginBottom: 12 }}>
-                              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 5 }}>Nome do Exercício *</label>
+                              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 5 }}><Tooltip text="Nome que identifica o exercício dentro da disciplina. Aparece nos relatórios de avaliação.">Nome do Exercício *</Tooltip></label>
                               <input style={inputStyle} value={exerciseForm.name} onChange={e => setExerciseForm(f => ({ ...f, name: e.target.value }))} placeholder="Ex: Redação Descritiva, Prova P1..." />
                             </div>
 
                             <div style={{ marginBottom: 12 }}>
-                              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 5 }}>Tipo de Trabalho</label>
+                              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 5 }}><Tooltip text="Define como a IA avalia o trabalho. Cada tipo tem critérios e instruções específicas para a área.">Tipo de Trabalho</Tooltip></label>
                               <button
                                 type="button"
                                 onClick={() => setShowTypeModal(true)}
@@ -299,7 +299,7 @@ export default function DisciplinasPage() {
                             <div style={{ marginBottom: 12 }}>
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
                                 <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)' }}>
-                                  Enunciado
+                                  <Tooltip text="Descreva o objetivo, requisitos e restrições do exercício. Quanto mais detalhado, mais precisa será a avaliação da IA.">Enunciado</Tooltip>
                                 </label>
                                 <button onClick={() => setShowAiPrompt(v => !v)}
                                   style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', border: '1px solid #0081f033', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>

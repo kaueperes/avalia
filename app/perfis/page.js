@@ -177,7 +177,7 @@ export default function PerfisPage() {
             <input type="checkbox" id="is-default" checked={form.isDefault} onChange={e => setForm(f => ({ ...f, isDefault: e.target.checked }))}
               style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#0081f0' }} />
             <label htmlFor="is-default" style={{ fontSize: 14, color: 'var(--text-main)', cursor: 'pointer', userSelect: 'none' }}>
-              Usar como perfil padrão nas avaliações
+              <Tooltip text="O perfil padrão é carregado automaticamente ao abrir uma nova avaliação. Você pode trocar na hora se precisar.">Usar como perfil padrão nas avaliações</Tooltip>
             </label>
           </div>
 

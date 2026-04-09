@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '../components/AppLayout';
+import Tooltip from '../components/Tooltip';
 
 const inputStyle = {
   width: '100%', padding: '10px 12px',
@@ -330,14 +331,14 @@ export default function TurmasPage() {
           <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '28px 28px' }}>
 
           <div style={{ marginBottom: 20 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>Nome da Turma *</label>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}><Tooltip text="Identificação da turma. Ex: '3º Ano B', '2025.1 — Manhã'. Aparece nos relatórios de turma e individuais.">Nome da Turma *</Tooltip></label>
             <input style={inputStyle} value={formClass.name} onChange={e => setFormClass(f => ({ ...f, name: e.target.value }))} placeholder="Ex: 3º Ano B, Turma Manhã, 2025.1..." />
           </div>
 
           {institutions.length > 0 && (
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>
-                Instituição <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>(opcional)</span>
+                <Tooltip text="Vincula esta turma a uma instituição cadastrada. O nome e logo da instituição aparecerão nos relatórios.">Instituição</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>(opcional)</span>
               </label>
               <select style={inputStyle} value={formClass.institutionId} onChange={e => setFormClass(f => ({ ...f, institutionId: e.target.value }))}>
                 <option value="">Sem vínculo</option>
