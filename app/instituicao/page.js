@@ -133,10 +133,11 @@ export default function InstituicaoPage() {
         )}
 
         {/* Formulário */}
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 14 }}>
-          {editingId ? 'Editar instituição' : 'Nova instituição'}
-        </h2>
-        <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '28px 28px' }}>
+        <div>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 14 }}>
+            {editingId ? 'Editar instituição' : 'Nova instituição'}
+          </h2>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '28px 28px' }}>
 
           <Field label="Nome da Instituição *">
             <input style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ex: Colégio Estadual, FAAP, USP..." />
@@ -200,6 +201,7 @@ export default function InstituicaoPage() {
               </button>
             )}
           </div>
+        </div>
         </div>
       </div>
     </AppLayout>
