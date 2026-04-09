@@ -281,9 +281,7 @@ export default function TurmasPage() {
                                       Editar
                                     </button>
                                     <button onClick={() => deleteStudent(s.id, s.name, cls.id)}
-                                      style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-sub)', display: 'flex', alignItems: 'center', padding: '2px 4px', borderRadius: 4, flexShrink: 0 }}
-                                      onMouseEnter={e => e.currentTarget.style.color = '#EF4444'}
-                                      onMouseLeave={e => e.currentTarget.style.color = 'var(--text-sub)'}>
+                                      style={{ padding: '4px 7px', border: '1px solid #EF444433', borderRadius: 7, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                                       <TrashIcon />
                                     </button>
                                   </>
