@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'KriterIA',
+  title: 'Kriteria',
   description: 'Avaliação educacional com IA',
   icons: { icon: '/imagens/favicon.svg' },
 };

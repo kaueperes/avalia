@@ -233,7 +233,7 @@ export default function AvaliacoesPage() {
       </div>` : ''}
       <!-- Footer -->
       <div style="margin-top:40px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center">
-        Gerado pela KriterIA · avalia.education
+        Gerado pela Kriteria · avalia.education
       </div>
     </body></html>`;
 

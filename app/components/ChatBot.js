@@ -145,7 +145,7 @@ export default function ChatBot({ darkMode }) {
                 <ChatIcon />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: textMain }}>{botName} · KriterIA</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: textMain }}>{botName} · Kriteria</div>
                 <div style={{ fontSize: 11, color: textMuted }}>Assistente virtual</div>
               </div>
             </div>
@@ -181,7 +181,7 @@ export default function ChatBot({ darkMode }) {
                   {userName ? `Olá, ${userName}!` : 'Olá!'}
                 </div>
                 <div style={{ fontSize: 13, color: textMuted, lineHeight: 1.5 }}>
-                  {(welcome || `Eu sou o {nome}, assistente do KriterIA. O que deseja perguntar?`).replace('{nome}', botName)}
+                  {(welcome || `Eu sou o {nome}, assistente do Kriteria. O que deseja perguntar?`).replace('{nome}', botName)}
                 </div>
               </div>
             )}
@@ -251,7 +251,7 @@ export default function ChatBot({ darkMode }) {
       {/* Floating button */}
       <button
         onClick={() => setOpen(o => !o)}
-        title={`${botName} · Assistente KriterIA`}
+        title={`${botName} · Assistente Kriteria`}
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 999,
           width: 52, height: 52, borderRadius: '50%', border: 'none', cursor: 'pointer',

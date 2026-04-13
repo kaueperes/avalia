@@ -33,7 +33,7 @@ export default function PortfolioContato() {
       const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ ...form, _subject: 'Contato via Portfolio - KriterIA' }),
+        body: JSON.stringify({ ...form, _subject: 'Contato via Portfolio - Kriteria' }),
       });
       setStatus(res.ok ? 'success' : 'error');
     } catch {
@@ -54,7 +54,7 @@ export default function PortfolioContato() {
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(14px)', borderBottom: '1px solid rgba(0,0,0,0.07)', padding: '0 32px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           <div style={{ cursor: 'pointer' }} onClick={() => router.push('/portfolio')}>
-            <img src="/imagens/logo_kriteria.svg" alt="KriterIA" style={{ height: 32, width: 'auto' }} />
+            <img src="/imagens/logo_kriteria.svg" alt="Kriteria" style={{ height: 32, width: 'auto' }} />
           </div>
           <button onClick={() => router.push('/portfolio')} style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
             ← Voltar ao portfolio
@@ -101,7 +101,7 @@ export default function PortfolioContato() {
               <div style={{ width: 44, height: 44, borderRadius: 12, background: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>📁</div>
               <div>
                 <p style={{ fontSize: 14, fontWeight: 700, color: '#111827', margin: '0 0 2px' }}>Ver portfolio</p>
-                <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>Case completo do KriterIA →</p>
+                <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>Case completo do Kriteria →</p>
               </div>
             </a>
           </div>

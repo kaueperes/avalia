@@ -56,7 +56,7 @@ export default function Portfolio() {
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(14px)', borderBottom: '1px solid rgba(0,0,0,0.07)', padding: '0 32px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           <div style={{ cursor: 'pointer' }} onClick={() => router.push('/')}>
-            <img src="/imagens/logo_kriteria.svg" alt="KriterIA" style={{ height: 32, width: 'auto' }} />
+            <img src="/imagens/logo_kriteria.svg" alt="Kriteria" style={{ height: 32, width: 'auto' }} />
           </div>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             <a href="#inicio" onClick={scrollTo('inicio')} style={{ fontSize: 13, color: '#6B7280', textDecoration: 'none', fontWeight: 500 }}>Início</a>
@@ -94,7 +94,7 @@ export default function Portfolio() {
           </div>
 
           <h1 style={{ fontSize: 64, fontWeight: 900, color: 'white', lineHeight: 1.0, letterSpacing: '-2.5px', marginBottom: 28 }}>
-            KriterIA<br />
+            Kriteria<br />
             <span style={{ background: 'linear-gradient(90deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               Menos tempo corrigindo.<br />Mais tempo ensinando.
             </span>
@@ -165,7 +165,7 @@ export default function Portfolio() {
           </p>
 
           <p style={{ fontSize: 17, color: '#374151', lineHeight: 1.8, marginBottom: 40 }}>
-            O KriterIA nasceu desse problema real — um problema que eu vivi como professor e que percebi não ter uma solução boa no mercado. As ferramentas existentes ou eram muito genéricas (chat GPT puro) ou muito complexas (LMS corporativos). Nenhuma respeitava o fluxo real de como um professor pensa e trabalha.
+            O Kriteria nasceu desse problema real — um problema que eu vivi como professor e que percebi não ter uma solução boa no mercado. As ferramentas existentes ou eram muito genéricas (chat GPT puro) ou muito complexas (LMS corporativos). Nenhuma respeitava o fluxo real de como um professor pensa e trabalha.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
@@ -581,7 +581,7 @@ export default function Portfolio() {
           <SectionLabel>07 · Próximos Passos</SectionLabel>
           <h2 style={{ fontSize: 32, fontWeight: 800, color: '#00173f', letterSpacing: '-0.5px', marginBottom: 12 }}>O produto ainda está evoluindo</h2>
           <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.7, marginBottom: 40 }}>
-            O KriterIA está em produção, mas longe de terminado. Estes são os próximos horizontes de design e produto.
+            O Kriteria está em produção, mas longe de terminado. Estes são os próximos horizontes de design e produto.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
@@ -627,7 +627,7 @@ export default function Portfolio() {
       {/* Footer */}
       <footer style={{ background: '#00173f', padding: '24px 32px', textAlign: 'center' }}>
         <p style={{ fontSize: 13, color: '#4B5563', margin: 0 }}>
-          Portfolio de Kauê Rodrigues Peres · KriterIA © 2025 · <a href="/" style={{ color: '#4B5563' }}>avalia.education</a>
+          Portfolio de Kauê Rodrigues Peres · Kriteria © 2025 · <a href="/" style={{ color: '#4B5563' }}>avalia.education</a>
         </p>
       </footer>
 

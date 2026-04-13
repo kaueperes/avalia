@@ -250,7 +250,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
 
           {/* Logo */}
           <div style={{ cursor: 'pointer' }} onClick={() => router.push('/inicio')}>
-            <img src={darkMode ? '/imagens/logo_kriteria_branco.svg' : '/imagens/logo_kriteria.svg'} alt="KriterIA" style={{ height: 30, width: 'auto', display: 'block' }} />
+            <img src={darkMode ? '/imagens/logo_kriteria_branco.svg' : '/imagens/logo_kriteria.svg'} alt="Kriteria" style={{ height: 30, width: 'auto', display: 'block' }} />
           </div>
 
           {/* Right side */}
@@ -430,7 +430,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
 
             {/* Bottom section */}
             <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: `1px solid ${border}` }}>
-              <p style={{ fontSize: 11, color: textMuted, textAlign: 'center' }}>KriterIA · avalia.education</p>
+              <p style={{ fontSize: 11, color: textMuted, textAlign: 'center' }}>Kriteria · avalia.education</p>
             </div>
           </aside>
 

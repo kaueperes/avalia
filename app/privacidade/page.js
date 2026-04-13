@@ -21,7 +21,7 @@ export default function Privacidade() {
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(14px)', borderBottom: '1px solid rgba(0,0,0,0.07)', padding: '0 32px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           <div style={{ cursor: 'pointer' }} onClick={() => router.push('/')}>
-            <img src="/imagens/logo_kriteria.svg" alt="KriterIA" style={{ height: 36, width: 'auto' }} />
+            <img src="/imagens/logo_kriteria.svg" alt="Kriteria" style={{ height: 36, width: 'auto' }} />
           </div>
           <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
             <a href="/#funcionalidades" style={{ textDecoration: 'none', fontSize: 15, fontWeight: 450, color: '#6B7280' }}>Funcionalidades</a>
@@ -53,12 +53,12 @@ export default function Privacidade() {
           <div style={{ background: '#F0F9FF', borderRadius: 14, padding: '20px 24px', marginBottom: 48, border: '1px solid #BAE6FD', display: 'flex', gap: 12 }}>
             <span style={{ fontSize: 18, flexShrink: 0 }}>ℹ️</span>
             <p style={{ fontSize: 14, color: '#0369A1', lineHeight: 1.65, margin: 0 }}>
-              Esta política descreve como o KriterIA coleta, usa e protege suas informações. Nos comprometemos a manter seus dados seguros e a ser transparentes sobre como os utilizamos.
+              Esta política descreve como o Kriteria coleta, usa e protege suas informações. Nos comprometemos a manter seus dados seguros e a ser transparentes sobre como os utilizamos.
             </p>
           </div>
 
           <Section title="1. Quem somos">
-            <P>O KriterIA é uma plataforma SaaS de avaliação educacional com inteligência artificial, desenvolvida para auxiliar professores na correção e análise de trabalhos de alunos.</P>
+            <P>O Kriteria é uma plataforma SaaS de avaliação educacional com inteligência artificial, desenvolvida para auxiliar professores na correção e análise de trabalhos de alunos.</P>
             <P>Para dúvidas sobre esta política, entre em contato pelo e-mail: <a href="mailto:contato@avalia.education" style={{ color: '#0081f0' }}>contato@avalia.education</a></P>
           </Section>
 
@@ -73,7 +73,7 @@ export default function Privacidade() {
 
           <Section title="3. Dados dos alunos">
             <P>Os textos enviados para avaliação são transmitidos à API da Anthropic (Claude) para processamento e <strong>não são armazenados em nossos servidores</strong> após o processamento.</P>
-            <P>O KriterIA não coleta nomes completos, documentos, dados biométricos ou qualquer dado sensível de alunos. Os resultados das avaliações (notas e feedbacks) são salvos associados apenas ao professor responsável.</P>
+            <P>O Kriteria não coleta nomes completos, documentos, dados biométricos ou qualquer dado sensível de alunos. Os resultados das avaliações (notas e feedbacks) são salvos associados apenas ao professor responsável.</P>
             <P>Recomendamos que professores não incluam dados pessoais identificáveis de alunos nos textos enviados para avaliação.</P>
           </Section>
 
@@ -124,9 +124,9 @@ export default function Privacidade() {
       {/* Footer simples */}
       <footer style={{ background: '#00173f', padding: '32px', textAlign: 'center' }}>
         <div style={{ cursor: 'pointer', display: 'inline-block', marginBottom: 12 }} onClick={() => router.push('/')}>
-          <img src="/imagens/logo_kriteria.svg" alt="KriterIA" style={{ height: 28, width: 'auto', filter: 'brightness(0) invert(1)' }} />
+          <img src="/imagens/logo_kriteria.svg" alt="Kriteria" style={{ height: 28, width: 'auto', filter: 'brightness(0) invert(1)' }} />
         </div>
-        <p style={{ fontSize: 13, color: '#4B5563' }}>© 2025 KriterIA · Todos os direitos reservados</p>
+        <p style={{ fontSize: 13, color: '#4B5563' }}>© 2025 Kriteria · Todos os direitos reservados</p>
       </footer>
 
     </div>

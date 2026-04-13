@@ -51,7 +51,7 @@ export default function SignupPage() {
         <div style={{ position: 'absolute', bottom: '20%', right: '10%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,12,250,0.14) 0%, transparent 65%)', pointerEvents: 'none' }} />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <img src="/imagens/logo_kriteria_branco.svg" alt="KriterIA" style={{ height: 32, marginBottom: 48 }} />
+          <img src="/imagens/logo_kriteria_branco.svg" alt="Kriteria" style={{ height: 32, marginBottom: 48 }} />
           <h2 style={{ fontSize: 32, fontWeight: 800, color: 'white', lineHeight: 1.2, marginBottom: 20, letterSpacing: '-0.5px' }}>
             Comece a avaliar<br />
             <span style={{ background: 'linear-gradient(135deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>

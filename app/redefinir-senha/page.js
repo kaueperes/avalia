@@ -53,7 +53,7 @@ function RedefinirSenhaForm() {
         <div style={{ position: 'absolute', top: '30%', left: '20%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,129,240,0.18) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: '20%', right: '10%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,12,250,0.14) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <img src="/imagens/logo_kriteria_branco.svg" alt="KriterIA" style={{ height: 32, marginBottom: 48 }} />
+          <img src="/imagens/logo_kriteria_branco.svg" alt="Kriteria" style={{ height: 32, marginBottom: 48 }} />
           <h2 style={{ fontSize: 28, fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px' }}>
             Crie uma{' '}
             <span style={{ background: 'linear-gradient(135deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
