@@ -963,7 +963,7 @@ export default function AvaliarPage() {
                         <Tooltip text="Material que o aluno usou como referência ou inspiração. O Kriteria usa como contexto mas não avalia como produção do aluno.">Referências do aluno</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
                       </label>
                       <div style={{ fontSize: 11, color: 'var(--text-sub)', marginBottom: 8, lineHeight: 1.5 }}>
-                        Imagens, vídeos, áudios, textos ou arquivos que o aluno usou como base. A IA entende o contexto sem confundir com o trabalho dele.
+                        Imagens, vídeos, áudios, textos ou arquivos que o aluno usou como base. O Kriteria entende o contexto sem confundir com o trabalho dele.
                       </div>
                       <input ref={studentRefFilesRef} type="file" multiple accept="image/*,video/*,audio/*,.obj,.txt,.docx,.pdf" style={{ display: 'none' }} onChange={e => setStudentRefFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
                       {studentRefFiles.length > 0 ? (
@@ -998,7 +998,7 @@ export default function AvaliarPage() {
                         <Tooltip text="Envie um gabarito ou imagens de referência. O Kriteria compara com o trabalho do aluno para avaliar melhor.">Referência para Correção</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
                       </label>
                       <div style={{ fontSize: 11, color: 'var(--text-sub)', marginBottom: 8, lineHeight: 1.5 }}>
-                        Envie o .obj gabarito e/ou imagens de concept (até 4). A IA usa tudo como referência visual e técnica.
+                        Envie o .obj gabarito e/ou imagens de concept (até 4). O Kriteria usa tudo como referência visual e técnica.
                       </div>
                       <input ref={referenceFilesRef} type="file" multiple accept=".obj,image/*,.pdf" style={{ display: 'none' }} onChange={e => setReferenceFiles(Array.from(e.target.files).slice(0, 4))} />
                       {referenceFiles.length > 0 ? (
