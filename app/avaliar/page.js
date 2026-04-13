@@ -1121,7 +1121,7 @@ export default function AvaliarPage() {
               ) : (
                 <>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5L12 3z"/></svg>
-                  Gerar Avaliação com IA
+                  Gerar Avaliação
                 </>
               )}
             </button>
@@ -1141,7 +1141,7 @@ export default function AvaliarPage() {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '64px 40px', textAlign: 'center' }}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--border)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5L12 3z"/></svg>
               <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Nenhuma avaliação gerada</h2>
-              <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0, lineHeight: 1.7 }}>Configure o perfil, tipo de trabalho e exercício<br/>ao lado e clique em <strong>Gerar Avaliação com IA</strong>.</p>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0, lineHeight: 1.7 }}>Configure o perfil, tipo de trabalho e exercício<br/>ao lado e clique em <strong>Gerar Avaliação</strong>.</p>
             </div>
           )}
 
