@@ -1056,9 +1056,9 @@ export default function AvaliarPage() {
                 <div style={{ marginBottom: 12 }}>
                   <label style={lbl}><Tooltip text="Informe como os arquivos dos alunos estão nomeados. O sistema extrai nome e matrícula automaticamente.">Padrão do nome do arquivo</Tooltip></label>
                   <select style={inp} value={filePattern} onChange={e => setFilePattern(e.target.value)}>
-                    <option value="nome_matricula">nome_matricula · ex: joao_silva_2023001.obj</option>
-                    <option value="matricula_nome">matricula_nome · ex: 2023001_joao_silva.obj</option>
-                    <option value="nome">nome · ex: joao_silva.obj</option>
+                    <option value="nome_matricula">nome_matricula · ex: joao_silva_2023001.jpg</option>
+                    <option value="matricula_nome">matricula_nome · ex: 2023001_joao_silva.jpg</option>
+                    <option value="nome">nome · ex: joao_silva.jpg</option>
                   </select>
                   <div style={{ fontSize: 11, color: 'var(--text-sub)', marginTop: 4 }}>Separadores aceitos: _ - · - espaço</div>
                 </div>
