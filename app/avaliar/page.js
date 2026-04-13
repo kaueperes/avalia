@@ -455,8 +455,12 @@ export default function AvaliarPage() {
         }
       }
 
-      if (TYPES[selectedType]?.input === 'img' && studentFile && (studentFile.type.startsWith('image/') || studentFile.type === 'application/pdf' || studentFile.name.endsWith('.pdf'))) {
-        images.push({ data: await toBase64(studentFile), mediaType: studentFile.type === 'application/pdf' || studentFile.name.endsWith('.pdf') ? 'application/pdf' : studentFile.type, label: `Trabalho do aluno: ${studentFile.name}` });
+      if (TYPES[selectedType]?.input === 'img') {
+        for (const f of studentFiles) {
+          if (f.type.startsWith('image/') || f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
+            images.push({ data: await toBase64(f), mediaType: f.type === 'application/pdf' || f.name.endsWith('.pdf') ? 'application/pdf' : f.type, label: `Trabalho do aluno: ${f.name}` });
+          }
+        }
       }
       for (const f of studentRefFiles) {
         if (f.type.startsWith('image/') || f.type.startsWith('video/') || f.type.startsWith('audio/') || f.name.endsWith('.obj')) {
@@ -837,7 +841,7 @@ export default function AvaliarPage() {
                     </div>
                     <div style={{ marginTop: 12 }}>
                       <label style={lbl}>
-                        <Tooltip text="Envie imagens, .txt ou .docx como contexto adicional. O texto do .docx é extraído automaticamente. Útil para prints, diagramas ou anexos.">Imagens e arquivos adicionais</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
+                        <Tooltip text="Envie imagens, .txt, .docx ou .pdf como contexto adicional. O texto do .docx é extraído automaticamente. Útil para prints, diagramas ou anexos.">Imagens e arquivos adicionais</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
                       </label>
                       <input ref={extraFilesRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.txt,.docx,.pdf" style={{ display: 'none' }} onChange={e => setExtraFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, maxExtraFiles))} />
                       {extraFiles.length > 0 ? (
@@ -861,7 +865,7 @@ export default function AvaliarPage() {
                         >
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px', display: 'block' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>Imagens (JPG, PNG, WEBP), .txt ou .docx · até {maxExtraFiles}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>imagens, .txt, .docx ou .pdf · até {maxExtraFiles}</div>
                         </div>
                       )}
                     </div>
@@ -882,10 +886,10 @@ export default function AvaliarPage() {
                       <input ref={studentFileRef}
                         type="file"
                         accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*,.pdf' : TYPES[selectedType]?.input === 'video' ? 'video/*,audio/*,image/*,.pdf' : 'image/*,.pdf'}
-                        multiple={['obj', 'video', 'imgs'].includes(TYPES[selectedType]?.input)}
+                        multiple={['obj', 'video', 'imgs', 'img'].includes(TYPES[selectedType]?.input)}
                         style={{ display: 'none' }}
                         onChange={e => {
-                          if (['obj', 'video', 'imgs'].includes(TYPES[selectedType]?.input)) {
+                          if (['obj', 'video', 'imgs', 'img'].includes(TYPES[selectedType]?.input)) {
                             setStudentFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 10));
                           } else {
                             setStudentFile(e.target.files[0] || null);
@@ -894,7 +898,7 @@ export default function AvaliarPage() {
                       />
 
                       {/* Modo OBJ, VIDEO ou IMGS: lista de múltiplos arquivos */}
-                      {['obj', 'video', 'imgs'].includes(TYPES[selectedType]?.input) ? (
+                      {['obj', 'video', 'imgs', 'img'].includes(TYPES[selectedType]?.input) ? (
                         <>
                           {studentFiles.length > 0 && (
                             <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', marginBottom: 8 }}>
@@ -923,7 +927,7 @@ export default function AvaliarPage() {
                               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 8px', display: 'block' }}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
                               <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>
-                                {TYPES[selectedType]?.input === 'video' ? 'vídeo (MP4, MOV), áudio (MP3, WAV, M4A) e/ou imagens (até 10)' : TYPES[selectedType]?.input === 'imgs' ? 'imagens JPG, PNG, WEBP (até 10)' : '.obj e/ou imagens (até 10)'}
+                                {TYPES[selectedType]?.input === 'video' ? 'vídeo (MP4, MOV), áudio (MP3, WAV, M4A), imagens ou .pdf (até 10)' : TYPES[selectedType]?.input === 'obj' ? 'imagens, .obj ou .pdf (até 10)' : 'imagens ou .pdf (até 10)'}
                               </div>
                             </div>
                           )}
@@ -987,7 +991,7 @@ export default function AvaliarPage() {
                         >
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px', display: 'block' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>imagem, vídeo, áudio, .obj, .txt, .docx</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>imagem, vídeo, áudio, .obj, .txt, .docx ou .pdf</div>
                         </div>
                       )}
                     </div>
@@ -998,7 +1002,7 @@ export default function AvaliarPage() {
                         <Tooltip text="Envie um gabarito ou imagens de referência. O Kriteria compara com o trabalho do aluno para avaliar melhor.">Referência para Correção</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
                       </label>
                       <div style={{ fontSize: 11, color: 'var(--text-sub)', marginBottom: 8, lineHeight: 1.5 }}>
-                        Envie o .obj gabarito e/ou imagens de concept (até 4). O Kriteria usa tudo como referência visual e técnica.
+                        Envie imagens ou .pdf como gabarito de referência (até 4). O Kriteria usa para comparar com o trabalho do aluno.
                       </div>
                       <input ref={referenceFilesRef} type="file" multiple accept=".obj,image/*,.pdf" style={{ display: 'none' }} onChange={e => setReferenceFiles(Array.from(e.target.files).slice(0, 4))} />
                       {referenceFiles.length > 0 ? (
@@ -1025,7 +1029,7 @@ export default function AvaliarPage() {
                         >
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px', display: 'block' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>.obj + imagens de concept</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>imagens ou .pdf (até 4)</div>
                         </div>
                       )}
                       <div style={{ marginTop: 10 }}>
@@ -1081,7 +1085,7 @@ export default function AvaliarPage() {
                   >
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 10px', display: 'block' }}><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>Clique ou arraste vários arquivos de uma vez</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>Aceita .obj, imagens e .txt</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>{TYPES[selectedType]?.input === 'video' ? 'vídeo, áudio, imagens ou .pdf' : TYPES[selectedType]?.input === 'obj' ? 'imagens, .obj ou .pdf' : TYPES[selectedType]?.input === 'text' ? 'imagens, .txt, .docx ou .pdf' : 'imagens ou .pdf'}</div>
                   </div>
                 )}
               </>
