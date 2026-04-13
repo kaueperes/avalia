@@ -148,8 +148,10 @@ Regras:
       ? [
           { type: 'text', text: promptText },
           ...files.flatMap(img => [
-            { type: 'text', text: img.label || 'Imagem:' },
-            { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } },
+            { type: 'text', text: img.label || 'Arquivo:' },
+            img.mediaType === 'application/pdf'
+              ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: img.data } }
+              : { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } },
           ]),
         ]
       : promptText;

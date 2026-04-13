@@ -339,6 +339,8 @@ export default function AvaliarPage() {
 
       if (file.type.startsWith('image/')) {
         images.push({ data: await toBase64(file), mediaType: file.type, label: `Trabalho do aluno: ${file.name}` });
+      } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        images.push({ data: await toBase64(file), mediaType: 'application/pdf', label: `Trabalho do aluno: ${file.name}` });
       } else if (file.name.endsWith('.obj')) {
         try { workContent = await file.text(); } catch { workContent = `[Arquivo: ${file.name}]`; }
       } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
@@ -453,12 +455,14 @@ export default function AvaliarPage() {
         }
       }
 
-      if (TYPES[selectedType]?.input === 'img' && studentFile && studentFile.type.startsWith('image/')) {
-        images.push({ data: await toBase64(studentFile), mediaType: studentFile.type, label: `Trabalho do aluno: ${studentFile.name}` });
+      if (TYPES[selectedType]?.input === 'img' && studentFile && (studentFile.type.startsWith('image/') || studentFile.type === 'application/pdf' || studentFile.name.endsWith('.pdf'))) {
+        images.push({ data: await toBase64(studentFile), mediaType: studentFile.type === 'application/pdf' || studentFile.name.endsWith('.pdf') ? 'application/pdf' : studentFile.type, label: `Trabalho do aluno: ${studentFile.name}` });
       }
       for (const f of studentRefFiles) {
         if (f.type.startsWith('image/') || f.type.startsWith('video/') || f.type.startsWith('audio/') || f.name.endsWith('.obj')) {
           images.push({ data: await toBase64(f), mediaType: f.type || 'application/octet-stream', label: `Referência do aluno: ${f.name}` });
+        } else if (f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
+          images.push({ data: await toBase64(f), mediaType: 'application/pdf', label: `Referência do aluno: ${f.name}` });
         } else if (f.type === 'text/plain' || f.name.endsWith('.txt')) {
           try { workContent = (workContent ? workContent + '\n\n[Referência do aluno]\n' : '[Referência do aluno]\n') + await f.text(); } catch {}
         } else if (f.name.endsWith('.docx')) {
@@ -470,13 +474,15 @@ export default function AvaliarPage() {
         }
       }
       for (const f of referenceFiles) {
-        if (f.type.startsWith('image/')) {
-          images.push({ data: await toBase64(f), mediaType: f.type, label: `Referência para Correção: ${f.name}` });
+        if (f.type.startsWith('image/') || f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
+          images.push({ data: await toBase64(f), mediaType: f.type === 'application/pdf' || f.name.endsWith('.pdf') ? 'application/pdf' : f.type, label: `Referência para Correção: ${f.name}` });
         }
       }
       for (const f of extraFiles) {
         if (f.type.startsWith('image/')) {
           images.push({ data: await toBase64(f), mediaType: f.type, label: `Arquivo adicional: ${f.name}` });
+        } else if (f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
+          images.push({ data: await toBase64(f), mediaType: 'application/pdf', label: `Arquivo adicional: ${f.name}` });
         } else if (f.type === 'text/plain' || f.name.endsWith('.txt')) {
           try { workContent = (workContent ? workContent + '\n\n' : '') + await f.text(); } catch {}
         } else if (f.name.endsWith('.docx')) {
@@ -833,7 +839,7 @@ export default function AvaliarPage() {
                       <label style={lbl}>
                         <Tooltip text="Envie imagens, .txt ou .docx como contexto adicional. O texto do .docx é extraído automaticamente. Útil para prints, diagramas ou anexos.">Imagens e arquivos adicionais</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
                       </label>
-                      <input ref={extraFilesRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.txt,.docx" style={{ display: 'none' }} onChange={e => setExtraFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, maxExtraFiles))} />
+                      <input ref={extraFilesRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,.txt,.docx,.pdf" style={{ display: 'none' }} onChange={e => setExtraFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, maxExtraFiles))} />
                       {extraFiles.length > 0 ? (
                         <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
                           {extraFiles.map((f, i) => (
@@ -875,7 +881,7 @@ export default function AvaliarPage() {
                       </label>
                       <input ref={studentFileRef}
                         type="file"
-                        accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*' : TYPES[selectedType]?.input === 'video' ? 'video/*,audio/*,image/*' : 'image/*'}
+                        accept={TYPES[selectedType]?.input === 'obj' ? '.obj,image/*,.pdf' : TYPES[selectedType]?.input === 'video' ? 'video/*,audio/*,image/*,.pdf' : 'image/*,.pdf'}
                         multiple={['obj', 'video', 'imgs'].includes(TYPES[selectedType]?.input)}
                         style={{ display: 'none' }}
                         onChange={e => {
@@ -959,7 +965,7 @@ export default function AvaliarPage() {
                       <div style={{ fontSize: 11, color: 'var(--text-sub)', marginBottom: 8, lineHeight: 1.5 }}>
                         Imagens, vídeos, áudios, textos ou arquivos que o aluno usou como base. A IA entende o contexto sem confundir com o trabalho dele.
                       </div>
-                      <input ref={studentRefFilesRef} type="file" multiple accept="image/*,video/*,audio/*,.obj,.txt,.docx" style={{ display: 'none' }} onChange={e => setStudentRefFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
+                      <input ref={studentRefFilesRef} type="file" multiple accept="image/*,video/*,audio/*,.obj,.txt,.docx,.pdf" style={{ display: 'none' }} onChange={e => setStudentRefFiles(prev => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
                       {studentRefFiles.length > 0 ? (
                         <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
                           {studentRefFiles.map((f, i) => (
@@ -994,7 +1000,7 @@ export default function AvaliarPage() {
                       <div style={{ fontSize: 11, color: 'var(--text-sub)', marginBottom: 8, lineHeight: 1.5 }}>
                         Envie o .obj gabarito e/ou imagens de concept (até 4). A IA usa tudo como referência visual e técnica.
                       </div>
-                      <input ref={referenceFilesRef} type="file" multiple accept=".obj,image/*" style={{ display: 'none' }} onChange={e => setReferenceFiles(Array.from(e.target.files).slice(0, 4))} />
+                      <input ref={referenceFilesRef} type="file" multiple accept=".obj,image/*,.pdf" style={{ display: 'none' }} onChange={e => setReferenceFiles(Array.from(e.target.files).slice(0, 4))} />
                       {referenceFiles.length > 0 ? (
                         <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
                           {referenceFiles.map((f, i) => (
@@ -1046,7 +1052,7 @@ export default function AvaliarPage() {
                   </select>
                   <div style={{ fontSize: 11, color: 'var(--text-sub)', marginTop: 4 }}>Separadores aceitos: _ - · - espaço</div>
                 </div>
-                <input ref={batchFilesRef} type="file" multiple accept=".obj,image/*,.txt" style={{ display: 'none' }} onChange={e => setBatchFiles(Array.from(e.target.files))} />
+                <input ref={batchFilesRef} type="file" multiple accept=".obj,image/*,.txt,.pdf" style={{ display: 'none' }} onChange={e => setBatchFiles(Array.from(e.target.files))} />
                 {batchFiles.length > 0 ? (
                   <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
                     <div style={{ padding: '8px 12px', background: 'var(--bg-content)', borderBottom: '1px solid var(--border)', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
