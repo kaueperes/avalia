@@ -243,7 +243,7 @@ export default function Home() {
                   <div style={{ flex: 1, height: 9, background: '#F3F4F6', borderRadius: 4 }} />
                 </div>
                 <button className="btn-primary" style={{ marginTop: 20, width: '100%', justifyContent: 'center', fontSize: 13, padding: '11px 0' }}>
-                  Avaliar com IA <ArrowRight />
+                  Gerar avaliação <ArrowRight />
                 </button>
               </div>
               {/* Right panel */}
@@ -282,7 +282,7 @@ export default function Home() {
             <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
               {[
                 { Icon: ZapIcon, title: 'Horas de volta', desc: 'Professores relatam economizar de 4 a 8 horas por semana. Tempo que volta para você ensinar, planejar e descansar.' },
-                { Icon: UserIcon, title: 'Seu estilo, sempre', desc: 'Configure uma vez como você avalia. A IA replica seu padrão, seu tom e seus critérios em todas as avaliações.' },
+                { Icon: UserIcon, title: 'Seu estilo, sempre', desc: 'Configure uma vez como você avalia. O Kriteria replica seu padrão, seu tom e seus critérios em todas as avaliações.' },
                 { Icon: BarChartIcon, title: 'Veja quem precisa de você', desc: 'Identifique rapidamente quais alunos estão lutando e quais critérios a turma toda está errando.' },
                 { Icon: ShieldIcon, title: 'Justo para todos', desc: 'Sem mais a dúvida "fui mais rigoroso nesse aluno?" O padrão é o mesmo do 1º ao último trabalho.' },
               ].map(({ Icon: Ic, title, desc }) => (
@@ -479,7 +479,7 @@ export default function Home() {
             <div style={{ textAlign: 'center', marginBottom: 64 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Para todas as disciplinas</p>
               <h2 style={{ fontSize: 44, fontWeight: 800, color: 'white', letterSpacing: '-1px', marginBottom: 16 }}>Vai muito além de redações</h2>
-              <p style={{ fontSize: 18, color: '#94A3B8', maxWidth: 520, margin: '0 auto' }}>60+ tipos de trabalho em 11 categorias — incluindo avaliação de vídeo por IA.</p>
+              <p style={{ fontSize: 18, color: '#94A3B8', maxWidth: 520, margin: '0 auto' }}>60+ tipos de trabalho em 11 categorias — incluindo avaliação de vídeo.</p>
             </div>
             <div className="cat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
               {[
@@ -509,7 +509,7 @@ export default function Home() {
             </div>
             <div style={{ marginTop: 40, padding: '16px 24px', background: 'rgba(0,129,240,0.1)', border: '1px solid rgba(0,129,240,0.2)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-              <span style={{ fontSize: 14, color: '#94A3B8' }}>Trabalhos em <strong style={{ color: '#60a5fa' }}>vídeo</strong> (apresentações, danças, exercícios, Libras, animações) são avaliados automaticamente por IA de visão computacional.</span>
+              <span style={{ fontSize: 14, color: '#94A3B8' }}>Trabalhos em <strong style={{ color: '#60a5fa' }}>vídeo</strong> (apresentações, danças, exercícios, Libras, animações) são avaliados pelo Kriteria.</span>
             </div>
           </div>
         </section>
@@ -634,7 +634,7 @@ export default function Home() {
             </div>
             <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
               {[
-                { Ic: BrainIcon,    title: 'IA pedagógica',        desc: 'Treinada para educação. Entende contexto, disciplina e objetivos pedagógicos reais.' },
+                { Ic: BrainIcon,    title: 'Avaliação pedagógica',  desc: 'Treinada para educação. Entende contexto, disciplina e objetivos pedagógicos reais.' },
                 { Ic: UsersIcon,    title: 'Múltiplos perfis',      desc: 'Gerencie disciplinas e turmas distintas com perfis completamente independentes.' },
                 { Ic: FileTextIcon, title: '60+ tipos de trabalho',  desc: 'Texto, vídeo, imagem, código, partitura, 3D e muito mais — 11 categorias para todas as disciplinas.' },
                 { Ic: BarChartIcon, title: 'Relatórios de turma',   desc: 'Dados consolidados por turma: média, aprovação, critérios abaixo da meta e alunos que precisam de atenção.' },
@@ -862,7 +862,7 @@ export default function Home() {
               Seu próximo fim de semana pode ser seu de volta
             </h2>
             <p style={{ fontSize: 19, color: 'rgba(255,255,255,0.8)', lineHeight: 1.65, marginBottom: 44 }}>
-              Crie sua conta grátis agora. Sem cartão de crédito. Em 5 minutos você já consegue avaliar seu primeiro trabalho com IA.
+              Crie sua conta grátis agora. Sem cartão de crédito. Em 5 minutos você já consegue avaliar seu primeiro trabalho com o Kriteria.
             </p>
             <button onClick={() => router.push('/signup')} style={{
               display: 'inline-flex', alignItems: 'center', gap: 10,
@@ -891,7 +891,7 @@ export default function Home() {
                   <img src="/imagens/logo_kriteria.svg" alt="KriterIA" style={{ height: 30, width: 'auto', filter: 'brightness(0) invert(1)' }} />
                 </div>
                 <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.75, maxWidth: 260 }}>
-                  Avaliação inteligente para educadores. Economize tempo e ofereça feedback de qualidade com IA.
+                  Avaliação inteligente para educadores. Economize tempo e ofereça feedback de qualidade com consistência.
                 </p>
               </div>
               <div>

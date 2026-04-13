@@ -48,7 +48,7 @@ export default function LoginPage() {
           <h2 style={{ fontSize: 32, fontWeight: 800, color: 'white', lineHeight: 1.2, marginBottom: 20, letterSpacing: '-0.5px' }}>
             Avalie trabalhos com<br />
             <span style={{ background: 'linear-gradient(135deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              inteligência artificial
+              qualidade e consistência!
             </span>
           </h2>
           <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.6, marginBottom: 40, maxWidth: 360 }}>
