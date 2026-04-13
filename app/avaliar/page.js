@@ -347,11 +347,17 @@ export default function AvaliarPage() {
         try { workContent = await file.text(); } catch {}
       }
 
+      for (const f of referenceFiles) {
+        if (f.type.startsWith('image/') || f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
+          images.push({ data: await toBase64(f), mediaType: f.type === 'application/pdf' || f.name.endsWith('.pdf') ? 'application/pdf' : f.type, label: `Referência para Correção: ${f.name}` });
+        }
+      }
+
       try {
         const r = await fetch('/api/evaluate', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName: studentNameResolved, studentWork: workContent, tone, profName, profDisc, profInstitution, writingSample, images: images.length > 0 ? images : undefined }),
+          body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName: studentNameResolved, studentWork: workContent, tone, profName, profDisc, profInstitution, writingSample, images: images.length > 0 ? images : undefined, referenceWeight: referenceFiles.length > 0 ? referenceWeight : undefined }),
         });
         const data = await r.json();
         if (!r.ok) {
@@ -1088,6 +1094,49 @@ export default function AvaliarPage() {
                     <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>{TYPES[selectedType]?.input === 'video' ? 'vídeo, áudio, imagens ou .pdf' : TYPES[selectedType]?.input === 'obj' ? 'imagens, .obj ou .pdf' : TYPES[selectedType]?.input === 'text' ? 'imagens, .txt, .docx ou .pdf' : 'imagens ou .pdf'}</div>
                   </div>
                 )}
+
+                {/* Referência para Correção — lote */}
+                <div style={{ marginTop: 16 }}>
+                  <label style={lbl}>
+                    <Tooltip text="Envie um gabarito ou imagens de referência. O Kriteria compara com o trabalho do aluno para avaliar melhor.">Referência para Correção</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
+                  </label>
+                  <div style={{ fontSize: 11, color: 'var(--text-sub)', marginBottom: 8, lineHeight: 1.5 }}>
+                    Envie imagens ou .pdf como gabarito de referência (até 4). O Kriteria usa para comparar com o trabalho do aluno.
+                  </div>
+                  <input ref={referenceFilesRef} type="file" multiple accept="image/*,.pdf" style={{ display: 'none' }} onChange={e => setReferenceFiles(Array.from(e.target.files).slice(0, 4))} />
+                  {referenceFiles.length > 0 ? (
+                    <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', marginBottom: 8 }}>
+                      {referenceFiles.map((f, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderBottom: i < referenceFiles.length - 1 ? '1px solid var(--border)' : 'none', fontSize: 12 }}>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0081f0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                          <span style={{ flex: 1, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{f.name}</span>
+                          <span onClick={() => setReferenceFiles(referenceFiles.filter((_, j) => j !== i))} style={{ color: 'var(--text-sub)', cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>×</span>
+                        </div>
+                      ))}
+                      {referenceFiles.length < 4 && (
+                        <div onClick={() => referenceFilesRef.current?.click()} style={{ padding: '8px 12px', fontSize: 12, color: '#0081f0', cursor: 'pointer', borderTop: '1px solid var(--border)', textAlign: 'center', fontWeight: 500 }}>+ Adicionar mais</div>
+                      )}
+                    </div>
+                  ) : (
+                    <div onClick={() => referenceFilesRef.current?.click()} style={{ border: '2px dashed var(--border)', borderRadius: 12, padding: '16px', textAlign: 'center', cursor: 'pointer', background: 'var(--bg-content)', transition: 'border-color .15s' }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = '#0081f0'}
+                      onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                    >
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 6px', display: 'block' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 2 }}>Clique ou arraste</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>imagens ou .pdf (até 4)</div>
+                    </div>
+                  )}
+                  {referenceFiles.length > 0 && (
+                    <div style={{ marginTop: 8 }}>
+                      <label style={{ ...lbl, marginBottom: 4 }}>Peso do gabarito na correção</label>
+                      <select style={inp} value={referenceWeight} onChange={e => setReferenceWeight(e.target.value)}>
+                        <option value="parcial">Parcial — considere o gabarito, mas aceite variações</option>
+                        <option value="estrito">Estrito — o aluno deve seguir o gabarito de perto</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </div>
