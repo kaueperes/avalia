@@ -106,7 +106,6 @@ export default function AvaliarPage() {
   const router = useRouter();
   const resultPanelRef = useRef(null);
   const studentFileRef = useRef(null);
-  const cameraRef = useRef(null);
   const referenceFilesRef = useRef(null);
   const studentRefFilesRef = useRef(null);
   const batchFilesRef = useRef(null);
@@ -950,19 +949,6 @@ export default function AvaliarPage() {
                         </>
                       )}
 
-                      {/* Câmera — só para img, aparece em todos os devices mas funciona melhor no mobile */}
-                      {TYPES[selectedType]?.input === 'img' && (
-                        <>
-                          <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={e => setStudentFile(e.target.files[0] || null)} />
-                          <button
-                            onClick={() => cameraRef.current?.click()}
-                            style={{ width: '100%', marginTop: 8, padding: '9px', border: '1px solid var(--border)', borderRadius: 9, background: 'var(--bg-content)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 12, fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                            Tirar foto com a câmera
-                          </button>
-                        </>
-                      )}
                     </div>
 
                     {/* Referências do aluno */}
