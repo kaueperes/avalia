@@ -819,7 +819,7 @@ export default function AvaliacoesPage() {
               {/* Feedback */}
               {editing && (
                 <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>
-                  <Tooltip text="Texto do feedback gerado pela IA. Você pode editar livremente antes de gerar o PDF.">Feedback</Tooltip>
+                  <Tooltip text="Texto do feedback gerado pelo Kriteria. Você pode editar livremente antes de gerar o PDF.">Feedback</Tooltip>
                 </p>
               )}
               {editing ? (

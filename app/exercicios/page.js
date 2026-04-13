@@ -185,7 +185,7 @@ export default function ExerciciosPage() {
             <Field label="Nome do Exercício *" tooltip="Nome do exercício. Aparece nos relatórios e pode ser reutilizado em qualquer turma.">
               <input style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ex: Modelagem de Personagem" />
             </Field>
-            <Field label="Tipo de Trabalho" tooltip="Define a categoria do trabalho. A IA usa isso para escolher os critérios certos de avaliação.">
+            <Field label="Tipo de Trabalho" tooltip="Define a categoria do trabalho. O Kriteria usa isso para escolher os critérios certos de avaliação.">
               <button
                 type="button"
                 onClick={() => setShowTypeModal(true)}
@@ -205,7 +205,7 @@ export default function ExerciciosPage() {
             <div style={{ marginBottom: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                 <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>
-                  <Tooltip text="Descreva o objetivo e os requisitos do exercício. Quanto mais detalhado, mais precisa será a avaliação da IA.">Enunciado / Descrição</Tooltip>
+                  <Tooltip text="Descreva o objetivo e os requisitos do exercício. Quanto mais detalhado, mais precisa será a avaliação do Kriteria.">Enunciado / Descrição</Tooltip>
                   <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}> (opcional)</span>
                 </label>
                 <button

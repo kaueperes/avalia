@@ -270,7 +270,7 @@ export default function DisciplinasPage() {
                             </div>
 
                             <div style={{ marginBottom: 12 }}>
-                              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 5 }}><Tooltip text="Define como a IA avalia o trabalho. Cada tipo tem critérios e instruções específicas para a área.">Tipo de Trabalho</Tooltip></label>
+                              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 5 }}><Tooltip text="Define como o Kriteria avalia o trabalho. Cada tipo tem critérios e instruções específicas para a área.">Tipo de Trabalho</Tooltip></label>
                               <button
                                 type="button"
                                 onClick={() => setShowTypeModal(true)}
@@ -306,7 +306,7 @@ export default function DisciplinasPage() {
                             <div style={{ marginBottom: 12 }}>
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
                                 <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)' }}>
-                                  <Tooltip text="Descreva o objetivo, requisitos e restrições do exercício. Quanto mais detalhado, mais precisa será a avaliação da IA.">Enunciado</Tooltip>
+                                  <Tooltip text="Descreva o objetivo, requisitos e restrições do exercício. Quanto mais detalhado, mais precisa será a avaliação do Kriteria.">Enunciado</Tooltip>
                                 </label>
                                 <button onClick={() => setShowAiPrompt(v => !v)}
                                   style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', border: '1px solid #0081f033', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>

@@ -683,7 +683,7 @@ export default function AvaliarPage() {
 
                 {/* TOM DO FEEDBACK */}
                 <div>
-                  <label style={lbl}><Tooltip text="Define o estilo do texto gerado pela IA — do mais técnico e direto ao mais encorajador e didático.">Tom de Feedback</Tooltip></label>
+                  <label style={lbl}><Tooltip text="Define o estilo do texto gerado pelo Kriteria — do mais técnico e direto ao mais encorajador e didático.">Tom de Feedback</Tooltip></label>
                   <select style={inp} value={tone} onChange={e => setTone(e.target.value)}>
                     {TONES.map(t => <option key={t.id} value={t.id}>{t.label} — {t.desc}</option>)}
                   </select>
@@ -697,7 +697,7 @@ export default function AvaliarPage() {
 
                 {/* TIPO DE TRABALHO */}
                 <div>
-                  <label style={lbl}><Tooltip text="Selecione o tipo do trabalho enviado pelo aluno. Isso define como a IA vai analisar.">Tipo de Trabalho</Tooltip></label>
+                  <label style={lbl}><Tooltip text="Selecione o tipo do trabalho enviado pelo aluno. Isso define como o Kriteria vai analisar.">Tipo de Trabalho</Tooltip></label>
                   <select style={inp} value={selectedType} onChange={e => switchType(e.target.value)}>
                     {Object.entries(CATEGORIES).map(([catKey, cat]) => (
                       <optgroup key={catKey} label={cat.label}>
@@ -733,7 +733,7 @@ export default function AvaliarPage() {
                 {/* ENUNCIADO */}
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <label style={lbl}><Tooltip text="Descreva o que foi pedido ao aluno. Quanto mais detalhado, melhor será a avaliação da IA.">Enunciado</Tooltip></label>
+                    <label style={lbl}><Tooltip text="Descreva o que foi pedido ao aluno. Quanto mais detalhado, melhor será a avaliação do Kriteria.">Enunciado</Tooltip></label>
                     <button onClick={() => setShowAiPrompt(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 9px', border: '1px solid #0081f033', borderRadius: 7, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2v4h4"/></svg>
                       Gerar automaticamente
@@ -792,7 +792,7 @@ export default function AvaliarPage() {
 
           {/* 6. ALUNO & ARQUIVO */}
           <div style={section}>
-            <div style={secLabel}><Tooltip text="Informe os dados do aluno e envie o arquivo do trabalho para ser avaliado pela IA.">Aluno & Arquivo</Tooltip></div>
+            <div style={secLabel}><Tooltip text="Informe os dados do aluno e envie o arquivo do trabalho para ser avaliado pelo Kriteria.">Aluno & Arquivo</Tooltip></div>
 
             {evalMode === 'individual' ? (
               <>
@@ -827,7 +827,7 @@ export default function AvaliarPage() {
                 {TYPES[selectedType]?.input === 'text' ? (
                   <>
                     <div>
-                      <label style={lbl}><Tooltip text="Cole aqui o trabalho escrito ou código do aluno para a IA analisar e avaliar.">Texto / Código do Aluno</Tooltip></label>
+                      <label style={lbl}><Tooltip text="Cole aqui o trabalho escrito ou código do aluno para o Kriteria analisar e avaliar.">Texto / Código do Aluno</Tooltip></label>
                       <textarea style={{ ...inp, minHeight: 90, resize: 'vertical' }} value={studentWork} onChange={e => setStudentWork(e.target.value)} placeholder="Cole aqui o texto ou código do aluno..." />
                     </div>
                     <div style={{ marginTop: 12 }}>
@@ -968,7 +968,7 @@ export default function AvaliarPage() {
                     {/* Referências do aluno */}
                     <div>
                       <label style={lbl}>
-                        <Tooltip text="Material que o aluno usou como referência ou inspiração. A IA usa como contexto mas não avalia como produção do aluno.">Referências do aluno</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
+                        <Tooltip text="Material que o aluno usou como referência ou inspiração. O Kriteria usa como contexto mas não avalia como produção do aluno.">Referências do aluno</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
                       </label>
                       <div style={{ fontSize: 11, color: 'var(--text-sub)', marginBottom: 8, lineHeight: 1.5 }}>
                         Imagens, vídeos, áudios, textos ou arquivos que o aluno usou como base. A IA entende o contexto sem confundir com o trabalho dele.
@@ -1003,7 +1003,7 @@ export default function AvaliarPage() {
                     {/* Referência para Correção */}
                     <div style={{ marginTop: 8 }}>
                       <label style={lbl}>
-                        <Tooltip text="Envie um gabarito ou imagens de referência. A IA compara com o trabalho do aluno para avaliar melhor.">Referência para Correção</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
+                        <Tooltip text="Envie um gabarito ou imagens de referência. O Kriteria compara com o trabalho do aluno para avaliar melhor.">Referência para Correção</Tooltip> <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-sub)' }}>opcional</span>
                       </label>
                       <div style={{ fontSize: 11, color: 'var(--text-sub)', marginBottom: 8, lineHeight: 1.5 }}>
                         Envie o .obj gabarito e/ou imagens de concept (até 4). A IA usa tudo como referência visual e técnica.
