@@ -95,12 +95,12 @@ export default function OnboardingPage() {
             Olá{userName ? `, ${userName}` : ''}! Bem-vindo ao KriterIA
           </h1>
           <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, marginBottom: 36 }}>
-            Em menos de 2 minutos você vai ver como o KriterIA avalia um trabalho real com inteligência artificial — sem gastar nenhuma das suas avaliações.
+            Em menos de 2 minutos você vai ver como o KriterIA avalia um trabalho real — sem gastar nenhuma das suas avaliações.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
             {[
               { emoji: '📄', text: 'Veja um trabalho de exemplo já carregado' },
-              { emoji: '⚡', text: 'Simule uma avaliação com IA em segundos' },
+              { emoji: '⚡', text: 'Simule uma avaliação em segundos' },
               { emoji: '✅', text: 'Entenda o resultado e comece a usar' },
             ].map(({ emoji, text }) => (
               <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: '12px 16px' }}>
@@ -129,7 +129,7 @@ export default function OnboardingPage() {
               ✦ Avaliação demonstração
             </div>
             <h2 style={{ fontSize: 24, fontWeight: 800, color: 'white', marginBottom: 8 }}>Veja como funciona na prática</h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>Um trabalho de exemplo já está carregado. Clique em "Avaliar com IA" para ver o resultado.</p>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>Um trabalho de exemplo já está carregado. Clique em "Gerar avaliação" para ver o resultado.</p>
           </div>
 
           <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '20px', marginBottom: 16 }}>
@@ -152,9 +152,9 @@ export default function OnboardingPage() {
                 <span style={{ display: 'inline-flex', gap: 4 }}>
                   {[0,1,2].map(i => <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', animation: 'bounce 1.2s infinite', animationDelay: `${i*0.2}s`, display: 'inline-block' }} />)}
                 </span>
-                IA avaliando o trabalho...
+                Gerando avaliação...
               </>
-            ) : '⚡ Avaliar com IA'}
+            ) : '⚡ Gerar avaliação'}
           </button>
         </div>
       )}
