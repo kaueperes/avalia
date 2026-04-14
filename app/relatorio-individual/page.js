@@ -19,6 +19,7 @@ function RelatorioIndividualInner() {
       fetch('/api/profiles', { headers: { Authorization: `Bearer ${token()}` } }).then(r => r.ok ? r.json() : []).catch(() => []),
     ]).then(([e, profiles]) => {
         const profile = (profiles || []).find(p => p.name === e.profileName);
+        document.title = e.studentName || 'Avaliação';
         setData({
           studentName: e.studentName || 'Aluno',
           turma: e.turma || '',
