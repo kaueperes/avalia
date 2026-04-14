@@ -80,13 +80,12 @@ function CriteriaBar({ name, score }) {
         <span style={{ fontSize: 13, fontWeight: 600, color: '#1f2937' }}>{name}</span>
         <span style={{ fontSize: 13, fontWeight: 800, color, minWidth: 28, textAlign: 'right' }}>{score.toFixed(1)}</span>
       </div>
-      <div style={{ height: 10, background: '#f1f5f9', borderRadius: 99, overflow: 'hidden' }}>
+      <div style={{ height: 10, background: '#f1f5f9', borderRadius: 99, overflow: 'hidden', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
         <div style={{
           height: '100%',
           width: `${pct}%`,
-          background: `linear-gradient(90deg, ${color}cc, ${color})`,
+          background: color,
           borderRadius: 99,
-          transition: 'width 0.6s ease',
         }} />
       </div>
     </div>
