@@ -328,6 +328,31 @@ export default function AvaliarPage() {
       reader.onerror = rej;
       reader.readAsDataURL(file);
     });
+    const compressImage = (file) => new Promise((res, rej) => {
+      if (!file.type.startsWith('image/') || file.size < 1024 * 1024) {
+        return toBase64(file).then(res).catch(rej);
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX = 2048;
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+            else { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          res(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
+        };
+        img.onerror = rej;
+        img.src = e.target.result;
+      };
+      reader.onerror = rej;
+      reader.readAsDataURL(file);
+    });
 
     const results = [];
     for (let i = 0; i < batchFiles.length; i++) {
@@ -338,7 +363,7 @@ export default function AvaliarPage() {
       let workContent = '';
 
       if (file.type.startsWith('image/')) {
-        images.push({ data: await toBase64(file), mediaType: file.type, label: `Trabalho do aluno: ${file.name}` });
+        images.push({ data: await compressImage(file), mediaType: 'image/jpeg', label: `Trabalho do aluno: ${file.name}` });
       } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
         images.push({ data: await toBase64(file), mediaType: 'application/pdf', label: `Trabalho do aluno: ${file.name}` });
       } else if (file.name.endsWith('.obj')) {
@@ -348,8 +373,10 @@ export default function AvaliarPage() {
       }
 
       for (const f of referenceFiles) {
-        if (f.type.startsWith('image/') || f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
-          images.push({ data: await toBase64(f), mediaType: f.type === 'application/pdf' || f.name.endsWith('.pdf') ? 'application/pdf' : f.type, label: `Referência para Correção: ${f.name}` });
+        if (f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
+          images.push({ data: await toBase64(f), mediaType: 'application/pdf', label: `Referência para Correção: ${f.name}` });
+        } else if (f.type.startsWith('image/')) {
+          images.push({ data: await compressImage(f), mediaType: 'image/jpeg', label: `Referência para Correção: ${f.name}` });
         }
       }
 
@@ -427,6 +454,33 @@ export default function AvaliarPage() {
         reader.readAsDataURL(file);
       });
 
+      // Helper: compress image to JPEG 85% if over 1MB, preserving aspect ratio
+      const compressImage = (file) => new Promise((res, rej) => {
+        if (!file.type.startsWith('image/') || file.size < 1024 * 1024) {
+          return toBase64(file).then(res).catch(rej);
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const MAX = 2048;
+            let w = img.width, h = img.height;
+            if (w > MAX || h > MAX) {
+              if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+              else { w = Math.round(w * MAX / h); h = MAX; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            res(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
+          };
+          img.onerror = rej;
+          img.src = e.target.result;
+        };
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+
       // Collect all images to send to the AI as vision
       const images = [];
 
@@ -436,7 +490,7 @@ export default function AvaliarPage() {
           if (f.name.endsWith('.obj')) {
             try { objTexts.push(await f.text()); } catch { objTexts.push(`[Arquivo: ${f.name}]`); }
           } else if (f.type.startsWith('image/')) {
-            images.push({ data: await toBase64(f), mediaType: f.type, label: `Trabalho do aluno: ${f.name}` });
+            images.push({ data: await compressImage(f), mediaType: 'image/jpeg', label: `Trabalho do aluno: ${f.name}` });
           }
         }
         if (objTexts.length > 0) workContent = objTexts.join('\n\n---\n\n');
@@ -456,20 +510,24 @@ export default function AvaliarPage() {
       if (TYPES[selectedType]?.input === 'imgs' && studentFiles.length > 0) {
         for (const f of studentFiles) {
           if (f.type.startsWith('image/')) {
-            images.push({ data: await toBase64(f), mediaType: f.type, label: `Trabalho do aluno: ${f.name}` });
+            images.push({ data: await compressImage(f), mediaType: 'image/jpeg', label: `Trabalho do aluno: ${f.name}` });
           }
         }
       }
 
       if (TYPES[selectedType]?.input === 'img') {
         for (const f of studentFiles) {
-          if (f.type.startsWith('image/') || f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
-            images.push({ data: await toBase64(f), mediaType: f.type === 'application/pdf' || f.name.endsWith('.pdf') ? 'application/pdf' : f.type, label: `Trabalho do aluno: ${f.name}` });
+          if (f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
+            images.push({ data: await toBase64(f), mediaType: 'application/pdf', label: `Trabalho do aluno: ${f.name}` });
+          } else if (f.type.startsWith('image/')) {
+            images.push({ data: await compressImage(f), mediaType: 'image/jpeg', label: `Trabalho do aluno: ${f.name}` });
           }
         }
       }
       for (const f of studentRefFiles) {
-        if (f.type.startsWith('image/') || f.type.startsWith('video/') || f.type.startsWith('audio/') || f.name.endsWith('.obj')) {
+        if (f.type.startsWith('image/')) {
+          images.push({ data: await compressImage(f), mediaType: 'image/jpeg', label: `Referência do aluno: ${f.name}` });
+        } else if (f.type.startsWith('video/') || f.type.startsWith('audio/') || f.name.endsWith('.obj')) {
           images.push({ data: await toBase64(f), mediaType: f.type || 'application/octet-stream', label: `Referência do aluno: ${f.name}` });
         } else if (f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
           images.push({ data: await toBase64(f), mediaType: 'application/pdf', label: `Referência do aluno: ${f.name}` });
@@ -484,13 +542,15 @@ export default function AvaliarPage() {
         }
       }
       for (const f of referenceFiles) {
-        if (f.type.startsWith('image/') || f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
-          images.push({ data: await toBase64(f), mediaType: f.type === 'application/pdf' || f.name.endsWith('.pdf') ? 'application/pdf' : f.type, label: `Referência para Correção: ${f.name}` });
+        if (f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
+          images.push({ data: await toBase64(f), mediaType: 'application/pdf', label: `Referência para Correção: ${f.name}` });
+        } else if (f.type.startsWith('image/')) {
+          images.push({ data: await compressImage(f), mediaType: 'image/jpeg', label: `Referência para Correção: ${f.name}` });
         }
       }
       for (const f of extraFiles) {
         if (f.type.startsWith('image/')) {
-          images.push({ data: await toBase64(f), mediaType: f.type, label: `Arquivo adicional: ${f.name}` });
+          images.push({ data: await compressImage(f), mediaType: 'image/jpeg', label: `Arquivo adicional: ${f.name}` });
         } else if (f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
           images.push({ data: await toBase64(f), mediaType: 'application/pdf', label: `Arquivo adicional: ${f.name}` });
         } else if (f.type === 'text/plain' || f.name.endsWith('.txt')) {
