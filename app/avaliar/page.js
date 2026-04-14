@@ -371,7 +371,7 @@ export default function AvaliarPage() {
           const sr = await fetch('/api/evaluations', {
             method: 'POST',
             headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ studentName: studentNameResolved, type: selectedType, score: data.score, feedback: data.feedback, criteria: data.criteriaScores, profileName: profName || '', turma: profTurma || '', exerciseName: exerciseName || '', institution: profInstitution || '', disciplina: exerciseDisciplina || profDisc || '', class_id: selectedClassId || null }),
+            body: JSON.stringify({ studentName: studentNameResolved, type: selectedType, score: data.score, feedback: data.feedback, criteria: data.criteriaScores, profileName: profName || '', turma: classes.find(c => c.id === selectedClassId)?.name || profTurma || '', exerciseName: exerciseName || '', institution: institutions.find(i => i.id === selectedInstitutionId)?.name || profInstitution || '', disciplina: exerciseDisciplina || profDisc || '', class_id: selectedClassId || null }),
           });
           wasSaved = sr.ok;
         } catch {}
@@ -543,9 +543,9 @@ export default function AvaliarPage() {
           feedback: result.feedback,
           criteria: result.criteriaScores,
           profileName: profName || '',
-          turma: profTurma || '',
+          turma: classes.find(c => c.id === selectedClassId)?.name || profTurma || '',
           exerciseName: exerciseName || '',
-          institution: profInstitution || '',
+          institution: institutions.find(i => i.id === selectedInstitutionId)?.name || profInstitution || '',
           disciplina: exerciseDisciplina || profDisc || '',
           student_id: selectedStudentId || null,
           class_id: selectedClassId || null,
