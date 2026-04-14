@@ -167,7 +167,10 @@ export default function AvaliacoesPage() {
   function generatePDF(e) {
     const profile = profiles.find(p => p.name === e.profileName);
     const evalClass = classes.find(c => c.id === e.classId);
-    const institution = institutionObjects.find(i => i.id === evalClass?.institutionId) || institutionObjects.find(i => i.name === e.institution);
+    const institution =
+      institutionObjects.find(i => i.id === evalClass?.institutionId) ||
+      institutionObjects.find(i => i.name === e.institution) ||
+      institutionObjects.find(i => i.name === profile?.institution);
     const logo = institution?.logoUrl || profile?.institutionLogo || '';
     const grade = scoreToGrade(e.score);
     const scoreNum = typeof e.score === 'number' ? e.score.toFixed(1) : e.score;
