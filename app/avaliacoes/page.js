@@ -48,6 +48,7 @@ export default function AvaliacoesPage() {
   const [selected, setSelected] = useState(new Set());
   const [classes, setClasses] = useState([]);
   const [classIdFilter, setClassIdFilter] = useState('');
+  const [institutionObjects, setInstitutionObjects] = useState([]);
 
   function token() { return localStorage.getItem('token'); }
 
@@ -70,6 +71,8 @@ export default function AvaliacoesPage() {
       .then(r => r.json()).then(data => setProfiles(Array.isArray(data) ? data : [])).catch(() => {});
     fetch('/api/classes', { headers: { Authorization: `Bearer ${token()}` } })
       .then(r => r.json()).then(data => setClasses(Array.isArray(data) ? data : [])).catch(() => {});
+    fetch('/api/institutions', { headers: { Authorization: `Bearer ${token()}` } })
+      .then(r => r.json()).then(data => setInstitutionObjects(Array.isArray(data) ? data : [])).catch(() => {});
   }, [router]);
 
   const filtered = evaluations.filter(e => {
@@ -163,7 +166,8 @@ export default function AvaliacoesPage() {
 
   function generatePDF(e) {
     const profile = profiles.find(p => p.name === e.profileName);
-    const logo = profile?.institutionLogo || '';
+    const institution = institutionObjects.find(i => i.name === e.institution);
+    const logo = institution?.logoUrl || profile?.institutionLogo || '';
     const grade = scoreToGrade(e.score);
     const scoreNum = typeof e.score === 'number' ? e.score.toFixed(1) : e.score;
     const scoreHex = e.score >= 7 ? '#16a34a' : e.score >= 5 ? '#ca8a04' : '#dc2626';
