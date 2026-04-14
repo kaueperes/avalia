@@ -1194,7 +1194,7 @@ export default function AvaliarPage() {
           {generating && evalMode === 'individual' && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '64px 40px' }}>
               <div style={{ width: 44, height: 44, border: '3px solid var(--border)', borderTop: '3px solid #0081f0', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-              <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>A IA está avaliando o trabalho...</p>
+              <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>Kriteria está avaliando...</p>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>Analisando critérios e gerando feedback personalizado</p>
             </div>
           )}
