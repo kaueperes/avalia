@@ -169,9 +169,8 @@ export default function AvaliacoesPage() {
     const evalClass = classes.find(c => c.id === e.classId);
     const institution =
       institutionObjects.find(i => i.id === evalClass?.institutionId) ||
-      institutionObjects.find(i => i.name === e.institution) ||
-      institutionObjects.find(i => i.name === profile?.institution);
-    const logo = institution?.logoUrl || profile?.institutionLogo || '';
+      institutionObjects.find(i => i.name === e.institution);
+    const logo = e.institutionLogoUrl || institution?.logoUrl || profile?.institutionLogo || '';
     const grade = scoreToGrade(e.score);
     const scoreNum = typeof e.score === 'number' ? e.score.toFixed(1) : e.score;
     const scoreHex = e.score >= 7 ? '#16a34a' : e.score >= 5 ? '#ca8a04' : '#dc2626';
