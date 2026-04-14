@@ -290,7 +290,6 @@ export function EvaluationReport({ data }) {
         </button>
       </div>
 
-      <div className="print-pg" />
       <style>{`
         @page { margin: 0; }
         @media print {
@@ -299,9 +298,6 @@ export function EvaluationReport({ data }) {
           * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .rpt-card { overflow: visible !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding-top: 24px; padding-bottom: 24px; }
         }
-        .print-pg { display: none; position: fixed; bottom: 12px; right: 16px; font-size: 10px; color: #94a3b8; font-family: sans-serif; }
-        .print-pg::after { content: counter(page); }
-        @media print { .print-pg { display: block; } }
       `}</style>
     </div>
   );
