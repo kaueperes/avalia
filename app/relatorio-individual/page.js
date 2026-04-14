@@ -23,7 +23,7 @@ function RelatorioIndividualInner() {
           studentName: e.studentName || 'Aluno',
           turma: e.turma || '',
           institution: e.institution || '',
-          institutionLogo: profile?.institutionLogo || '',
+          institutionLogo: e.institutionLogoUrl || profile?.institutionLogo || '',
           profileName: e.profileName || '',
           exerciseName: e.exerciseName || '',
           disciplina: e.disciplina || '',
