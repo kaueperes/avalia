@@ -204,9 +204,9 @@ export default function AvaliacoesPage() {
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
     <title>Avaliação — ${e.studentName}</title>
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
+      * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 740px; margin: 0 auto; }
-      @media print { body { padding: 24px; } @page { margin: 1.5cm; } }
+      @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }
     </style></head><body>
       <!-- Header -->
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #e5e7eb">
@@ -238,10 +238,6 @@ export default function AvaliacoesPage() {
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;margin-bottom:12px">Feedback</div>
         <div style="background:#f9fafb;border-radius:12px;padding:20px 24px;font-size:14px;line-height:1.85;color:#374151;white-space:pre-wrap;border-left:3px solid #7c3aed">${e.feedback}</div>
       </div>` : ''}
-      <!-- Footer -->
-      <div style="margin-top:40px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center">
-        Gerado pela Kriteria · avalia.education
-      </div>
     </body></html>`;
 
     const w = window.open('', '_blank');
@@ -318,9 +314,9 @@ export default function AvaliacoesPage() {
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
     <title>Relatório da Turma — ${turmaTitle}</title>
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
+      * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 760px; margin: 0 auto; }
-      @media print { body { padding: 24px; } @page { margin: 1.5cm; } }
+      @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }
     </style></head><body>
       <div style="border-bottom:2px solid #e5e7eb;padding-bottom:24px;margin-bottom:32px">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-weight:600;margin-bottom:6px">Relatório Pedagógico da Turma</div>
@@ -409,7 +405,7 @@ export default function AvaliacoesPage() {
     const avgScore = evalsForQuick.length ? (evalsForQuick.reduce((s,e)=>s+e.score,0)/evalsForQuick.length).toFixed(1) : '—';
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
     <title>Notas — ${date}</title>
-    <style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; } @media print { body { padding: 24px; } @page { margin: 1.5cm; } }</style>
+    <style>* { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; } @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }</style>
     </head><body>
       <div style="border-bottom:2px solid #e5e7eb;padding-bottom:20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-end">
         <div>
@@ -483,7 +479,7 @@ export default function AvaliacoesPage() {
 
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
     <title>Parecer Individual — ${studentName}</title>
-    <style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 720px; margin: 0 auto; } @media print { body { padding: 24px; } @page { margin: 1.5cm; } }</style>
+    <style>* { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 720px; margin: 0 auto; } @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }</style>
     </head><body>
       <div style="border-bottom:2px solid #e5e7eb;padding-bottom:24px;margin-bottom:32px">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-weight:600;margin-bottom:6px">Parecer Individual do Aluno</div>
