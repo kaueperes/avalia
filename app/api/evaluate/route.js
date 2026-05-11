@@ -167,28 +167,20 @@ Regras:
     const hasVideoOrAudio = images?.some(img =>
       img.mediaType?.startsWith('video/') || img.mediaType?.startsWith('audio/')
     );
-    const hasImages = images?.some(img => img.mediaType?.startsWith('image/'));
 
-    // Use Sonnet only for complex text-only evaluations (no files, high complexity)
     const { model: selectedModel, maxTokens: selectedMaxTokens } = selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
-    const isComplexText = !images?.length && selectedModel === 'claude-sonnet-4-6';
 
     let parsed;
 
-    if (isComplexText) {
-      // Complex text → Claude Sonnet for best reasoning quality
-      parsed = await callClaude(prompt, null, { model: 'claude-sonnet-4-6', maxTokens: selectedMaxTokens });
+    if (hasVideoOrAudio) {
+      // Vídeo/áudio → Gemini 2.0 Flash (único com suporte a vídeo)
+      parsed = await callGemini(prompt, images);
+    } else if (images?.length > 0) {
+      // Imagens (PNG, JPG, PDF...) → Claude Sonnet com visão
+      parsed = await callClaude(prompt, images, { model: 'claude-sonnet-4-6', maxTokens: 3000 });
     } else {
-      // Everything else (images, video, audio, simple text) → Gemini first, Claude as fallback
-      try {
-        parsed = await callGemini(prompt, images?.length > 0 ? images : null);
-      } catch (geminiErr) {
-        console.warn('Gemini failed, falling back to Claude:', geminiErr?.message, geminiErr?.status);
-        const fallback = hasImages
-          ? { model: 'claude-sonnet-4-6', maxTokens: 3000 }
-          : { model: selectedModel, maxTokens: selectedMaxTokens };
-        parsed = await callClaude(prompt, images?.length > 0 ? images : null, fallback);
-      }
+      // Texto puro → Haiku ou Sonnet conforme complexidade
+      parsed = await callClaude(prompt, null, { model: selectedModel, maxTokens: selectedMaxTokens });
     }
 
     // Calculate weighted score
