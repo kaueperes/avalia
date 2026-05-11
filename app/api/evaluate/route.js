@@ -183,7 +183,7 @@ Regras:
       try {
         parsed = await callGemini(prompt, images?.length > 0 ? images : null);
       } catch (geminiErr) {
-        console.warn('Gemini failed, falling back to Claude:', geminiErr.message);
+        console.warn('Gemini failed, falling back to Claude:', geminiErr?.message, geminiErr?.status);
         const fallback = hasImages
           ? { model: 'claude-sonnet-4-6', maxTokens: 3000 }
           : { model: selectedModel, maxTokens: selectedMaxTokens };
@@ -209,7 +209,7 @@ Regras:
 
     return NextResponse.json({ score, criteriaScores: parsed.criteriaScores, feedback: parsed.feedback });
   } catch (err) {
-    console.error('evaluate error:', err);
+    console.error('evaluate error:', err?.message || err, err?.status, err?.error);
     return NextResponse.json({ error: 'Erro ao chamar a IA. Tente novamente.' }, { status: 500 });
   }
 }
