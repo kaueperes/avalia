@@ -141,6 +141,15 @@ Regras:
     return parseJson(result.response.text());
   }
 
+  // Detects actual image format from base64 prefix to avoid MIME type mismatch
+  function detectImageMediaType(base64Data) {
+    if (base64Data.startsWith('iVBOR')) return 'image/png';
+    if (base64Data.startsWith('/9j/'))  return 'image/jpeg';
+    if (base64Data.startsWith('R0lG'))  return 'image/gif';
+    if (base64Data.startsWith('UklG'))  return 'image/webp';
+    return null;
+  }
+
   // Helper: call Claude with prompt + optional image blocks
   async function callClaude(promptText, files, modelOverride) {
     const { model, maxTokens } = modelOverride || selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
@@ -151,7 +160,7 @@ Regras:
             { type: 'text', text: img.label || 'Arquivo:' },
             img.mediaType === 'application/pdf'
               ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: img.data } }
-              : { type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.data } },
+              : { type: 'image', source: { type: 'base64', media_type: detectImageMediaType(img.data) || img.mediaType, data: img.data } },
           ]),
         ]
       : promptText;
