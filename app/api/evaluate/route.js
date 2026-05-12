@@ -175,23 +175,21 @@ Regras:
   }
 
   try {
-    const hasVideoOrAudio = images?.some(img =>
-      img.mediaType?.startsWith('video/') || img.mediaType?.startsWith('audio/')
-    );
-
     const { model: selectedModel, maxTokens: selectedMaxTokens } = selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
 
     let parsed;
 
-    if (hasVideoOrAudio) {
-      // Vídeo/áudio → Gemini 2.0 Flash (único com suporte a vídeo)
-      parsed = await callGemini(prompt, images);
-    } else if (images?.length > 0) {
-      // Imagens (PNG, JPG, PDF...) → Claude Sonnet com visão
-      parsed = await callClaude(prompt, images, { model: 'claude-sonnet-4-6', maxTokens: 3000 });
-    } else {
-      // Texto puro → Haiku ou Sonnet conforme complexidade
-      parsed = await callClaude(prompt, null, { model: selectedModel, maxTokens: selectedMaxTokens });
+    // Gemini first (generous free tier, supports all media types).
+    // Falls back to Claude if Gemini is unavailable or fails.
+    try {
+      parsed = await callGemini(prompt, images?.length > 0 ? images : null);
+    } catch (geminiErr) {
+      console.warn('Gemini failed, falling back to Claude:', geminiErr?.message);
+      if (images?.length > 0) {
+        parsed = await callClaude(prompt, images, { model: 'claude-sonnet-4-6', maxTokens: 3000 });
+      } else {
+        parsed = await callClaude(prompt, null, { model: selectedModel, maxTokens: selectedMaxTokens });
+      }
     }
 
     // Calculate weighted score

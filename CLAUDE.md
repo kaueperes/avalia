@@ -40,22 +40,20 @@ Variáveis de ambiente necessárias (configuradas no Vercel):
 
 ## Arquitetura de roteamento de IA
 
-Esta é a decisão mais importante do sistema. Cada avaliação é roteada para a IA mais adequada:
+Gemini primeiro, Claude como fallback. Gemini 2.0 Flash tem 1.500 avaliações gratuitas/dia e suporta todos os tipos de mídia — evita dependência de um único provedor.
 
 ```
-Texto / código           → Claude Haiku (simples) ou Sonnet (complexo)
-Imagem(ns)               → Claude Sonnet (visão)
-Vídeo (mp4, mov...)      → Gemini 2.0 Flash
-Áudio puro (mp3, wav...) → Gemini 2.0 Flash  ← foi bug até março/2026, áudio caía no Claude
-Vídeo + imagens juntos   → Gemini (vídeo) + Claude não mistura; Gemini processa tudo
+Qualquer avaliação       → Gemini 2.0 Flash (primário, gratuito)
+Se Gemini falhar         → Claude Sonnet (imagens) ou Haiku/Sonnet (texto)
 ```
 
 A lógica fica em `app/api/evaluate/route.js`:
 ```js
-const hasVideoOrAudio = images?.some(img =>
-  img.mediaType?.startsWith('video/') || img.mediaType?.startsWith('audio/')
-);
-// hasVideoOrAudio → Gemini; caso contrário → Claude
+try {
+  parsed = await callGemini(prompt, images);
+} catch {
+  parsed = await callClaude(prompt, images, modelConfig);
+}
 ```
 
 **Por que não Whisper?** Whisper só transcreve fala — perde entonação, ritmo e dicção. Para locução, apresentação oral, etc., o Gemini ouve o áudio e avalia diretamente. Qualidade superior.
