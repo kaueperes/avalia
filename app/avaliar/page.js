@@ -625,7 +625,7 @@ export default function AvaliarPage() {
         localStorage.setItem('user', JSON.stringify(u));
         window.dispatchEvent(new Event('storage'));
       } catch {}
-    } catch { setEvalError('Erro de conexão. Tente novamente.'); }
+    } catch (err) { setEvalError('Erro: ' + (err?.message || 'desconhecido')); }
     finally { setGenerating(false); }
   }
 
