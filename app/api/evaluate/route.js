@@ -212,7 +212,8 @@ Regras:
 
     return NextResponse.json({ score, criteriaScores: parsed.criteriaScores, feedback: parsed.feedback });
   } catch (err) {
-    console.error('evaluate error:', err?.message || err, err?.status, err?.error);
-    return NextResponse.json({ error: 'Erro ao chamar a IA. Tente novamente.' }, { status: 500 });
+    const detail = err?.message || String(err);
+    console.error('evaluate error:', detail, err?.status, err?.error);
+    return NextResponse.json({ error: `Erro IA: ${detail}` }, { status: 500 });
   }
 }
