@@ -9,12 +9,16 @@ import mammoth from 'mammoth';
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
-function summarizeObj(text, filename) {
-  const lines = text.split('\n');
+function summarizeObj(text, filename, truncated) {
   let verts = 0, uvs = 0, normals = 0, tris = 0, quads = 0, ngons = 0;
   const objects = [], materials = [];
-  for (const line of lines) {
-    const t = line.trimStart();
+  let pos = 0;
+  const len = text.length;
+  while (pos < len) {
+    const nl = text.indexOf('\n', pos);
+    const end = nl === -1 ? len : nl;
+    const t = text.slice(pos, end).trimStart();
+    pos = end + 1;
     if (t.startsWith('v '))       verts++;
     else if (t.startsWith('vt ')) uvs++;
     else if (t.startsWith('vn ')) normals++;
@@ -33,7 +37,7 @@ function summarizeObj(text, filename) {
   }
   const total = tris + quads + ngons;
   const pct = n => total > 0 ? ` (${((n / total) * 100).toFixed(1)}%)` : '';
-  return `=== ${filename} ===
+  return `=== ${filename}${truncated ? ' (amostra — arquivo grande)' : ''} ===
 Vértices: ${verts} | UVs: ${uvs} | Normais: ${normals}
 Objetos/grupos: ${objects.length > 0 ? objects.join(', ') : '(nenhum nomeado)'}
 Materiais: ${materials.length > 0 ? materials.join(', ') : '(nenhum)'}
@@ -401,7 +405,11 @@ export default function AvaliarPage() {
       } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
         images.push({ data: await toBase64(file), mediaType: 'application/pdf', label: `Trabalho do aluno: ${file.name}` });
       } else if (file.name.endsWith('.obj')) {
-        try { workContent = summarizeObj(await file.text(), file.name); } catch { workContent = `[Arquivo: ${file.name}]`; }
+        try {
+          const MAX_OBJ = 5 * 1024 * 1024;
+          const blob = file.size > MAX_OBJ ? file.slice(0, MAX_OBJ) : file;
+          workContent = summarizeObj(await blob.text(), file.name, file.size > MAX_OBJ);
+        } catch { workContent = `[Arquivo: ${file.name}]`; }
       } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
         try { workContent = await file.text(); } catch {}
       }
@@ -522,7 +530,11 @@ export default function AvaliarPage() {
         const objTexts = [];
         for (const f of studentFiles) {
           if (f.name.endsWith('.obj')) {
-            try { objTexts.push(summarizeObj(await f.text(), f.name)); } catch { objTexts.push(`[Arquivo: ${f.name}]`); }
+            try {
+              const MAX_OBJ = 5 * 1024 * 1024;
+              const blob = f.size > MAX_OBJ ? f.slice(0, MAX_OBJ) : f;
+              objTexts.push(summarizeObj(await blob.text(), f.name, f.size > MAX_OBJ));
+            } catch { objTexts.push(`[Arquivo: ${f.name}]`); }
           } else if (f.type.startsWith('image/')) {
             images.push({ data: await compressImage(f), mediaType: 'image/jpeg', label: `Trabalho do aluno: ${f.name}` });
           }
