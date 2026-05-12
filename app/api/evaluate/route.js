@@ -175,7 +175,7 @@ Regras:
   }
 
   try {
-    const { model: selectedModel, maxTokens: selectedMaxTokens } = selectModel({ studentWork, criteria, writingSample, exerciseContext, tone });
+    selectModel({ studentWork, criteria, writingSample, exerciseContext, tone }); // reservado para fallback Claude
 
     let parsed;
 
@@ -184,12 +184,8 @@ Regras:
     try {
       parsed = await callGemini(prompt, images?.length > 0 ? images : null);
     } catch (geminiErr) {
-      console.warn('Gemini failed, falling back to Claude:', geminiErr?.message);
-      if (images?.length > 0) {
-        parsed = await callClaude(prompt, images, { model: 'claude-sonnet-4-6', maxTokens: 3000 });
-      } else {
-        parsed = await callClaude(prompt, null, { model: selectedModel, maxTokens: selectedMaxTokens });
-      }
+      console.error('Gemini failed:', geminiErr?.message, geminiErr?.status, JSON.stringify(geminiErr?.errorDetails));
+      throw new Error(`Gemini: ${geminiErr?.message || 'erro desconhecido'}`);
     }
 
     // Calculate weighted score
@@ -211,9 +207,6 @@ Regras:
     return NextResponse.json({ score, criteriaScores: parsed.criteriaScores, feedback: parsed.feedback });
   } catch (err) {
     console.error('evaluate error:', err?.message || err, err?.status, err?.error);
-    if (err?.status === 529 || err?.error?.type === 'overloaded_error') {
-      return NextResponse.json({ error: 'A IA está sobrecarregada no momento. Aguarde alguns segundos e tente novamente.' }, { status: 503 });
-    }
-    return NextResponse.json({ error: 'Erro ao chamar a IA. Tente novamente.' }, { status: 500 });
+    return NextResponse.json({ error: `Erro: ${err?.message || 'desconhecido'}` }, { status: 500 });
   }
 }
