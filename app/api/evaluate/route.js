@@ -210,10 +210,11 @@ Regras:
 
     return NextResponse.json({ score, criteriaScores: parsed.criteriaScores, feedback: parsed.feedback });
   } catch (err) {
-    console.error('evaluate error:', err?.message || err, err?.status, err?.error);
+    const detail = err?.message || String(err);
+    console.error('evaluate error:', detail, err?.status, err?.error);
     if (err?.status === 529 || err?.error?.type === 'overloaded_error') {
       return NextResponse.json({ error: 'A IA está sobrecarregada no momento. Aguarde alguns segundos e tente novamente.' }, { status: 503 });
     }
-    return NextResponse.json({ error: 'Erro ao chamar a IA. Tente novamente.' }, { status: 500 });
+    return NextResponse.json({ error: `Erro: ${detail}` }, { status: 500 });
   }
 }
