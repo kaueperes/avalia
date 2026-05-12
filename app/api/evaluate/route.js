@@ -5,6 +5,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { TYPES, TONES } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
+export const maxDuration = 60;
+
 // Selects the model based on evaluation complexity to balance quality and cost.
 // Returns { model, maxTokens }
 function selectModel({ studentWork, criteria, writingSample, exerciseContext, tone }) {

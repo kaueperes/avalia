@@ -9,6 +9,40 @@ import mammoth from 'mammoth';
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
+function summarizeObj(text, filename) {
+  const lines = text.split('\n');
+  let verts = 0, uvs = 0, normals = 0, tris = 0, quads = 0, ngons = 0;
+  const objects = [], materials = [];
+  for (const line of lines) {
+    const t = line.trimStart();
+    if (t.startsWith('v '))       verts++;
+    else if (t.startsWith('vt ')) uvs++;
+    else if (t.startsWith('vn ')) normals++;
+    else if (t.startsWith('f ')) {
+      const vCount = t.trim().split(/\s+/).length - 1;
+      if (vCount === 3) tris++;
+      else if (vCount === 4) quads++;
+      else if (vCount >= 5) ngons++;
+    } else if (t.startsWith('o ') || t.startsWith('g ')) {
+      const name = t.slice(2).trim();
+      if (name && name !== 'default') objects.push(name);
+    } else if (t.startsWith('usemtl ')) {
+      const name = t.slice(7).trim();
+      if (name && !materials.includes(name)) materials.push(name);
+    }
+  }
+  const total = tris + quads + ngons;
+  const pct = n => total > 0 ? ` (${((n / total) * 100).toFixed(1)}%)` : '';
+  return `=== ${filename} ===
+Vértices: ${verts} | UVs: ${uvs} | Normais: ${normals}
+Objetos/grupos: ${objects.length > 0 ? objects.join(', ') : '(nenhum nomeado)'}
+Materiais: ${materials.length > 0 ? materials.join(', ') : '(nenhum)'}
+Topologia — Total de faces: ${total}
+  Triângulos: ${tris}${pct(tris)}
+  Quads: ${quads}${pct(quads)}
+  N-gons (5+ verts): ${ngons}${pct(ngons)}`;
+}
+
 const CAT_ICONS = {
   '3d':          <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
   audiovisual:   <><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></>,
@@ -367,7 +401,7 @@ export default function AvaliarPage() {
       } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
         images.push({ data: await toBase64(file), mediaType: 'application/pdf', label: `Trabalho do aluno: ${file.name}` });
       } else if (file.name.endsWith('.obj')) {
-        try { workContent = await file.text(); } catch { workContent = `[Arquivo: ${file.name}]`; }
+        try { workContent = summarizeObj(await file.text(), file.name); } catch { workContent = `[Arquivo: ${file.name}]`; }
       } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
         try { workContent = await file.text(); } catch {}
       }
@@ -488,7 +522,7 @@ export default function AvaliarPage() {
         const objTexts = [];
         for (const f of studentFiles) {
           if (f.name.endsWith('.obj')) {
-            try { objTexts.push(await f.text()); } catch { objTexts.push(`[Arquivo: ${f.name}]`); }
+            try { objTexts.push(summarizeObj(await f.text(), f.name)); } catch { objTexts.push(`[Arquivo: ${f.name}]`); }
           } else if (f.type.startsWith('image/')) {
             images.push({ data: await compressImage(f), mediaType: 'image/jpeg', label: `Trabalho do aluno: ${f.name}` });
           }
@@ -564,12 +598,18 @@ export default function AvaliarPage() {
         }
       }
 
+      const body = JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName: resolved, studentWork: workContent, tone, profName, profDisc, profInstitution, writingSample, images: images.length > 0 ? images : undefined, referenceWeight: referenceWeight });
+      if (body.length > 4 * 1024 * 1024) {
+        setEvalError('Os arquivos enviados são muito grandes (máx. 4MB no total). Reduza a quantidade ou o tamanho das imagens.');
+        return;
+      }
       const r = await fetch('/api/evaluate', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: selectedType, exerciseName, exerciseContext, criteria, studentName: resolved, studentWork: workContent, tone, profName, profDisc, profInstitution, writingSample, images: images.length > 0 ? images : undefined, referenceWeight: referenceWeight }),
+        body,
       });
-      const data = await r.json();
+      let data;
+      try { data = await r.json(); } catch { setEvalError('Tempo limite excedido. Tente novamente.'); return; }
       if (!r.ok) { setEvalError(data.error || 'Erro ao gerar avaliação.'); return; }
       setResult(data);
       // Decrement quota in localStorage
