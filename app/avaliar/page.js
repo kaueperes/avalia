@@ -363,14 +363,14 @@ export default function AvaliarPage() {
       reader.readAsDataURL(file);
     });
     const compressImage = (file) => new Promise((res, rej) => {
-      if (!file.type.startsWith('image/') || file.size < 1024 * 1024) {
+      if (!file.type.startsWith('image/')) {
         return toBase64(file).then(res).catch(rej);
       }
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const MAX = 2048;
+          const MAX = 1600;
           let w = img.width, h = img.height;
           if (w > MAX || h > MAX) {
             if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
@@ -379,7 +379,7 @@ export default function AvaliarPage() {
           const canvas = document.createElement('canvas');
           canvas.width = w; canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          res(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
+          res(canvas.toDataURL('image/jpeg', 0.82).split(',')[1]);
         };
         img.onerror = rej;
         img.src = e.target.result;
@@ -490,14 +490,14 @@ export default function AvaliarPage() {
 
       // Helper: compress image to JPEG 85% if over 1MB, preserving aspect ratio
       const compressImage = (file) => new Promise((res, rej) => {
-        if (!file.type.startsWith('image/') || file.size < 1024 * 1024) {
+        if (!file.type.startsWith('image/')) {
           return toBase64(file).then(res).catch(rej);
         }
         const reader = new FileReader();
         reader.onload = (e) => {
           const img = new Image();
           img.onload = () => {
-            const MAX = 2048;
+            const MAX = 1600;
             let w = img.width, h = img.height;
             if (w > MAX || h > MAX) {
               if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
@@ -506,7 +506,7 @@ export default function AvaliarPage() {
             const canvas = document.createElement('canvas');
             canvas.width = w; canvas.height = h;
             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            res(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
+            res(canvas.toDataURL('image/jpeg', 0.82).split(',')[1]);
           };
           img.onerror = rej;
           img.src = e.target.result;
