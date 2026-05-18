@@ -769,7 +769,9 @@ export default function AvaliacoesPage() {
                     <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)' }}>{detail.studentName}</h2>
                   )}
                   <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-                    {TYPES[detail.type]?.label || detail.type} · {new Date(detail.createdAt).toLocaleDateString('pt-BR')}
+                    {detail.disciplina || (TYPES[detail.type]?.label !== 'outro' ? TYPES[detail.type]?.label : null) || null}
+                    {(detail.disciplina || (TYPES[detail.type]?.label !== 'outro' ? TYPES[detail.type]?.label : null)) ? ' · ' : ''}
+                    {new Date(detail.createdAt).toLocaleDateString('pt-BR')}
                     {detail.turma ? ` · ${detail.turma}` : ''}
                     {detail.profileName ? ` · ${detail.profileName}` : ''}
                   </p>
