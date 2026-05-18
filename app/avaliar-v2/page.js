@@ -74,7 +74,8 @@ async function processAnyFile(file) {
   if (type === 'application/pdf' || name.endsWith('.pdf')) return { kind: 'media', data: await toBase64(file), mediaType: 'application/pdf', label: 'Trabalho do aluno', name: file.name };
   if (name.endsWith('.docx') || type.includes('wordprocessingml')) { const { value } = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() }); return { kind: 'text', content: value, name: file.name }; }
   if (name.endsWith('.obj')) { const slice = file.size > 5e6 ? file.slice(0, 5e6) : file; return { kind: 'text', content: summarizeObj(await slice.text(), file.name), name: file.name }; }
-  try { return { kind: 'text', content: await file.text(), name: file.name }; } catch { return { kind: 'media', data: await toBase64(file), mediaType: type || 'application/octet-stream', label: 'Trabalho do aluno', name: file.name }; }
+  try { return { kind: 'text', content: await file.text(), name: file.name }; }
+  catch { return { kind: 'media', data: await toBase64(file), mediaType: type || 'application/octet-stream', label: 'Trabalho do aluno', name: file.name }; }
 }
 
 function fileIcon(name = '') {
@@ -98,7 +99,7 @@ const IconUpload = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="n
 
 // ── Barra de progresso ────────────────────────────────────────────────────────
 function StepBar({ current }) {
-  const steps = ['Descrição', 'Critérios', 'Alunos'];
+  const steps = ['Configuração', 'Exercício', 'Alunos'];
   return (
     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 28 }}>
       {steps.map((label, i) => {
@@ -121,7 +122,7 @@ function StepBar({ current }) {
 
 // ── Seletor com botão + ───────────────────────────────────────────────────────
 function SelectWithAdd({ label, value, onChange, options, placeholder, href, disabled }) {
-  const inp = { width: '100%', padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', boxSizing: 'border-box' };
+  const inp = { width: '100%', padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, background: disabled ? 'var(--bg-card)' : 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', boxSizing: 'border-box' };
   return (
     <div style={{ marginBottom: 12 }}>
       <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>{label}</label>
@@ -212,7 +213,6 @@ function StudentSlot({ slot, index, students, onChange, onRemove, canRemove }) {
               )}
             </div>
           )}
-          {!slot.result && !slot.evaluating && slot.error && <p style={{ color: '#ef4444', fontSize: 12, margin: 0 }}>{slot.error}</p>}
         </div>
         {canRemove && (
           <button onClick={onRemove} style={{ background: 'transparent', border: 'none', color: 'var(--text-sub)', cursor: 'pointer', padding: 4, marginTop: 6, flexShrink: 0 }}><IconTrash /></button>
@@ -232,7 +232,7 @@ function ResultCard({ slot }) {
         <div style={{ ...col, borderRadius: 8, padding: '5px 12px', fontSize: 16, fontWeight: 800, flexShrink: 0 }}>{slot.result.score?.toFixed(1)}</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{slot.studentName || 'Aluno'}</div>
-          <div style={{ fontSize: 12, color: 'var(--text-sub)' }}>{scoreToGrade(slot.result.score)} · {slot.result.criteriaScores?.length} critérios avaliados</div>
+          <div style={{ fontSize: 12, color: 'var(--text-sub)' }}>{scoreToGrade(slot.result.score)} · {slot.result.criteriaScores?.length} critérios</div>
         </div>
         {slot.evalId && (
           <button onClick={e => { e.stopPropagation(); window.open(`/relatorio-individual?id=${slot.evalId}&print=1`, '_blank'); }}
@@ -275,15 +275,11 @@ function ResultCard({ slot }) {
 // ── Página principal ──────────────────────────────────────────────────────────
 export default function AvaliarV2() {
   const [step, setStep] = useState(1);
-  const [description, setDescription] = useState('');
   const [exerciseName, setExerciseName] = useState('');
   const [exerciseContext, setExerciseContext] = useState('');
   const [criteria, setCriteria] = useState([]);
   const [tone, setTone] = useState('neutro');
-  const [loadingCriteria, setLoadingCriteria] = useState(false);
-  const [stepError, setStepError] = useState('');
 
-  // Dados do sistema
   const [profiles, setProfiles] = useState([]);
   const [selectedProfileId, setSelectedProfileId] = useState('');
   const [profName, setProfName] = useState('');
@@ -297,7 +293,6 @@ export default function AvaliarV2() {
   const [selectedClassId, setSelectedClassId] = useState('');
   const [students, setStudents] = useState([]);
 
-  // Multi-aluno
   const [slots, setSlots] = useState([newSlot()]);
   const [evaluating, setEvaluating] = useState(false);
   const [evalProgress, setEvalProgress] = useState('');
@@ -323,6 +318,7 @@ export default function AvaliarV2() {
   async function loadDisciplinesForInstitution(institutionId) {
     setSelectedInstitutionId(institutionId);
     setSelectedDisciplineId(''); setDisciplineExercises([]); setSelectedExerciseId('');
+    setExerciseName(''); setExerciseContext(''); setCriteria([]);
     const url = institutionId ? `/api/disciplines?institutionId=${institutionId}` : '/api/disciplines';
     const r = await fetch(url, { headers: { Authorization: `Bearer ${token()}` } });
     if (r.ok) setDisciplines(await r.json());
@@ -330,6 +326,7 @@ export default function AvaliarV2() {
 
   async function loadDiscipline(id) {
     setSelectedDisciplineId(id); setDisciplineExercises([]); setSelectedExerciseId('');
+    setExerciseName(''); setExerciseContext(''); setCriteria([]);
     if (!id) return;
     const r = await fetch(`/api/exercises?disciplineId=${id}`, { headers: { Authorization: `Bearer ${token()}` } });
     if (r.ok) setDisciplineExercises(await r.json());
@@ -337,7 +334,7 @@ export default function AvaliarV2() {
 
   function loadExercise(id) {
     setSelectedExerciseId(id);
-    if (!id) return;
+    if (!id) { setExerciseName(''); setExerciseContext(''); setCriteria([]); return; }
     const ex = disciplineExercises.find(e => e.id === id);
     if (!ex) return;
     setExerciseName(ex.name || '');
@@ -362,33 +359,13 @@ export default function AvaliarV2() {
 
   function updateSlot(id, patch) { setSlots(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s)); }
 
-  async function handleGenerateCriteria() {
-    if (!description.trim()) return;
-    setLoadingCriteria(true); setStepError('');
-    try {
-      const res = await fetch('/api/generate-criteria', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
-        body: JSON.stringify({ description }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erro ao gerar');
-      setExerciseName(data.exerciseName || '');
-      setExerciseContext(data.exerciseContext || '');
-      setCriteria(data.criteria || []);
-      setStep(2);
-    } catch (e) { setStepError(e.message); }
-    finally { setLoadingCriteria(false); }
-  }
-
   async function handleEvaluateAll() {
     const validSlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0);
     if (!validSlots.length) return;
     setEvaluating(true); setShowResults(false);
     const profile = profiles.find(p => p.id === selectedProfileId);
     const turmaName = classes.find(c => c.id === selectedClassId)?.name || '';
-    const institutionName = institutions.find(i => i.id === selectedInstitutionId)?.name || profile?.institution || '';
-    const instLogo = institutions.find(i => i.id === selectedInstitutionId)?.logoUrl || profile?.institutionLogo || '';
+    const institutionObj = institutions.find(i => i.id === selectedInstitutionId);
 
     for (let i = 0; i < slots.length; i++) {
       const slot = slots[i];
@@ -421,10 +398,11 @@ export default function AvaliarV2() {
               studentName: slot.studentName || 'Aluno', type: 'outro',
               score: evalData.score, feedback: evalData.feedback,
               criteria: evalData.criteriaScores, profileName: profile?.name || '',
-              turma: turmaName, exerciseName, institution: institutionName,
+              turma: turmaName, exerciseName,
+              institution: institutionObj?.name || profile?.institution || '',
               disciplina: profile?.discipline || '',
               student_id: slot.studentId || null, class_id: selectedClassId || null,
-              institution_logo_url: instLogo,
+              institution_logo_url: institutionObj?.logoUrl || profile?.institutionLogo || '',
             }),
           });
           if (saveRes.ok) { const saved = await saveRes.json(); evalId = saved.id; }
@@ -436,15 +414,16 @@ export default function AvaliarV2() {
   }
 
   function reset() {
-    setStep(1); setDescription(''); setExerciseName(''); setExerciseContext('');
-    setCriteria([]); setSelectedExerciseId(''); setSelectedClassId('');
-    setStudents([]); setSlots([newSlot()]); setShowResults(false); setStepError('');
+    setStep(1); setExerciseName(''); setExerciseContext(''); setCriteria([]);
+    setSelectedExerciseId(''); setSelectedDisciplineId(''); setDisciplineExercises([]);
+    setSelectedClassId(''); setStudents([]); setSlots([newSlot()]); setShowResults(false);
   }
 
+  const canGoToStep2 = !!selectedExerciseId;
   const readySlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0);
   const doneSlots = slots.filter(s => s.result);
 
-  // Estilos do design system
+  // Design system
   const secLabel = { fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 };
   const section = { padding: '20px 24px', borderBottom: '1px solid var(--border-card)' };
   const sectionLast = { padding: '20px 24px' };
@@ -458,11 +437,11 @@ export default function AvaliarV2() {
     <AppLayout>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
-      {/* Header padrão */}
       <div style={{ marginBottom: 32 }}>
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Avaliação</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px', margin: 0 }}>Nova Avaliação</h1>
-        <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 0 }}>Descreva o exercício e a IA cuida do resto.{' '}
+        <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 0 }}>
+          Selecione o exercício, adicione os trabalhos e gere as avaliações.{' '}
           <span style={{ background: '#810cfa', color: '#fff', fontSize: 11, fontWeight: 700, padding: '1px 7px', borderRadius: 10 }}>V2</span>
         </p>
       </div>
@@ -470,47 +449,109 @@ export default function AvaliarV2() {
       <div style={{ maxWidth: 680 }}>
         {!showResults && <StepBar current={step} />}
 
-        {/* ── PASSO 1: Descrição ──────────────────────────────────────── */}
+        {/* ── PASSO 1: Configuração ────────────────────────────────────── */}
         {step === 1 && (
           <div style={card}>
+            {/* Perfil */}
             <div style={section}>
-              <div style={secLabel}>Passo 1 — Descreva o exercício</div>
-              <p style={{ fontSize: 14, color: 'var(--text-sub)', marginTop: 0, marginBottom: 16, lineHeight: 1.6 }}>
-                Escreva em suas próprias palavras. A IA vai gerar o enunciado e os critérios para você revisar.
-              </p>
-              <textarea value={description} onChange={e => setDescription(e.target.value)} autoFocus
-                placeholder="Ex: Redação sobre os impactos da tecnologia na educação, mínimo 25 linhas, argumentação clara com pelo menos 3 argumentos..."
-                rows={5} style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
-              {stepError && <p style={{ color: '#ef4444', fontSize: 13, marginTop: 8, marginBottom: 0 }}>{stepError}</p>}
+              <div style={secLabel}>Perfil do Professor</div>
+              {profName ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-content)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                  <div>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{profName}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-sub)', marginLeft: 8 }}>· {TONES.find(t => t.id === tone)?.label || 'Neutro'}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                    {profiles.length > 1 && (
+                      <select value={selectedProfileId} onChange={e => loadProfile(e.target.value)}
+                        style={{ ...inp, width: 'auto', padding: '4px 8px', fontSize: 12 }}>
+                        {profiles.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                      </select>
+                    )}
+                    <Link href="/perfis" style={{ fontSize: 12, color: '#0081f0', textDecoration: 'none', fontWeight: 500 }}>Editar perfil</Link>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: '10px 14px', background: '#FEF9EC', border: '1px solid #F59E0B33', borderRadius: 10 }}>
+                  <span style={{ fontSize: 13, color: '#92400E' }}>Nenhum perfil configurado. </span>
+                  <Link href="/perfis" style={{ fontSize: 13, color: '#0081f0', fontWeight: 600, textDecoration: 'none' }}>Criar perfil →</Link>
+                </div>
+              )}
             </div>
+
+            {/* Configuração */}
+            <div style={section}>
+              <div style={secLabel}>Configuração da Avaliação</div>
+
+              <SelectWithAdd label="Instituição" value={selectedInstitutionId}
+                onChange={loadDisciplinesForInstitution}
+                options={institutions.map(i => ({ value: i.id, label: i.name }))}
+                placeholder="Selecione uma instituição" href="/instituicao" />
+
+              <SelectWithAdd label="Disciplina" value={selectedDisciplineId}
+                onChange={loadDiscipline}
+                options={disciplines.map(d => ({ value: d.id, label: d.subject }))}
+                placeholder="Selecione uma disciplina" href="/disciplinas" />
+
+              <SelectWithAdd label="Exercício" value={selectedExerciseId}
+                onChange={loadExercise}
+                options={disciplineExercises.map(e => ({ value: e.id, label: e.name }))}
+                placeholder={selectedDisciplineId ? 'Selecione um exercício' : 'Selecione uma disciplina primeiro'}
+                href="/disciplinas" disabled={!selectedDisciplineId} />
+
+              <SelectWithAdd label="Turma" value={selectedClassId}
+                onChange={loadClass}
+                options={classes.map(c => ({ value: c.id, label: c.name }))}
+                placeholder="Selecione uma turma" href="/turmas" />
+            </div>
+
+            {/* Tom */}
+            <div style={section}>
+              <div style={secLabel}>Tom do Feedback</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {TONES.map(t => (
+                  <button key={t.id} onClick={() => setTone(t.id)} title={t.desc}
+                    style={{ padding: '7px 16px', borderRadius: 20, fontSize: 13, cursor: 'pointer', border: `1px solid ${tone === t.id ? '#810cfa' : 'var(--border)'}`, background: tone === t.id ? '#810cfa' : 'var(--bg-content)', color: tone === t.id ? '#fff' : 'var(--text-main)', fontWeight: tone === t.id ? 700 : 400, fontFamily: 'inherit' }}>
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div style={{ ...sectionLast, display: 'flex', justifyContent: 'flex-end' }}>
-              <button style={{ ...btnPrimary, opacity: !description.trim() || loadingCriteria ? 0.6 : 1 }}
-                onClick={handleGenerateCriteria} disabled={!description.trim() || loadingCriteria}>
-                {loadingCriteria ? <><IconSpinner /> Gerando critérios...</> : 'Próximo →'}
+              {!canGoToStep2 && (
+                <p style={{ fontSize: 13, color: 'var(--text-sub)', marginRight: 'auto', alignSelf: 'center' }}>
+                  Selecione um exercício para continuar
+                </p>
+              )}
+              <button style={{ ...btnPrimary, opacity: !canGoToStep2 ? 0.5 : 1 }}
+                onClick={() => canGoToStep2 && setStep(2)} disabled={!canGoToStep2}>
+                Próximo →
               </button>
             </div>
           </div>
         )}
 
-        {/* ── PASSO 2: Critérios ──────────────────────────────────────── */}
+        {/* ── PASSO 2: Exercício ───────────────────────────────────────── */}
         {step === 2 && (
           <div style={card}>
             <div style={section}>
-              <div style={secLabel}>Passo 2 — Revise e ajuste</div>
+              <div style={secLabel}>Passo 2 — Exercício</div>
               <div style={{ marginBottom: 16 }}>
                 <label style={lbl}>Nome do exercício</label>
                 <input type="text" value={exerciseName} onChange={e => setExerciseName(e.target.value)} style={inp} />
               </div>
               <div>
                 <label style={lbl}>Enunciado</label>
-                <textarea value={exerciseContext} onChange={e => setExerciseContext(e.target.value)} rows={5} style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
+                <textarea value={exerciseContext} onChange={e => setExerciseContext(e.target.value)} rows={5}
+                  style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
               </div>
             </div>
 
             <div style={section}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                <div style={secLabel}>Critérios de avaliação</div>
-                <button style={{ ...btnSecondary, padding: '5px 12px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, borderRadius: 8 }}
+                <div style={secLabel}>Critérios de Avaliação</div>
+                <button style={{ background: 'transparent', color: 'var(--text-sub)', border: '1px solid var(--border)', borderRadius: 8, padding: '5px 12px', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}
                   onClick={() => setCriteria(prev => [...prev, { name: '', weight: 1 }])}>
                   <IconPlus /> Adicionar
                 </button>
@@ -545,83 +586,9 @@ export default function AvaliarV2() {
           </div>
         )}
 
-        {/* ── PASSO 3: Configuração + Alunos ──────────────────────────── */}
+        {/* ── PASSO 3: Alunos ─────────────────────────────────────────── */}
         {step === 3 && !showResults && (
           <div style={card}>
-            {/* Perfil do professor */}
-            <div style={section}>
-              <div style={secLabel}>Perfil do Professor</div>
-              {profName ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-content)', borderRadius: 10, border: '1px solid var(--border)' }}>
-                  <div>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{profName}</span>
-                    <span style={{ fontSize: 12, color: 'var(--text-sub)', marginLeft: 8 }}>· {TONES.find(t => t.id === tone)?.label || 'Neutro'}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                    {profiles.length > 1 && (
-                      <select value={selectedProfileId} onChange={e => loadProfile(e.target.value)}
-                        style={{ ...inp, width: 'auto', padding: '4px 8px', fontSize: 12 }}>
-                        {profiles.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                      </select>
-                    )}
-                    <Link href="/perfis" style={{ fontSize: 12, color: '#0081f0', textDecoration: 'none', fontWeight: 500 }}>Editar perfil</Link>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ padding: '10px 14px', background: '#FEF9EC', border: '1px solid #F59E0B33', borderRadius: 10 }}>
-                  <span style={{ fontSize: 13, color: '#92400E' }}>Nenhum perfil configurado. </span>
-                  <Link href="/perfis" style={{ fontSize: 13, color: '#0081f0', fontWeight: 600, textDecoration: 'none' }}>Criar perfil →</Link>
-                </div>
-              )}
-            </div>
-
-            {/* Configuração da avaliação */}
-            <div style={section}>
-              <div style={secLabel}>Configuração da Avaliação</div>
-
-              <SelectWithAdd label="Instituição" value={selectedInstitutionId}
-                onChange={loadDisciplinesForInstitution}
-                options={institutions.map(i => ({ value: i.id, label: i.name }))}
-                placeholder="Selecione uma instituição" href="/instituicao" />
-
-              <SelectWithAdd label="Disciplina" value={selectedDisciplineId}
-                onChange={loadDiscipline}
-                options={disciplines.map(d => ({ value: d.id, label: d.subject }))}
-                placeholder="Selecione uma disciplina" href="/disciplinas" />
-
-              <SelectWithAdd label="Exercício" value={selectedExerciseId}
-                onChange={loadExercise}
-                options={disciplineExercises.map(e => ({ value: e.id, label: e.name }))}
-                placeholder={selectedDisciplineId ? 'Selecione um exercício' : 'Selecione uma disciplina primeiro'}
-                href="/disciplinas" disabled={!selectedDisciplineId} />
-
-              {selectedExerciseId && (
-                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#166534', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>Exercício carregado — enunciado e critérios atualizados.</span>
-                  <button onClick={() => setStep(2)} style={{ background: 'none', border: 'none', color: '#166534', cursor: 'pointer', fontWeight: 600, fontSize: 12, textDecoration: 'underline', fontFamily: 'inherit' }}>Rever critérios</button>
-                </div>
-              )}
-
-              <SelectWithAdd label="Turma" value={selectedClassId}
-                onChange={loadClass}
-                options={classes.map(c => ({ value: c.id, label: c.name }))}
-                placeholder="Selecione uma turma" href="/turmas" />
-            </div>
-
-            {/* Tom do feedback */}
-            <div style={section}>
-              <div style={secLabel}>Tom do Feedback</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {TONES.map(t => (
-                  <button key={t.id} onClick={() => setTone(t.id)} title={t.desc}
-                    style={{ padding: '7px 16px', borderRadius: 20, fontSize: 13, cursor: 'pointer', border: `1px solid ${tone === t.id ? '#810cfa' : 'var(--border)'}`, background: tone === t.id ? '#810cfa' : 'var(--bg-content)', color: tone === t.id ? '#fff' : 'var(--text-main)', fontWeight: tone === t.id ? 700 : 400, fontFamily: 'inherit' }}>
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Alunos */}
             <div style={section}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                 <div style={secLabel}>Alunos {selectedClassId && students.length > 0 ? `— ${students.length} na turma` : ''}</div>
