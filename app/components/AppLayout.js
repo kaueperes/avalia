@@ -392,7 +392,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
           {/* ── SIDEBAR ── */}
           <aside className={`sidebar${menuOpen ? ' sidebar-open' : ''}`} style={{
             position: 'fixed', top: 58, left: 0, bottom: 0,
-            width: 290,
+            width: 320,
             background: bg,
             borderRight: `1px solid ${border}`,
             display: 'flex', flexDirection: 'column',
@@ -436,7 +436,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
           </aside>
 
           {/* ── MAIN CONTENT ── */}
-          <main className="main-area" style={{ marginLeft: 290, flex: 1, minHeight: '100%', padding: noPadding ? 0 : '32px 36px', overflow: noPadding ? 'hidden' : undefined }}>
+          <main className="main-area" style={{ marginLeft: 320, flex: 1, minHeight: '100%', padding: noPadding ? 0 : '32px 36px', overflow: noPadding ? 'hidden' : undefined }}>
             {children}
           </main>
         </div>
