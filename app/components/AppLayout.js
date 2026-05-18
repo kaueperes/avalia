@@ -131,6 +131,7 @@ const navItems = [
   { Icon: ClipboardIcon, label: 'Cadastro de Disciplinas',   href: '/disciplinas' },
   { Icon: ReportIcon,    label: 'Cadastro de Turmas',        href: '/turmas' },
   { Icon: PlusIcon,      label: 'Nova Avaliação',            href: '/avaliar',   highlight: true },
+  { Icon: PlusIcon,      label: 'Nova Avaliação V2',         href: '/avaliar-v2', highlight: true },
   { Icon: ClipboardIcon, label: 'Gerenciar Avaliações',      href: '/avaliacoes' },
   { Icon: ReportIcon,    label: 'Gerenciar Relatórios',      href: '/relatorios' },
   { Icon: HelpIcon,      label: 'Ajuda',                     href: '/ajuda' },
