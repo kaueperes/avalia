@@ -690,7 +690,7 @@ export default function AvaliacoesPage() {
                     style={{ cursor: 'pointer', width: 15, height: 15 }}
                   />
                 </th>
-                {['Aluno', 'Tipo', 'Exercício', 'Nota', 'Conceito', 'Turma', 'Instituição', 'Professor', 'Data', ''].map(h => (
+                {['Aluno', 'Disciplina', 'Exercício', 'Nota', 'Conceito', 'Turma', 'Instituição', 'Professor', 'Data', ''].map(h => (
                   <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: 'var(--text-sub)', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                 ))}
               </tr>
@@ -709,7 +709,7 @@ export default function AvaliacoesPage() {
                       />
                     </td>
                     <td style={{ padding: '13px 16px', fontWeight: 600, color: 'var(--text-main)' }}>{e.studentName}</td>
-                    <td style={{ padding: '13px 16px', color: 'var(--text-muted)' }}>{TYPES[e.type]?.label || e.type}</td>
+                    <td style={{ padding: '13px 16px', color: 'var(--text-muted)' }}>{e.disciplina || '—'}</td>
                     <td style={{ padding: '13px 16px', color: 'var(--text-sub)', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.exerciseName || '—'}</td>
                     <td style={{ padding: '13px 16px', fontWeight: 700, color: c.text, fontSize: 15 }}>{typeof e.score === 'number' ? e.score.toFixed(1) : e.score}</td>
                     <td style={{ padding: '13px 16px' }}>

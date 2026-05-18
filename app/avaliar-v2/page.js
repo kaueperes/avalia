@@ -400,7 +400,7 @@ export default function AvaliarV2() {
               criteria: evalData.criteriaScores, profileName: profile?.name || '',
               turma: turmaName, exerciseName,
               institution: institutionObj?.name || profile?.institution || '',
-              disciplina: profile?.discipline || '',
+              disciplina: disciplines.find(d => d.id === selectedDisciplineId)?.subject || profile?.discipline || '',
               student_id: slot.studentId || null, class_id: selectedClassId || null,
               institution_logo_url: institutionObj?.logoUrl || profile?.institutionLogo || '',
             }),
