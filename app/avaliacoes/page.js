@@ -818,7 +818,12 @@ export default function AvaliacoesPage() {
                           <input
                             type="number" min="0" max="10" step="0.1"
                             value={c.score || 0}
-                            onChange={e => setDetailDraft(dd => ({ ...dd, criteria: dd.criteria.map((cr, j) => j === i ? { ...cr, score: parseFloat(e.target.value) || 0 } : cr) }))}
+                            onChange={e => setDetailDraft(dd => {
+                              const updated = dd.criteria.map((cr, j) => j === i ? { ...cr, score: parseFloat(e.target.value) || 0 } : cr);
+                              const totalW = updated.reduce((s, cr) => s + (cr.weight || 1), 0);
+                              const newScore = Math.round(updated.reduce((s, cr) => s + (cr.score || 0) * (cr.weight || 1), 0) / totalW * 10) / 10;
+                              return { ...dd, criteria: updated, score: newScore };
+                            })}
                             style={{ width: 58, fontSize: 13, fontWeight: 700, border: '1px solid var(--border)', borderRadius: 6, padding: '3px 6px', textAlign: 'center', color: cc.text, background: 'var(--bg-content)', fontFamily: 'inherit' }}
                           />
                         ) : (
