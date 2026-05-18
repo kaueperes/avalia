@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { TONES, scoreToGrade, scoreColor } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import mammoth from 'mammoth';
@@ -47,67 +48,33 @@ async function toBase64(file) {
 function summarizeObj(text, filename) {
   let verts = 0, uvs = 0, normals = 0, tris = 0, quads = 0, ngons = 0;
   const objects = [], materials = [];
-  let pos = 0;
-  const len = text.length;
+  let pos = 0; const len = text.length;
   while (pos < len) {
-    const nl = text.indexOf('\n', pos);
-    const end = nl === -1 ? len : nl;
-    const t = text.slice(pos, end).trimStart();
-    pos = end + 1;
+    const nl = text.indexOf('\n', pos); const end = nl === -1 ? len : nl;
+    const t = text.slice(pos, end).trimStart(); pos = end + 1;
     if (t.startsWith('v ')) verts++;
     else if (t.startsWith('vt ')) uvs++;
     else if (t.startsWith('vn ')) normals++;
-    else if (t.startsWith('f ')) {
-      const vCount = t.trim().split(/\s+/).length - 1;
-      if (vCount === 3) tris++;
-      else if (vCount === 4) quads++;
-      else if (vCount >= 5) ngons++;
-    } else if (t.startsWith('o ') || t.startsWith('g ')) {
-      const name = t.slice(2).trim();
-      if (name && name !== 'default') objects.push(name);
-    } else if (t.startsWith('usemtl ')) {
-      const name = t.slice(7).trim();
-      if (name && !materials.includes(name)) materials.push(name);
-    }
+    else if (t.startsWith('f ')) { const v = t.trim().split(/\s+/).length - 1; if (v === 3) tris++; else if (v === 4) quads++; else if (v >= 5) ngons++; }
+    else if (t.startsWith('o ') || t.startsWith('g ')) { const n = t.slice(2).trim(); if (n && n !== 'default') objects.push(n); }
+    else if (t.startsWith('usemtl ')) { const n = t.slice(7).trim(); if (n && !materials.includes(n)) materials.push(n); }
   }
   const total = tris + quads + ngons;
   const pct = n => total > 0 ? ` (${((n / total) * 100).toFixed(1)}%)` : '';
-  return `=== ${filename} ===\nVértices: ${verts} | UVs: ${uvs} | Normais: ${normals}\nObjetos/grupos: ${objects.length ? objects.join(', ') : '(nenhum nomeado)'}\nMateriais: ${materials.length ? materials.join(', ') : '(nenhum)'}\nFaces: ${total} — Triângulos: ${tris}${pct(tris)} | Quads: ${quads}${pct(quads)} | N-gons: ${ngons}${pct(ngons)}`;
+  return `=== ${filename} ===\nVértices: ${verts} | UVs: ${uvs} | Normais: ${normals}\nObjetos: ${objects.join(', ') || '(nenhum)'} | Materiais: ${materials.join(', ') || '(nenhum)'}\nFaces: ${total} — Triângulos: ${tris}${pct(tris)} | Quads: ${quads}${pct(quads)} | N-gons: ${ngons}${pct(ngons)}`;
 }
 
-// Detecta o tipo e processa qualquer arquivo automaticamente
 async function processAnyFile(file) {
-  const name = file.name.toLowerCase();
-  const type = file.type;
-
-  if (type.startsWith('image/')) {
-    return { kind: 'media', data: await compressImage(file), mediaType: 'image/jpeg', label: 'Trabalho do aluno', name: file.name };
-  }
+  const name = file.name.toLowerCase(); const type = file.type;
+  if (type.startsWith('image/')) return { kind: 'media', data: await compressImage(file), mediaType: 'image/jpeg', label: 'Trabalho do aluno', name: file.name };
   if (type.startsWith('video/') || type.startsWith('audio/')) {
-    if (file.size > 20 * 1024 * 1024) throw new Error(`"${file.name}" é maior que 20MB. Reduza o tamanho ou exporte em qualidade menor.`);
+    if (file.size > 20 * 1024 * 1024) throw new Error(`"${file.name}" maior que 20MB.`);
     return { kind: 'media', data: await toBase64(file), mediaType: type, label: 'Trabalho do aluno', name: file.name };
   }
-  if (type === 'application/pdf' || name.endsWith('.pdf')) {
-    return { kind: 'media', data: await toBase64(file), mediaType: 'application/pdf', label: 'Trabalho do aluno', name: file.name };
-  }
-  if (name.endsWith('.docx') || type.includes('wordprocessingml')) {
-    const arrayBuffer = await file.arrayBuffer();
-    const { value } = await mammoth.extractRawText({ arrayBuffer });
-    return { kind: 'text', content: value, name: file.name };
-  }
-  if (name.endsWith('.obj')) {
-    const MAX = 5 * 1024 * 1024;
-    const slice = file.size > MAX ? file.slice(0, MAX) : file;
-    const text = await slice.text();
-    return { kind: 'text', content: summarizeObj(text, file.name), name: file.name };
-  }
-  // txt e outros arquivos de texto
-  try {
-    const text = await file.text();
-    return { kind: 'text', content: text, name: file.name };
-  } catch {
-    return { kind: 'media', data: await toBase64(file), mediaType: type || 'application/octet-stream', label: 'Trabalho do aluno', name: file.name };
-  }
+  if (type === 'application/pdf' || name.endsWith('.pdf')) return { kind: 'media', data: await toBase64(file), mediaType: 'application/pdf', label: 'Trabalho do aluno', name: file.name };
+  if (name.endsWith('.docx') || type.includes('wordprocessingml')) { const { value } = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() }); return { kind: 'text', content: value, name: file.name }; }
+  if (name.endsWith('.obj')) { const slice = file.size > 5e6 ? file.slice(0, 5e6) : file; return { kind: 'text', content: summarizeObj(await slice.text(), file.name), name: file.name }; }
+  try { return { kind: 'text', content: await file.text(), name: file.name }; } catch { return { kind: 'media', data: await toBase64(file), mediaType: type || 'application/octet-stream', label: 'Trabalho do aluno', name: file.name }; }
 }
 
 function fileIcon(name = '') {
@@ -122,35 +89,49 @@ function fileIcon(name = '') {
 }
 
 // ── Ícones ───────────────────────────────────────────────────────────────────
-const IconCheck = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
-const IconPlus = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
-const IconTrash = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>;
-const IconSpinner = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>;
+const IconCheck = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
+const IconPlus = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
+const IconTrash = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>;
+const IconSpinner = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>;
 const IconPDF = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
-const IconUpload = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>;
-const IconX = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+const IconUpload = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>;
 
 // ── Barra de progresso ────────────────────────────────────────────────────────
 function StepBar({ current }) {
   const steps = ['Descrição', 'Critérios', 'Alunos'];
   return (
-    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 32 }}>
+    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 28 }}>
       {steps.map((label, i) => {
-        const n = i + 1;
-        const done = current > n;
-        const active = current === n;
+        const n = i + 1; const done = current > n; const active = current === n;
         return (
           <div key={n} style={{ display: 'flex', alignItems: 'center', flex: i < steps.length - 1 ? 1 : 'none' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: done || active ? 'var(--accent)' : 'var(--bg-card)', border: `2px solid ${done || active ? 'var(--accent)' : 'var(--border)'}`, color: done || active ? '#fff' : 'var(--text-muted)', fontSize: 13, fontWeight: 600 }}>
+              <div style={{ width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: done || active ? '#810cfa' : 'var(--bg-card)', border: `2px solid ${done || active ? '#810cfa' : 'var(--border)'}`, color: done || active ? '#fff' : 'var(--text-sub)', fontSize: 12, fontWeight: 700 }}>
                 {done ? <IconCheck /> : n}
               </div>
-              <span style={{ fontSize: 11, color: active ? 'var(--accent)' : 'var(--text-muted)', fontWeight: active ? 600 : 400, whiteSpace: 'nowrap' }}>{label}</span>
+              <span style={{ fontSize: 11, color: active ? '#810cfa' : 'var(--text-sub)', fontWeight: active ? 700 : 400, whiteSpace: 'nowrap' }}>{label}</span>
             </div>
-            {i < steps.length - 1 && <div style={{ flex: 1, height: 2, background: done ? 'var(--accent)' : 'var(--border)', margin: '0 8px', marginBottom: 20 }} />}
+            {i < steps.length - 1 && <div style={{ flex: 1, height: 2, background: done ? '#810cfa' : 'var(--border)', margin: '0 8px', marginBottom: 20 }} />}
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Seletor com botão + ───────────────────────────────────────────────────────
+function SelectWithAdd({ label, value, onChange, options, placeholder, href, disabled }) {
+  const inp = { width: '100%', padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', boxSizing: 'border-box' };
+  return (
+    <div style={{ marginBottom: 12 }}>
+      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 }}>{label}</label>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <select style={{ ...inp, flex: 1, opacity: disabled ? 0.5 : 1 }} value={value} onChange={e => onChange(e.target.value)} disabled={disabled}>
+          <option value="">{placeholder}</option>
+          {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+        <Link href={href} style={{ width: 38, height: 38, border: '1px solid var(--border)', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textDecoration: 'none', fontSize: 18, background: 'var(--bg-content)', flexShrink: 0 }}>+</Link>
+      </div>
     </div>
   );
 }
@@ -162,81 +143,52 @@ function StudentSlot({ slot, index, students, onChange, onRemove, canRemove }) {
 
   async function handleFiles(selectedFiles) {
     setProcessing(true);
-    const mediaFiles = [];
-    const textParts = [];
-    const fileNames = [];
-    const errors = [];
-
+    const mediaFiles = [], textParts = [], fileNames = [], errors = [];
     for (const file of Array.from(selectedFiles)) {
-      try {
-        const result = await processAnyFile(file);
-        fileNames.push(file.name);
-        if (result.kind === 'media') mediaFiles.push(result);
-        else textParts.push(result.content);
-      } catch (e) {
-        errors.push(e.message);
-      }
+      try { const r = await processAnyFile(file); fileNames.push(file.name); if (r.kind === 'media') mediaFiles.push(r); else textParts.push(r.content); }
+      catch (e) { errors.push(e.message); }
     }
-
-    onChange({
-      mediaFiles,
-      textContent: textParts.join('\n\n'),
-      fileNames,
-      error: errors.join(' '),
-    });
+    onChange({ mediaFiles, textContent: textParts.join('\n\n'), fileNames, error: errors.join(' ') });
     setProcessing(false);
   }
 
-  const inputStyle = { width: '100%', padding: '8px 10px', borderRadius: 7, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 13, boxSizing: 'border-box', fontFamily: 'inherit' };
+  const inp = { width: '100%', padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', boxSizing: 'border-box' };
   const hasFiles = slot.fileNames.length > 0 || slot.textContent;
 
   return (
-    <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 10, padding: 16 }}>
+    <div style={{ background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 12, padding: 16 }}>
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-        <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--accent)', color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 6 }}>
+        <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#810cfa', color: '#fff', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 7 }}>
           {index + 1}
         </div>
-
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {/* Seletor de aluno */}
           <select value={slot.studentId}
-            onChange={e => {
-              const s = students.find(s => s.id === e.target.value);
-              onChange({ studentId: e.target.value, studentName: s?.name || '' });
-            }}
-            style={inputStyle}>
-            <option value="">Selecionar aluno...</option>
+            onChange={e => { const s = students.find(s => s.id === e.target.value); onChange({ studentId: e.target.value, studentName: s?.name || '' }); }}
+            style={inp}>
+            <option value="">Selecione o aluno...</option>
             {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
 
-          {/* Área de upload */}
-          <div
-            onClick={() => !processing && fileRef.current?.click()}
+          <div onClick={() => !processing && fileRef.current?.click()}
             onDragOver={e => e.preventDefault()}
             onDrop={e => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
-            style={{ border: `1.5px dashed ${hasFiles ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 8, padding: hasFiles ? '10px 14px' : '18px 16px', cursor: processing ? 'wait' : 'pointer', transition: 'border-color 0.15s', background: hasFiles ? 'var(--bg-card)' : 'transparent' }}
-          >
+            style={{ border: `1.5px dashed ${hasFiles ? '#810cfa' : 'var(--border)'}`, borderRadius: 10, padding: hasFiles ? '10px 14px' : '16px', cursor: processing ? 'wait' : 'pointer', background: hasFiles ? 'var(--bg-card)' : 'transparent' }}>
             {processing ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-muted)', fontSize: 13 }}>
-                <IconSpinner /> Processando arquivos...
-              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-sub)', fontSize: 13 }}><IconSpinner /> Processando...</div>
             ) : hasFiles ? (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
                 {slot.fileNames.map((name, i) => (
-                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 8px', fontSize: 12 }}>
+                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 8px', fontSize: 12, color: 'var(--text-main)' }}>
                     {fileIcon(name)} {name}
                   </span>
                 ))}
-                {slot.textContent && !slot.fileNames.length && (
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Texto extraído ({slot.textContent.length} caracteres)</span>
-                )}
-                <span style={{ fontSize: 12, color: 'var(--accent)', marginLeft: 4 }}>Clique para trocar</span>
+                <span style={{ fontSize: 12, color: '#810cfa', marginLeft: 4 }}>Clique para trocar</span>
               </div>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-muted)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-sub)' }}>
                 <IconUpload />
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 500 }}>Clique ou arraste qualquer arquivo</div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-main)' }}>Clique ou arraste o trabalho do aluno</div>
                   <div style={{ fontSize: 11, marginTop: 2 }}>Imagem, vídeo, áudio, PDF, DOCX, TXT, OBJ...</div>
                 </div>
               </div>
@@ -246,34 +198,24 @@ function StudentSlot({ slot, index, students, onChange, onRemove, canRemove }) {
             accept="image/*,video/*,audio/*,.pdf,.docx,.doc,.txt,.obj"
             onChange={e => handleFiles(e.target.files)} />
 
-          {slot.error && <p style={{ color: '#dc2626', fontSize: 12, margin: 0 }}>{slot.error}</p>}
+          {slot.error && <p style={{ color: '#ef4444', fontSize: 12, margin: 0 }}>{slot.error}</p>}
 
-          {/* Status da avaliação */}
-          {slot.evaluating && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-muted)', fontSize: 13 }}>
-              <IconSpinner /> Avaliando...
-            </div>
-          )}
+          {slot.evaluating && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-sub)', fontSize: 13 }}><IconSpinner /> Avaliando...</div>}
           {slot.result && !slot.evaluating && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <span style={{ ...scoreColor(slot.result.score), padding: '3px 10px', borderRadius: 6, fontSize: 13, fontWeight: 700 }}>
-                {slot.result.score?.toFixed(1)} — {scoreToGrade(slot.result.score)}
-              </span>
+              <span style={{ ...scoreColor(slot.result.score), padding: '3px 10px', borderRadius: 6, fontSize: 13, fontWeight: 700 }}>{slot.result.score?.toFixed(1)} — {scoreToGrade(slot.result.score)}</span>
               {slot.evalId && (
                 <button onClick={() => window.open(`/relatorio-individual?id=${slot.evalId}&print=1`, '_blank')}
-                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', background: 'var(--bg-card)', color: 'var(--text)', fontFamily: 'inherit' }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: 'inherit' }}>
                   <IconPDF /> Baixar PDF
                 </button>
               )}
             </div>
           )}
+          {!slot.result && !slot.evaluating && slot.error && <p style={{ color: '#ef4444', fontSize: 12, margin: 0 }}>{slot.error}</p>}
         </div>
-
         {canRemove && (
-          <button onClick={onRemove}
-            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4, marginTop: 4, flexShrink: 0 }}>
-            <IconTrash />
-          </button>
+          <button onClick={onRemove} style={{ background: 'transparent', border: 'none', color: 'var(--text-sub)', cursor: 'pointer', padding: 4, marginTop: 6, flexShrink: 0 }}><IconTrash /></button>
         )}
       </div>
     </div>
@@ -285,45 +227,42 @@ function ResultCard({ slot }) {
   const [expanded, setExpanded] = useState(false);
   const col = scoreColor(slot.result.score);
   return (
-    <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
-      <div onClick={() => setExpanded(v => !v)}
-        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', cursor: 'pointer', background: 'var(--bg-card)' }}>
-        <div style={{ ...col, borderRadius: 6, padding: '4px 10px', fontSize: 15, fontWeight: 800, flexShrink: 0 }}>
-          {slot.result.score?.toFixed(1)}
-        </div>
+    <div style={{ border: '1px solid var(--border-card)', borderRadius: 12, overflow: 'hidden' }}>
+      <div onClick={() => setExpanded(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', cursor: 'pointer', background: 'var(--bg-card)' }}>
+        <div style={{ ...col, borderRadius: 8, padding: '5px 12px', fontSize: 16, fontWeight: 800, flexShrink: 0 }}>{slot.result.score?.toFixed(1)}</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 600 }}>{slot.studentName || 'Aluno'}</div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{scoreToGrade(slot.result.score)} · {slot.result.criteriaScores?.length} critérios</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{slot.studentName || 'Aluno'}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-sub)' }}>{scoreToGrade(slot.result.score)} · {slot.result.criteriaScores?.length} critérios avaliados</div>
         </div>
         {slot.evalId && (
           <button onClick={e => { e.stopPropagation(); window.open(`/relatorio-individual?id=${slot.evalId}&print=1`, '_blank'); }}
-            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', background: 'var(--bg)', color: 'var(--text)', fontFamily: 'inherit', flexShrink: 0 }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', fontWeight: 500, flexShrink: 0 }}>
             <IconPDF /> PDF
           </button>
         )}
-        <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{expanded ? '▲' : '▼'}</span>
+        <span style={{ color: 'var(--text-sub)', fontSize: 11 }}>{expanded ? '▲' : '▼'}</span>
       </div>
       {expanded && (
-        <div style={{ padding: '16px 18px', borderTop: '1px solid var(--border)', background: 'var(--bg)' }}>
+        <div style={{ padding: '18px 20px', borderTop: '1px solid var(--border-card)', background: 'var(--bg-content)' }}>
           {slot.result.criteriaScores?.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               {slot.result.criteriaScores.map((c, i) => {
                 const cc = scoreColor(c.score);
                 return (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                    <div style={{ flex: 1, fontSize: 13 }}>{c.name}</div>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    <div style={{ flex: 1, fontSize: 13, color: 'var(--text-main)' }}>{c.name}</div>
                     <div style={{ width: 100, height: 5, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
                       <div style={{ width: `${(c.score / 10) * 100}%`, height: '100%', background: cc.text, borderRadius: 3 }} />
                     </div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: cc.text, minWidth: 32, textAlign: 'right' }}>{c.score?.toFixed(1)}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', minWidth: 36 }}>×{c.weight}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-sub)', minWidth: 36 }}>×{c.weight}</div>
                   </div>
                 );
               })}
             </div>
           )}
           {slot.result.feedback && (
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '12px 14px', fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px', fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap', color: 'var(--text-main)' }}>
               {slot.result.feedback}
             </div>
           )}
@@ -341,46 +280,91 @@ export default function AvaliarV2() {
   const [exerciseContext, setExerciseContext] = useState('');
   const [criteria, setCriteria] = useState([]);
   const [tone, setTone] = useState('neutro');
+  const [loadingCriteria, setLoadingCriteria] = useState(false);
+  const [stepError, setStepError] = useState('');
 
+  // Dados do sistema
   const [profiles, setProfiles] = useState([]);
   const [selectedProfileId, setSelectedProfileId] = useState('');
+  const [profName, setProfName] = useState('');
+  const [institutions, setInstitutions] = useState([]);
+  const [selectedInstitutionId, setSelectedInstitutionId] = useState('');
+  const [disciplines, setDisciplines] = useState([]);
+  const [selectedDisciplineId, setSelectedDisciplineId] = useState('');
+  const [disciplineExercises, setDisciplineExercises] = useState([]);
+  const [selectedExerciseId, setSelectedExerciseId] = useState('');
   const [classes, setClasses] = useState([]);
   const [selectedClassId, setSelectedClassId] = useState('');
   const [students, setStudents] = useState([]);
 
+  // Multi-aluno
   const [slots, setSlots] = useState([newSlot()]);
   const [evaluating, setEvaluating] = useState(false);
   const [evalProgress, setEvalProgress] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [loadingCriteria, setLoadingCriteria] = useState(false);
-  const [stepError, setStepError] = useState('');
 
   useEffect(() => {
-    const headers = { Authorization: `Bearer ${token()}` };
+    const h = { Authorization: `Bearer ${token()}` };
     Promise.all([
-      fetch('/api/profiles', { headers }).then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('/api/classes', { headers }).then(r => r.ok ? r.json() : []).catch(() => []),
-    ]).then(([profs, cls]) => {
+      fetch('/api/profiles',     { headers: h }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/institutions', { headers: h }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/disciplines',  { headers: h }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/classes',      { headers: h }).then(r => r.ok ? r.json() : []).catch(() => []),
+    ]).then(([profs, inst, disc, cls]) => {
       setProfiles(profs || []);
+      setInstitutions(inst || []);
+      setDisciplines(disc || []);
       setClasses(cls || []);
-      if (profs?.length === 1) setSelectedProfileId(profs[0].id);
+      const def = (profs || []).find(p => p.isDefault) || (profs || [])[0];
+      if (def) { setSelectedProfileId(def.id); setProfName(def.name || ''); if (def.tone) setTone(def.tone); }
     });
   }, []);
 
-  useEffect(() => {
-    if (!selectedClassId) { setStudents([]); return; }
-    fetch(`/api/students?classId=${selectedClassId}`, { headers: { Authorization: `Bearer ${token()}` } })
-      .then(r => r.ok ? r.json() : []).then(s => setStudents(s || [])).catch(() => setStudents([]));
-  }, [selectedClassId]);
-
-  function updateSlot(id, patch) {
-    setSlots(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
+  async function loadDisciplinesForInstitution(institutionId) {
+    setSelectedInstitutionId(institutionId);
+    setSelectedDisciplineId(''); setDisciplineExercises([]); setSelectedExerciseId('');
+    const url = institutionId ? `/api/disciplines?institutionId=${institutionId}` : '/api/disciplines';
+    const r = await fetch(url, { headers: { Authorization: `Bearer ${token()}` } });
+    if (r.ok) setDisciplines(await r.json());
   }
+
+  async function loadDiscipline(id) {
+    setSelectedDisciplineId(id); setDisciplineExercises([]); setSelectedExerciseId('');
+    if (!id) return;
+    const r = await fetch(`/api/exercises?disciplineId=${id}`, { headers: { Authorization: `Bearer ${token()}` } });
+    if (r.ok) setDisciplineExercises(await r.json());
+  }
+
+  function loadExercise(id) {
+    setSelectedExerciseId(id);
+    if (!id) return;
+    const ex = disciplineExercises.find(e => e.id === id);
+    if (!ex) return;
+    setExerciseName(ex.name || '');
+    setExerciseContext(ex.context || '');
+    if (ex.criteria?.length) setCriteria(ex.criteria.map(c => ({ name: c.name, weight: c.weight || 1 })));
+  }
+
+  async function loadClass(classId) {
+    setSelectedClassId(classId);
+    if (!classId) { setStudents([]); return; }
+    const r = await fetch(`/api/students?classId=${classId}`, { headers: { Authorization: `Bearer ${token()}` } });
+    if (r.ok) setStudents(await r.json());
+  }
+
+  function loadProfile(id) {
+    setSelectedProfileId(id);
+    const p = profiles.find(p => p.id === id);
+    if (!p) { setProfName(''); return; }
+    setProfName(p.name || '');
+    if (p.tone) setTone(p.tone);
+  }
+
+  function updateSlot(id, patch) { setSlots(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s)); }
 
   async function handleGenerateCriteria() {
     if (!description.trim()) return;
-    setLoadingCriteria(true);
-    setStepError('');
+    setLoadingCriteria(true); setStepError('');
     try {
       const res = await fetch('/api/generate-criteria', {
         method: 'POST',
@@ -393,40 +377,33 @@ export default function AvaliarV2() {
       setExerciseContext(data.exerciseContext || '');
       setCriteria(data.criteria || []);
       setStep(2);
-    } catch (e) {
-      setStepError(e.message);
-    } finally {
-      setLoadingCriteria(false);
-    }
+    } catch (e) { setStepError(e.message); }
+    finally { setLoadingCriteria(false); }
   }
 
   async function handleEvaluateAll() {
     const validSlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0);
     if (!validSlots.length) return;
-    setEvaluating(true);
-    setShowResults(false);
+    setEvaluating(true); setShowResults(false);
     const profile = profiles.find(p => p.id === selectedProfileId);
     const turmaName = classes.find(c => c.id === selectedClassId)?.name || '';
+    const institutionName = institutions.find(i => i.id === selectedInstitutionId)?.name || profile?.institution || '';
+    const instLogo = institutions.find(i => i.id === selectedInstitutionId)?.logoUrl || profile?.institutionLogo || '';
 
     for (let i = 0; i < slots.length; i++) {
       const slot = slots[i];
       if (!slot.studentId && !slot.textContent && slot.mediaFiles.length === 0) continue;
       setEvalProgress(`Avaliando ${slot.studentName || `Aluno ${i + 1}`} (${i + 1} de ${validSlots.length})...`);
       updateSlot(slot.id, { evaluating: true, error: '', result: null, evalId: null });
-
       try {
         const evalRes = await fetch('/api/evaluate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
           body: JSON.stringify({
-            type: 'outro',
-            exerciseName,
-            exerciseContext,
-            criteria,
+            type: 'outro', exerciseName, exerciseContext, criteria,
             studentName: slot.studentName,
             studentWork: slot.textContent || undefined,
-            tone,
-            profName: profile?.name || '',
+            tone, profName: profile?.name || '',
             profDisc: profile?.discipline || '',
             images: slot.mediaFiles.length > 0 ? slot.mediaFiles : undefined,
             referenceWeight: 'livre',
@@ -441,102 +418,99 @@ export default function AvaliarV2() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
             body: JSON.stringify({
-              studentName: slot.studentName || 'Aluno',
-              type: 'outro',
-              score: evalData.score,
-              feedback: evalData.feedback,
-              criteria: evalData.criteriaScores,
-              profileName: profile?.name || '',
-              turma: turmaName,
-              exerciseName,
-              institution: profile?.institution || '',
+              studentName: slot.studentName || 'Aluno', type: 'outro',
+              score: evalData.score, feedback: evalData.feedback,
+              criteria: evalData.criteriaScores, profileName: profile?.name || '',
+              turma: turmaName, exerciseName, institution: institutionName,
               disciplina: profile?.discipline || '',
-              student_id: slot.studentId || null,
-              class_id: selectedClassId || null,
-              institution_logo_url: profile?.institutionLogo || '',
+              student_id: slot.studentId || null, class_id: selectedClassId || null,
+              institution_logo_url: instLogo,
             }),
           });
           if (saveRes.ok) { const saved = await saveRes.json(); evalId = saved.id; }
         } catch {}
-
         updateSlot(slot.id, { result: evalData, evalId, evaluating: false });
-      } catch (e) {
-        updateSlot(slot.id, { error: e.message, evaluating: false });
-      }
+      } catch (e) { updateSlot(slot.id, { error: e.message, evaluating: false }); }
     }
-
-    setEvaluating(false);
-    setEvalProgress('');
-    setShowResults(true);
+    setEvaluating(false); setEvalProgress(''); setShowResults(true);
   }
 
   function reset() {
     setStep(1); setDescription(''); setExerciseName(''); setExerciseContext('');
-    setCriteria([]); setTone('neutro'); setSelectedClassId(''); setStudents([]);
-    setSlots([newSlot()]); setShowResults(false); setStepError('');
+    setCriteria([]); setSelectedExerciseId(''); setSelectedClassId('');
+    setStudents([]); setSlots([newSlot()]); setShowResults(false); setStepError('');
   }
 
   const readySlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0);
   const doneSlots = slots.filter(s => s.result);
 
-  const cardStyle = { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 24, maxWidth: 700, margin: '0 auto' };
-  const btnPrimary = { background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'inherit' };
-  const btnSecondary = { background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 20px', fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' };
-  const inputStyle = { width: '100%', padding: '9px 11px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14, boxSizing: 'border-box', fontFamily: 'inherit' };
-  const labelStyle = { fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 6 };
+  // Estilos do design system
+  const secLabel = { fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 };
+  const section = { padding: '20px 24px', borderBottom: '1px solid var(--border-card)' };
+  const sectionLast = { padding: '20px 24px' };
+  const inp = { width: '100%', padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', boxSizing: 'border-box' };
+  const lbl = { display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 };
+  const btnPrimary = { background: '#810cfa', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 26px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'inherit' };
+  const btnSecondary = { background: 'transparent', color: 'var(--text-sub)', border: '1px solid var(--border)', borderRadius: 10, padding: '11px 20px', fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' };
+  const card = { background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 16, overflow: 'hidden' };
 
   return (
     <AppLayout>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      <div style={{ maxWidth: 740, margin: '0 auto', padding: '8px 0 40px' }}>
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Nova Avaliação</h1>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0' }}>
-            Descreva o exercício e a IA cuida do resto.{' '}
-            <span style={{ background: 'var(--accent)', color: '#fff', fontSize: 11, fontWeight: 700, padding: '1px 7px', borderRadius: 10 }}>V2</span>
-          </p>
-        </div>
 
+      {/* Header padrão */}
+      <div style={{ marginBottom: 32 }}>
+        <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Avaliação</p>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px', margin: 0 }}>Nova Avaliação</h1>
+        <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 0 }}>Descreva o exercício e a IA cuida do resto.{' '}
+          <span style={{ background: '#810cfa', color: '#fff', fontSize: 11, fontWeight: 700, padding: '1px 7px', borderRadius: 10 }}>V2</span>
+        </p>
+      </div>
+
+      <div style={{ maxWidth: 680 }}>
         {!showResults && <StepBar current={step} />}
 
-        {/* ── PASSO 1: Descrição ──────────────────────────────────────────── */}
+        {/* ── PASSO 1: Descrição ──────────────────────────────────────── */}
         {step === 1 && (
-          <div style={cardStyle}>
-            <h2 style={{ fontSize: 17, fontWeight: 700, marginTop: 0, marginBottom: 6 }}>Descreva o exercício</h2>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 0, marginBottom: 20 }}>
-              Escreva em suas próprias palavras — a IA vai gerar o enunciado e os critérios para você revisar.
-            </p>
-            <textarea value={description} onChange={e => setDescription(e.target.value)} autoFocus
-              placeholder="Ex: Redação sobre os impactos da tecnologia na educação, mínimo 25 linhas, argumentação clara com pelo menos 3 argumentos..."
-              rows={5} style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }} />
-            {stepError && <p style={{ color: '#dc2626', fontSize: 13, marginTop: 8 }}>{stepError}</p>}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+          <div style={card}>
+            <div style={section}>
+              <div style={secLabel}>Passo 1 — Descreva o exercício</div>
+              <p style={{ fontSize: 14, color: 'var(--text-sub)', marginTop: 0, marginBottom: 16, lineHeight: 1.6 }}>
+                Escreva em suas próprias palavras. A IA vai gerar o enunciado e os critérios para você revisar.
+              </p>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} autoFocus
+                placeholder="Ex: Redação sobre os impactos da tecnologia na educação, mínimo 25 linhas, argumentação clara com pelo menos 3 argumentos..."
+                rows={5} style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
+              {stepError && <p style={{ color: '#ef4444', fontSize: 13, marginTop: 8, marginBottom: 0 }}>{stepError}</p>}
+            </div>
+            <div style={{ ...sectionLast, display: 'flex', justifyContent: 'flex-end' }}>
               <button style={{ ...btnPrimary, opacity: !description.trim() || loadingCriteria ? 0.6 : 1 }}
                 onClick={handleGenerateCriteria} disabled={!description.trim() || loadingCriteria}>
-                {loadingCriteria ? <><IconSpinner /> Gerando...</> : 'Próximo'}
+                {loadingCriteria ? <><IconSpinner /> Gerando critérios...</> : 'Próximo →'}
               </button>
             </div>
           </div>
         )}
 
-        {/* ── PASSO 2: Critérios ──────────────────────────────────────────── */}
+        {/* ── PASSO 2: Critérios ──────────────────────────────────────── */}
         {step === 2 && (
-          <div style={cardStyle}>
-            <h2 style={{ fontSize: 17, fontWeight: 700, marginTop: 0, marginBottom: 6 }}>Revise e ajuste</h2>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 0, marginBottom: 20 }}>Edite o enunciado e os critérios à vontade.</p>
+          <div style={card}>
+            <div style={section}>
+              <div style={secLabel}>Passo 2 — Revise e ajuste</div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={lbl}>Nome do exercício</label>
+                <input type="text" value={exerciseName} onChange={e => setExerciseName(e.target.value)} style={inp} />
+              </div>
+              <div>
+                <label style={lbl}>Enunciado</label>
+                <textarea value={exerciseContext} onChange={e => setExerciseContext(e.target.value)} rows={5} style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
+              </div>
+            </div>
 
-            <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>Nome do exercício</label>
-              <input type="text" value={exerciseName} onChange={e => setExerciseName(e.target.value)} style={inputStyle} />
-            </div>
-            <div style={{ marginBottom: 20 }}>
-              <label style={labelStyle}>Enunciado</label>
-              <textarea value={exerciseContext} onChange={e => setExerciseContext(e.target.value)} rows={5} style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.6 }} />
-            </div>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <label style={{ ...labelStyle, marginBottom: 0 }}>Critérios de avaliação</label>
-                <button style={{ ...btnSecondary, padding: '5px 12px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
+            <div style={section}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                <div style={secLabel}>Critérios de avaliação</div>
+                <button style={{ ...btnSecondary, padding: '5px 12px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, borderRadius: 8 }}
                   onClick={() => setCriteria(prev => [...prev, { name: '', weight: 1 }])}>
                   <IconPlus /> Adicionar
                 </button>
@@ -546,72 +520,112 @@ export default function AvaliarV2() {
                   <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <input type="text" value={c.name} placeholder="Nome do critério"
                       onChange={e => setCriteria(prev => prev.map((x, j) => j === i ? { ...x, name: e.target.value } : x))}
-                      style={{ ...inputStyle, flex: 1 }} />
+                      style={{ ...inp, flex: 1 }} />
                     <select value={c.weight}
                       onChange={e => setCriteria(prev => prev.map((x, j) => j === i ? { ...x, weight: Number(e.target.value) } : x))}
-                      style={{ ...inputStyle, width: 90 }}>
+                      style={{ ...inp, width: 90 }}>
                       <option value={1}>Peso 1</option>
                       <option value={2}>Peso 2</option>
                       <option value={3}>Peso 3</option>
                     </select>
                     <button onClick={() => setCriteria(prev => prev.filter((_, j) => j !== i))}
-                      style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 6 }}>
-                      <IconTrash />
-                    </button>
+                      style={{ background: 'transparent', border: 'none', color: 'var(--text-sub)', cursor: 'pointer', padding: 6 }}><IconTrash /></button>
                   </div>
                 ))}
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
-              <button style={btnSecondary} onClick={() => setStep(1)}>Voltar</button>
+
+            <div style={{ ...sectionLast, display: 'flex', justifyContent: 'space-between' }}>
+              <button style={btnSecondary} onClick={() => setStep(1)}>← Voltar</button>
               <button style={{ ...btnPrimary, opacity: !exerciseName || !criteria.length ? 0.6 : 1 }}
                 onClick={() => setStep(3)} disabled={!exerciseName || !criteria.length}>
-                Próximo
+                Próximo →
               </button>
             </div>
           </div>
         )}
 
-        {/* ── PASSO 3: Alunos ─────────────────────────────────────────────── */}
+        {/* ── PASSO 3: Configuração + Alunos ──────────────────────────── */}
         {step === 3 && !showResults && (
-          <div style={cardStyle}>
-            <h2 style={{ fontSize: 17, fontWeight: 700, marginTop: 0, marginBottom: 20 }}>Alunos e trabalhos</h2>
-
-            <div style={{ display: 'grid', gridTemplateColumns: profiles.length > 1 ? '1fr 1fr' : '1fr', gap: 12, marginBottom: 20 }}>
-              {profiles.length > 1 && (
-                <div>
-                  <label style={labelStyle}>Perfil do professor</label>
-                  <select value={selectedProfileId} onChange={e => setSelectedProfileId(e.target.value)} style={inputStyle}>
-                    <option value="">Selecionar perfil...</option>
-                    {profiles.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                  </select>
+          <div style={card}>
+            {/* Perfil do professor */}
+            <div style={section}>
+              <div style={secLabel}>Perfil do Professor</div>
+              {profName ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-content)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                  <div>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{profName}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-sub)', marginLeft: 8 }}>· {TONES.find(t => t.id === tone)?.label || 'Neutro'}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    {profiles.length > 1 && (
+                      <select value={selectedProfileId} onChange={e => loadProfile(e.target.value)}
+                        style={{ ...inp, width: 'auto', padding: '4px 8px', fontSize: 12 }}>
+                        {profiles.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                      </select>
+                    )}
+                    <Link href="/perfis" style={{ fontSize: 12, color: '#0081f0', textDecoration: 'none', fontWeight: 500 }}>Editar perfil</Link>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: '10px 14px', background: '#FEF9EC', border: '1px solid #F59E0B33', borderRadius: 10 }}>
+                  <span style={{ fontSize: 13, color: '#92400E' }}>Nenhum perfil configurado. </span>
+                  <Link href="/perfis" style={{ fontSize: 13, color: '#0081f0', fontWeight: 600, textDecoration: 'none' }}>Criar perfil →</Link>
                 </div>
               )}
-              <div>
-                <label style={labelStyle}>Turma</label>
-                <select value={selectedClassId} onChange={e => setSelectedClassId(e.target.value)} style={inputStyle}>
-                  <option value="">Selecionar turma...</option>
-                  {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
             </div>
 
-            <div style={{ marginBottom: 20 }}>
-              <label style={labelStyle}>Tom do feedback</label>
+            {/* Configuração da avaliação */}
+            <div style={section}>
+              <div style={secLabel}>Configuração da Avaliação</div>
+
+              <SelectWithAdd label="Instituição" value={selectedInstitutionId}
+                onChange={loadDisciplinesForInstitution}
+                options={institutions.map(i => ({ value: i.id, label: i.name }))}
+                placeholder="Selecione uma instituição" href="/instituicao" />
+
+              <SelectWithAdd label="Disciplina" value={selectedDisciplineId}
+                onChange={loadDiscipline}
+                options={disciplines.map(d => ({ value: d.id, label: d.subject }))}
+                placeholder="Selecione uma disciplina" href="/disciplinas" />
+
+              <SelectWithAdd label="Exercício" value={selectedExerciseId}
+                onChange={loadExercise}
+                options={disciplineExercises.map(e => ({ value: e.id, label: e.name }))}
+                placeholder={selectedDisciplineId ? 'Selecione um exercício' : 'Selecione uma disciplina primeiro'}
+                href="/disciplinas" disabled={!selectedDisciplineId} />
+
+              {selectedExerciseId && (
+                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#166534', marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>Exercício carregado — enunciado e critérios atualizados.</span>
+                  <button onClick={() => setStep(2)} style={{ background: 'none', border: 'none', color: '#166534', cursor: 'pointer', fontWeight: 600, fontSize: 12, textDecoration: 'underline', fontFamily: 'inherit' }}>Rever critérios</button>
+                </div>
+              )}
+
+              <SelectWithAdd label="Turma" value={selectedClassId}
+                onChange={loadClass}
+                options={classes.map(c => ({ value: c.id, label: c.name }))}
+                placeholder="Selecione uma turma" href="/turmas" />
+            </div>
+
+            {/* Tom do feedback */}
+            <div style={section}>
+              <div style={secLabel}>Tom do Feedback</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {TONES.map(t => (
                   <button key={t.id} onClick={() => setTone(t.id)} title={t.desc}
-                    style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, cursor: 'pointer', border: `1px solid ${tone === t.id ? 'var(--accent)' : 'var(--border)'}`, background: tone === t.id ? 'var(--accent)' : 'transparent', color: tone === t.id ? '#fff' : 'var(--text)', fontWeight: tone === t.id ? 600 : 400, fontFamily: 'inherit' }}>
+                    style={{ padding: '7px 16px', borderRadius: 20, fontSize: 13, cursor: 'pointer', border: `1px solid ${tone === t.id ? '#810cfa' : 'var(--border)'}`, background: tone === t.id ? '#810cfa' : 'var(--bg-content)', color: tone === t.id ? '#fff' : 'var(--text-main)', fontWeight: tone === t.id ? 700 : 400, fontFamily: 'inherit' }}>
                     {t.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ ...labelStyle, marginBottom: 12 }}>
-                Alunos {selectedClassId && students.length > 0 ? `— ${students.length} na turma` : ''}
-              </label>
+            {/* Alunos */}
+            <div style={section}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                <div style={secLabel}>Alunos {selectedClassId && students.length > 0 ? `— ${students.length} na turma` : ''}</div>
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {slots.map((slot, i) => (
                   <StudentSlot key={slot.id} slot={slot} index={i} students={students}
@@ -621,19 +635,19 @@ export default function AvaliarV2() {
                 ))}
               </div>
               <button onClick={() => setSlots(prev => [...prev, newSlot()])}
-                style={{ ...btnSecondary, marginTop: 10, width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
+                style={{ ...btnSecondary, marginTop: 10, width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, borderRadius: 10 }}>
                 <IconPlus /> Adicionar aluno
               </button>
             </div>
 
             {evaluating && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-muted)', fontSize: 13, marginBottom: 12 }}>
+              <div style={{ padding: '12px 24px', borderTop: '1px solid var(--border-card)', display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-sub)', fontSize: 13 }}>
                 <IconSpinner /> {evalProgress}
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <button style={btnSecondary} onClick={() => setStep(2)} disabled={evaluating}>Voltar</button>
+            <div style={{ ...sectionLast, display: 'flex', justifyContent: 'space-between' }}>
+              <button style={btnSecondary} onClick={() => setStep(2)} disabled={evaluating}>← Voltar</button>
               <button style={{ ...btnPrimary, opacity: evaluating || readySlots.length === 0 ? 0.6 : 1 }}
                 onClick={handleEvaluateAll} disabled={evaluating || readySlots.length === 0}>
                 {evaluating ? <><IconSpinner /> Avaliando...</> : `Gerar Avaliação${readySlots.length > 1 ? `ões (${readySlots.length})` : ''}`}
@@ -642,13 +656,13 @@ export default function AvaliarV2() {
           </div>
         )}
 
-        {/* ── RESULTADOS ─────────────────────────────────────────────────── */}
+        {/* ── RESULTADOS ─────────────────────────────────────────────── */}
         {showResults && (
-          <div style={{ maxWidth: 700, margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
               <div>
-                <h2 style={{ fontSize: 17, fontWeight: 700, margin: 0 }}>Resultados</h2>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0' }}>
+                <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', margin: 0, letterSpacing: '-0.3px' }}>Resultados</h2>
+                <p style={{ fontSize: 14, color: 'var(--text-sub)', margin: '4px 0 0' }}>
                   {exerciseName} · {doneSlots.length} avaliação{doneSlots.length !== 1 ? 'ões' : ''} concluída{doneSlots.length !== 1 ? 's' : ''}
                 </p>
               </div>
@@ -660,13 +674,12 @@ export default function AvaliarV2() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {slots.filter(s => s.result || s.error).map(slot => (
                 <div key={slot.id}>
-                  {slot.result
-                    ? <ResultCard slot={slot} />
-                    : <div style={{ border: '1px solid #fca5a5', borderRadius: 10, padding: '14px 18px', background: '#fef2f2' }}>
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>{slot.studentName || 'Aluno'}</span>
-                        <span style={{ fontSize: 13, color: '#dc2626', marginLeft: 10 }}>{slot.error}</span>
-                      </div>
-                  }
+                  {slot.result ? <ResultCard slot={slot} /> : (
+                    <div style={{ border: '1px solid #fca5a5', borderRadius: 12, padding: '14px 20px', background: '#fef2f2' }}>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{slot.studentName || 'Aluno'}</span>
+                      <span style={{ fontSize: 13, color: '#dc2626', marginLeft: 10 }}>{slot.error}</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
