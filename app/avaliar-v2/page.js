@@ -548,7 +548,7 @@ export default function AvaliarV2() {
                 <input type="text" value={exerciseName} onChange={e => setExerciseName(e.target.value)} style={inp} />
               </div>
               <div>
-                <label style={lbl}>Enunciado</label>
+                <label style={lbl}>Descrição do exercício</label>
                 <textarea value={exerciseContext} onChange={e => setExerciseContext(e.target.value)} rows={5}
                   style={{ ...inp, resize: 'vertical', lineHeight: 1.6 }} />
               </div>
