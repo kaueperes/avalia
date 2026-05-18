@@ -65,7 +65,16 @@ export default function AvaliacoesPage() {
     try { const u = JSON.parse(localStorage.getItem('user') || '{}'); if (u.name) setUserName(u.name); } catch {}
     fetch('/api/evaluations', { headers: { Authorization: `Bearer ${token()}` } })
       .then(r => r.json())
-      .then(data => { setEvaluations(Array.isArray(data) ? data : []); setLoading(false); })
+      .then(data => {
+        const list = Array.isArray(data) ? data : [];
+        setEvaluations(list);
+        setLoading(false);
+        const editId = new URLSearchParams(window.location.search).get('edit');
+        if (editId) {
+          const target = list.find(e => e.id === editId);
+          if (target) { setDetail(target); setDetailDraft(JSON.parse(JSON.stringify(target))); }
+        }
+      })
       .catch(() => setLoading(false));
     fetch('/api/profiles', { headers: { Authorization: `Bearer ${token()}` } })
       .then(r => r.json()).then(data => setProfiles(Array.isArray(data) ? data : [])).catch(() => {});

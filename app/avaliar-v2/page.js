@@ -235,10 +235,16 @@ function ResultCard({ slot }) {
           <div style={{ fontSize: 12, color: 'var(--text-sub)' }}>{scoreToGrade(slot.result.score)} · {slot.result.criteriaScores?.length} critérios</div>
         </div>
         {slot.evalId && (
-          <button onClick={e => { e.stopPropagation(); window.open(`/relatorio-individual?id=${slot.evalId}&print=1`, '_blank'); }}
-            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', fontWeight: 500, flexShrink: 0 }}>
-            <IconPDF /> PDF
-          </button>
+          <>
+            <button onClick={e => { e.stopPropagation(); window.open(`/relatorio-individual?id=${slot.evalId}&print=1`, '_blank'); }}
+              style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', fontWeight: 500, flexShrink: 0 }}>
+              <IconPDF /> Imprimir PDF
+            </button>
+            <button onClick={e => { e.stopPropagation(); window.open(`/avaliacoes?edit=${slot.evalId}`, '_blank'); }}
+              style={{ padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', fontWeight: 500, flexShrink: 0 }}>
+              Editar
+            </button>
+          </>
         )}
         <span style={{ color: 'var(--text-sub)', fontSize: 11 }}>{expanded ? '▲' : '▼'}</span>
       </div>
