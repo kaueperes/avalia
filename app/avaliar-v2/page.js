@@ -303,6 +303,11 @@ export default function AvaliarV2() {
   const [evaluating, setEvaluating] = useState(false);
   const [evalProgress, setEvalProgress] = useState('');
   const [showResults, setShowResults] = useState(false);
+  const abortRef = useRef(null);
+
+  function cancelEvaluation() {
+    if (abortRef.current) abortRef.current.abort();
+  }
 
   useEffect(() => {
     const h = { Authorization: `Bearer ${token()}` };
@@ -368,12 +373,15 @@ export default function AvaliarV2() {
   async function handleEvaluateAll() {
     const validSlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0);
     if (!validSlots.length) return;
+    const controller = new AbortController();
+    abortRef.current = controller;
     setEvaluating(true); setShowResults(false);
     const profile = profiles.find(p => p.id === selectedProfileId);
     const turmaName = classes.find(c => c.id === selectedClassId)?.name || '';
     const institutionObj = institutions.find(i => i.id === selectedInstitutionId);
 
     for (let i = 0; i < slots.length; i++) {
+      if (controller.signal.aborted) break;
       const slot = slots[i];
       if (!slot.studentId && !slot.textContent && slot.mediaFiles.length === 0) continue;
       setEvalProgress(`Avaliando ${slot.studentName || `Aluno ${i + 1}`} (${i + 1} de ${validSlots.length})...`);
@@ -381,6 +389,7 @@ export default function AvaliarV2() {
       try {
         const evalRes = await fetch('/api/evaluate', {
           method: 'POST',
+          signal: controller.signal,
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
           body: JSON.stringify({
             type: 'outro', exerciseName, exerciseContext, criteria,
@@ -422,9 +431,14 @@ export default function AvaliarV2() {
           if (saveRes.ok) { const saved = await saveRes.json(); evalId = saved.id; }
         } catch {}
         updateSlot(slot.id, { result: evalData, evalId, evaluating: false });
-      } catch (e) { updateSlot(slot.id, { error: e.message, evaluating: false }); }
+      } catch (e) {
+        if (e.name === 'AbortError') { updateSlot(slot.id, { evaluating: false }); break; }
+        updateSlot(slot.id, { error: e.message, evaluating: false });
+      }
     }
-    setEvaluating(false); setEvalProgress(''); setShowResults(true);
+    setEvaluating(false); setEvalProgress('');
+    const hasDone = slots.some(s => s.result);
+    if (hasDone) setShowResults(true);
   }
 
   function reset() {
@@ -621,8 +635,14 @@ export default function AvaliarV2() {
             </div>
 
             {evaluating && (
-              <div style={{ padding: '12px 24px', borderTop: '1px solid var(--border-card)', display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-sub)', fontSize: 13 }}>
-                <IconSpinner /> {evalProgress}
+              <div style={{ padding: '12px 24px', borderTop: '1px solid var(--border-card)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-sub)', fontSize: 13 }}>
+                  <IconSpinner /> {evalProgress}
+                </div>
+                <button onClick={cancelEvaluation}
+                  style={{ padding: '5px 14px', border: '1px solid #ef444455', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'transparent', color: '#ef4444', fontFamily: 'inherit' }}>
+                  Cancelar
+                </button>
               </div>
             )}
 
