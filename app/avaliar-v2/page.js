@@ -395,6 +395,14 @@ export default function AvaliarV2() {
         const evalData = await evalRes.json();
         if (!evalRes.ok) throw new Error(evalData.error || 'Erro ao avaliar');
 
+        try {
+          const u = JSON.parse(localStorage.getItem('user') || '{}');
+          if (typeof u.quota_ciclo === 'number' && u.quota_ciclo > 0) u.quota_ciclo -= 1;
+          else if (typeof u.quota_extra === 'number' && u.quota_extra > 0) u.quota_extra -= 1;
+          localStorage.setItem('user', JSON.stringify(u));
+          window.dispatchEvent(new Event('storage'));
+        } catch {}
+
         let evalId = null;
         try {
           const saveRes = await fetch('/api/evaluations', {
