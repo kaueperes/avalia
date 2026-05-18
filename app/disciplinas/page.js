@@ -181,7 +181,7 @@ export default function DisciplinasPage() {
     <AppLayout userName={userName}>
       <div style={{ marginBottom: 32 }}>
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Cadastro</p>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Cadastro de Disciplinas</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Cadastro de Disciplinas/Exercícios</h1>
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Cadastre suas disciplinas e adicione exercícios com critérios personalizados dentro de cada uma.</p>
       </div>
 

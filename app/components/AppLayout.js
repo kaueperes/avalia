@@ -128,7 +128,7 @@ const navItems = [
   { Icon: HomeIcon,      label: 'Início',                    href: '/inicio' },
   { Icon: UserIcon,      label: 'Perfil do Professor',       href: '/perfis' },
   { Icon: BookIcon,      label: 'Cadastro de Instituição',   href: '/instituicao' },
-  { Icon: ClipboardIcon, label: 'Cadastro de Disciplinas',   href: '/disciplinas' },
+  { Icon: ClipboardIcon, label: 'Cadastro de Disciplinas/Exercícios', href: '/disciplinas' },
   { Icon: ReportIcon,    label: 'Cadastro de Turmas',        href: '/turmas' },
   { Icon: PlusIcon,      label: 'Nova Avaliação',            href: '/avaliar',   highlight: true },
   { Icon: PlusIcon,      label: 'Nova Avaliação V2',         href: '/avaliar-v2', highlight: true },
