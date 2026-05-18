@@ -99,7 +99,7 @@ const IconUpload = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="n
 
 // ── Barra de progresso ────────────────────────────────────────────────────────
 function StepBar({ current }) {
-  const steps = ['Configuração', 'Revisão do Exercício', 'Alunos'];
+  const steps = ['Configuração', 'Revisão do Exercício', 'Alunos e arquivos'];
   return (
     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 28 }}>
       {steps.map((label, i) => {
