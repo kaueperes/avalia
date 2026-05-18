@@ -1,10 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { TYPES, CATEGORIES } from '@/lib/types';
+import { TYPES } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
-import WorkTypeSelector from '../components/WorkTypeSelector';
 
 const inputStyle = {
   width: '100%', padding: '10px 12px',
@@ -39,8 +38,6 @@ export default function DisciplinasPage() {
   const [editingExerciseId, setEditingExerciseId] = useState(null);
   const [loadingExercise, setLoadingExercise] = useState(false);
   const [showExerciseForm, setShowExerciseForm] = useState(false);
-
-  const [showTypeModal, setShowTypeModal] = useState(false);
 
   // AI
   const [showAiPrompt, setShowAiPrompt] = useState(false);
@@ -125,11 +122,6 @@ export default function DisciplinasPage() {
 
   // ── Exercício CRUD ──────────────────────────────────────────────────────────
 
-  function onTypeChange(type) {
-    const def = (TYPES[type]?.criteria || []).map(c => ({ name: c.name, weight: c.w }));
-    setExerciseForm(f => ({ ...f, type, criteria: def }));
-  }
-
   async function saveExercise(disciplineId) {
     if (!exerciseForm.name.trim()) { flash('Nome do exercício é obrigatório', false); return; }
     setLoadingExercise(true);
@@ -163,17 +155,25 @@ export default function DisciplinasPage() {
     setShowExerciseForm(true);
   }
 
-  async function generateContext(disciplineId) {
+  async function generateAll() {
     if (!aiPrompt.trim()) return;
     setAiLoading(true);
     try {
       const r = await fetch('/api/exercises/generate', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ exerciseName: exerciseForm.name, exerciseType: exerciseForm.type, briefDescription: aiPrompt }),
+        body: JSON.stringify({ exerciseName: exerciseForm.name, briefDescription: aiPrompt }),
       });
       const d = await r.json();
-      if (d.context) { setExerciseForm(f => ({ ...f, context: d.context })); setShowAiPrompt(false); setAiPrompt(''); }
+      if (d.context || d.criteria) {
+        setExerciseForm(f => ({
+          ...f,
+          context: d.context || f.context,
+          criteria: d.criteria?.length ? d.criteria : f.criteria,
+        }));
+        setShowAiPrompt(false);
+        setAiPrompt('');
+      }
     } finally { setAiLoading(false); }
   }
 
@@ -269,16 +269,29 @@ export default function DisciplinasPage() {
                               <input style={inputStyle} value={exerciseForm.name} onChange={e => setExerciseForm(f => ({ ...f, name: e.target.value }))} placeholder="Ex: Redação Descritiva, Prova P1..." />
                             </div>
 
+                            {/* Descrição do exercício */}
                             <div style={{ marginBottom: 12 }}>
-                              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-main)', marginBottom: 5 }}><Tooltip text="Define como o Kriteria avalia o trabalho. Cada tipo tem critérios e instruções específicas para a área.">Tipo de Trabalho</Tooltip></label>
-                              <button
-                                type="button"
-                                onClick={() => setShowTypeModal(true)}
-                                style={{ ...inputStyle, textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                              >
-                                <span>{TYPES[exerciseForm.type]?.label || exerciseForm.type}</span>
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                              </button>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+                                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)' }}>
+                                  <Tooltip text="Descreva o objetivo, requisitos e restrições do exercício. Quanto mais detalhado, mais precisa será a avaliação do Kriteria.">Descrição do exercício</Tooltip>
+                                </label>
+                                <button onClick={() => setShowAiPrompt(v => !v)}
+                                  style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', border: '1px solid #0081f033', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>
+                                  Gerar descrição e critérios
+                                </button>
+                              </div>
+                              {showAiPrompt && (
+                                <div style={{ marginBottom: 8, padding: '10px 12px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 8 }}>
+                                  <div style={{ display: 'flex', gap: 6 }}>
+                                    <input style={{ ...inputStyle, flex: 1, fontSize: 13, padding: '7px 10px' }} value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} onKeyDown={e => e.key === 'Enter' && generateAll()} placeholder="Descreva brevemente o exercício..." autoFocus />
+                                    <button onClick={() => generateAll()} disabled={aiLoading || !aiPrompt.trim()}
+                                      style={{ padding: '7px 14px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: aiLoading ? 'wait' : 'pointer', opacity: !aiPrompt.trim() ? 0.5 : 1, flexShrink: 0 }}>
+                                      {aiLoading ? '...' : 'Gerar'}
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                              <textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical', lineHeight: 1.6 }} value={exerciseForm.context} onChange={e => setExerciseForm(f => ({ ...f, context: e.target.value }))} placeholder="Descreva o objetivo e requisitos..." />
                             </div>
 
                             {/* Critérios */}
@@ -300,31 +313,6 @@ export default function DisciplinasPage() {
                                 style={{ padding: '5px 12px', border: '1px dashed var(--border)', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
                                 + Critério
                               </button>
-                            </div>
-
-                            {/* Enunciado */}
-                            <div style={{ marginBottom: 12 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
-                                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)' }}>
-                                  <Tooltip text="Descreva o objetivo, requisitos e restrições do exercício. Quanto mais detalhado, mais precisa será a avaliação do Kriteria.">Descrição do exercício</Tooltip>
-                                </label>
-                                <button onClick={() => setShowAiPrompt(v => !v)}
-                                  style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', border: '1px solid #0081f033', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>
-                                  Gerar automaticamente
-                                </button>
-                              </div>
-                              {showAiPrompt && (
-                                <div style={{ marginBottom: 8, padding: '10px 12px', background: 'var(--selected-bg)', border: '1px solid #0081f033', borderRadius: 8 }}>
-                                  <div style={{ display: 'flex', gap: 6 }}>
-                                    <input style={{ ...inputStyle, flex: 1, fontSize: 13, padding: '7px 10px' }} value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} onKeyDown={e => e.key === 'Enter' && generateContext(disc.id)} placeholder="Descreva brevemente o exercício..." autoFocus />
-                                    <button onClick={() => generateContext(disc.id)} disabled={aiLoading || !aiPrompt.trim()}
-                                      style={{ padding: '7px 14px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: aiLoading ? 'wait' : 'pointer', opacity: !aiPrompt.trim() ? 0.5 : 1, flexShrink: 0 }}>
-                                      {aiLoading ? '...' : 'Gerar'}
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                              <textarea style={{ ...inputStyle, minHeight: 80, resize: 'vertical', lineHeight: 1.6 }} value={exerciseForm.context} onChange={e => setExerciseForm(f => ({ ...f, context: e.target.value }))} placeholder="Descreva o objetivo e requisitos..." />
                             </div>
 
                             <div style={{ display: 'flex', gap: 8 }}>
@@ -389,29 +377,6 @@ export default function DisciplinasPage() {
         </div>
       </div>
 
-      {/* Modal seletor de tipo */}
-      {showTypeModal && (
-        <div
-          onClick={() => setShowTypeModal(false)}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{ background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border-card)', width: '100%', maxWidth: 620, maxHeight: '80vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--border-card)' }}>
-              <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>Tipo de Trabalho</p>
-              <button onClick={() => setShowTypeModal(false)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 20, lineHeight: 1, padding: '0 4px' }}>×</button>
-            </div>
-            <div style={{ overflowY: 'auto', flex: 1 }}>
-              <WorkTypeSelector
-                value={exerciseForm.type}
-                onChange={type => { onTypeChange(type); setShowTypeModal(false); }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </AppLayout>
   );
 }
