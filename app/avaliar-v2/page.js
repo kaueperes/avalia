@@ -630,7 +630,7 @@ export default function AvaliarV2() {
               <button style={btnSecondary} onClick={() => setStep(2)} disabled={evaluating}>← Voltar</button>
               <button style={{ ...btnPrimary, opacity: evaluating || readySlots.length === 0 ? 0.6 : 1 }}
                 onClick={handleEvaluateAll} disabled={evaluating || readySlots.length === 0}>
-                {evaluating ? <><IconSpinner /> Avaliando...</> : `Gerar Avaliação${readySlots.length > 1 ? `ões (${readySlots.length})` : ''}`}
+                {evaluating ? <><IconSpinner /> Avaliando...</> : readySlots.length > 1 ? `Gerar Avaliações (${readySlots.length})` : 'Gerar Avaliação'}
               </button>
             </div>
           </div>
