@@ -99,7 +99,7 @@ const IconUpload = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="n
 
 // ── Barra de progresso ────────────────────────────────────────────────────────
 function StepBar({ current }) {
-  const steps = ['Configuração', 'Exercício', 'Alunos'];
+  const steps = ['Configuração', 'Revisão do Exercício', 'Alunos'];
   return (
     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 28 }}>
       {steps.map((label, i) => {
@@ -536,7 +536,7 @@ export default function AvaliarV2() {
         {step === 2 && (
           <div style={card}>
             <div style={section}>
-              <div style={secLabel}>Passo 2 — Exercício</div>
+              <div style={secLabel}>Passo 2 — Revisão do Exercício</div>
               <div style={{ marginBottom: 16 }}>
                 <label style={lbl}>Nome do exercício</label>
                 <input type="text" value={exerciseName} onChange={e => setExerciseName(e.target.value)} style={inp} />
