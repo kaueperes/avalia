@@ -43,7 +43,9 @@ Regras:
     });
 
     const text = message.content[0]?.text || '';
-    const parsed = JSON.parse(text);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return NextResponse.json({ error: 'Resposta inválida da IA' }, { status: 500 });
+    const parsed = JSON.parse(jsonMatch[0]);
     return NextResponse.json({ context: parsed.context, criteria: parsed.criteria });
   } catch (e) {
     return NextResponse.json({ error: 'Erro ao gerar exercício' }, { status: 500 });
