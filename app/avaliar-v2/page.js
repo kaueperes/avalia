@@ -305,8 +305,29 @@ export default function AvaliarV2() {
   const [showResults, setShowResults] = useState(false);
   const abortRef = useRef(null);
 
+  const [refFiles, setRefFiles] = useState([]);
+  const [refFileNames, setRefFileNames] = useState([]);
+  const [refWeight, setRefWeight] = useState('livre');
+  const [refProcessing, setRefProcessing] = useState(false);
+  const refInputRef = useRef(null);
+
   function cancelEvaluation() {
     if (abortRef.current) abortRef.current.abort();
+  }
+
+  async function handleRefFiles(selectedFiles) {
+    setRefProcessing(true);
+    const mediaFiles = [], names = [];
+    for (const file of Array.from(selectedFiles)) {
+      try {
+        const r = await processAnyFile(file);
+        names.push(file.name);
+        if (r.kind === 'media') mediaFiles.push({ ...r, label: `Referência para Correção: ${file.name}` });
+      } catch {}
+    }
+    setRefFiles(mediaFiles);
+    setRefFileNames(names);
+    setRefProcessing(false);
   }
 
   useEffect(() => {
@@ -398,8 +419,8 @@ export default function AvaliarV2() {
             tone, profName: profile?.name || '',
             profDisc: profile?.discipline || '',
             writingSample: profile?.writingSample || undefined,
-            images: slot.mediaFiles.length > 0 ? slot.mediaFiles : undefined,
-            referenceWeight: 'livre',
+            images: (slot.mediaFiles.length > 0 || refFiles.length > 0) ? [...slot.mediaFiles, ...refFiles] : undefined,
+            referenceWeight: refFiles.length > 0 ? refWeight : undefined,
           }),
         });
         const evalData = await evalRes.json();
@@ -446,6 +467,7 @@ export default function AvaliarV2() {
     setStep(1); setExerciseName(''); setExerciseContext(''); setCriteria([]);
     setSelectedExerciseId(''); setSelectedDisciplineId(''); setDisciplineExercises([]);
     setSelectedClassId(''); setStudents([]); setSlots([newSlot()]); setShowResults(false);
+    setRefFiles([]); setRefFileNames([]); setRefWeight('livre');
   }
 
   const canGoToStep2 = !!selectedExerciseId;
@@ -617,6 +639,58 @@ export default function AvaliarV2() {
         {/* ── PASSO 3: Alunos ─────────────────────────────────────────── */}
         {step === 3 && !showResults && (
           <div style={card}>
+            {/* Materiais de Referência */}
+            <div style={section}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                <div style={secLabel}>
+                  Materiais de Referência
+                  <span style={{ fontWeight: 400, textTransform: 'none', fontSize: 11, color: 'var(--text-muted)', marginLeft: 6 }}>— opcional · aplicado a todos os alunos</span>
+                </div>
+              </div>
+              <div
+                onClick={() => !refProcessing && refInputRef.current?.click()}
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => { e.preventDefault(); handleRefFiles(e.dataTransfer.files); }}
+                style={{ border: `1.5px dashed ${refFiles.length > 0 ? '#810cfa' : 'var(--border)'}`, borderRadius: 10, padding: refFiles.length > 0 ? '10px 14px' : '16px', cursor: refProcessing ? 'wait' : 'pointer', background: refFiles.length > 0 ? 'var(--bg-card)' : 'transparent' }}>
+                {refProcessing ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-sub)', fontSize: 13 }}><IconSpinner /> Processando...</div>
+                ) : refFiles.length > 0 ? (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                    {refFileNames.map((name, i) => (
+                      <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 8px', fontSize: 12, color: 'var(--text-main)' }}>
+                        {fileIcon(name)} {name}
+                      </span>
+                    ))}
+                    <button onClick={e => { e.stopPropagation(); setRefFiles([]); setRefFileNames([]); }}
+                      style={{ fontSize: 11, color: '#ef4444', background: 'transparent', border: 'none', cursor: 'pointer', marginLeft: 4, fontFamily: 'inherit' }}>
+                      Remover
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-sub)' }}>
+                    <IconUpload />
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-main)' }}>Gabarito, concept ou referências visuais</div>
+                      <div style={{ fontSize: 11, marginTop: 2 }}>Imagem, PDF — usado como contexto de correção para toda a turma</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <input ref={refInputRef} type="file" style={{ display: 'none' }} multiple
+                accept="image/*,.pdf"
+                onChange={e => handleRefFiles(e.target.files)} />
+              {refFiles.length > 0 && (
+                <div style={{ marginTop: 10 }}>
+                  <label style={{ ...lbl, marginBottom: 6 }}>Peso na correção</label>
+                  <select style={inp} value={refWeight} onChange={e => setRefWeight(e.target.value)}>
+                    <option value="livre">Referência livre — apenas orientação, valorize a criatividade</option>
+                    <option value="parcial">Parcial — considere o gabarito, mas aceite variações</option>
+                    <option value="estrito">Estrito — o aluno deve seguir o gabarito de perto</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
             <div style={section}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                 <div style={secLabel}>Alunos {selectedClassId && students.length > 0 ? `— ${students.length} na turma` : ''}</div>
