@@ -435,7 +435,7 @@ export default function AvaliarV2() {
   const sectionLast = { padding: '20px 24px' };
   const inp = { width: '100%', padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', boxSizing: 'border-box' };
   const lbl = { display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 };
-  const btnPrimary = { background: '#810cfa', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 26px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'inherit' };
+  const btnPrimary = { background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 26px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'inherit' };
   const btnSecondary = { background: 'transparent', color: 'var(--text-sub)', border: '1px solid var(--border)', borderRadius: 10, padding: '11px 20px', fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' };
   const card = { background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 16, overflow: 'hidden' };
 
@@ -562,21 +562,20 @@ export default function AvaliarV2() {
                   <IconPlus /> Adicionar
                 </button>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {criteria.map((c, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 10px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8 }}>
+                    <span style={{ fontSize: 10, background: '#0081f022', color: '#0081f0', border: '1px solid #0081f033', borderRadius: 4, padding: '1px 5px', fontWeight: 700, flexShrink: 0 }}>{c.weight}×</span>
                     <input type="text" value={c.name} placeholder="Nome do critério"
                       onChange={e => setCriteria(prev => prev.map((x, j) => j === i ? { ...x, name: e.target.value } : x))}
-                      style={{ ...inp, flex: 1 }} />
+                      style={{ flex: 1, border: 'none', background: 'transparent', fontSize: 13, outline: 'none', color: 'var(--text-main)', fontFamily: 'inherit' }} />
                     <select value={c.weight}
                       onChange={e => setCriteria(prev => prev.map((x, j) => j === i ? { ...x, weight: Number(e.target.value) } : x))}
-                      style={{ ...inp, width: 90 }}>
-                      <option value={1}>Peso 1</option>
-                      <option value={2}>Peso 2</option>
-                      <option value={3}>Peso 3</option>
+                      style={{ width: 54, padding: '3px 4px', fontSize: 11, background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 5, color: 'var(--text-main)', outline: 'none', cursor: 'pointer' }}>
+                      {[1, 2, 3].map(w => <option key={w} value={w}>{w}×</option>)}
                     </select>
                     <button onClick={() => setCriteria(prev => prev.filter((_, j) => j !== i))}
-                      style={{ background: 'transparent', border: 'none', color: 'var(--text-sub)', cursor: 'pointer', padding: 6 }}><IconTrash /></button>
+                      style={{ border: 'none', background: 'transparent', color: 'var(--text-sub)', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '0 2px' }}>×</button>
                   </div>
                 ))}
               </div>
