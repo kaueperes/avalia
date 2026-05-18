@@ -277,7 +277,7 @@ export default function DisciplinasPage() {
                                 </label>
                                 <button onClick={() => setShowAiPrompt(v => !v)}
                                   style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', border: '1px solid #0081f033', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}>
-                                  Gerar descrição e critérios
+                                  Gerar descrição e critérios automaticamente
                                 </button>
                               </div>
                               {showAiPrompt && (
