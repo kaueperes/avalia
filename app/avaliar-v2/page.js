@@ -397,6 +397,7 @@ export default function AvaliarV2() {
             studentWork: slot.textContent || undefined,
             tone, profName: profile?.name || '',
             profDisc: profile?.discipline || '',
+            writingSample: profile?.writingSample || undefined,
             images: slot.mediaFiles.length > 0 ? slot.mediaFiles : undefined,
             referenceWeight: 'livre',
           }),
