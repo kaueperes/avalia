@@ -28,7 +28,7 @@ export default function AvaliacoesPage() {
   const [evaluations, setEvaluations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
+  const [disciplinaFilter, setDisciplinaFilter] = useState('');
   const [turmaFilter, setTurmaFilter] = useState('');
   const [exerciseFilter, setExerciseFilter] = useState('');
   const [institutionFilter, setInstitutionFilter] = useState('');
@@ -86,7 +86,7 @@ export default function AvaliacoesPage() {
 
   const filtered = evaluations.filter(e => {
     if (search && !e.studentName.toLowerCase().includes(search.toLowerCase())) return false;
-    if (typeFilter && e.type !== typeFilter) return false;
+    if (disciplinaFilter && (e.disciplina || '') !== disciplinaFilter) return false;
     if (classIdFilter && e.classId !== classIdFilter) return false;
     if (!classIdFilter && turmaFilter && (e.turma || '').toLowerCase() !== turmaFilter.toLowerCase()) return false;
     if (exerciseFilter && (e.exerciseName || '') !== exerciseFilter) return false;
@@ -130,7 +130,7 @@ export default function AvaliacoesPage() {
     }
   }
 
-  function clearFilters() { setSearch(''); setTypeFilter(''); setTurmaFilter(''); setExerciseFilter(''); setInstitutionFilter(''); setScoreMin(''); setScoreMax(''); setClassIdFilter(''); }
+  function clearFilters() { setSearch(''); setDisciplinaFilter(''); setTurmaFilter(''); setExerciseFilter(''); setInstitutionFilter(''); setScoreMin(''); setScoreMax(''); setClassIdFilter(''); }
 
   async function saveEdit() {
     if (!detailDraft) return;
@@ -642,9 +642,9 @@ export default function AvaliacoesPage() {
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <input style={{ ...inpStyle, width: 180 }} value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar aluno..." />
-          <select style={{ ...inpStyle, width: 170 }} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
-            <option value="">Todos os tipos</option>
-            {Object.entries(TYPES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+          <select style={{ ...inpStyle, width: 170 }} value={disciplinaFilter} onChange={e => setDisciplinaFilter(e.target.value)}>
+            <option value="">Todas as disciplinas</option>
+            {[...new Set(evaluations.map(e => e.disciplina).filter(Boolean))].sort().map(d => <option key={d} value={d}>{d}</option>)}
           </select>
           <select style={{ ...inpStyle, width: 150 }} value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)}>
             <option value="">Todas as turmas</option>
@@ -661,7 +661,7 @@ export default function AvaliacoesPage() {
           <input style={{ ...inpStyle, width: 80 }} value={scoreMin} onChange={e => setScoreMin(e.target.value)} placeholder="Nota ≥" type="number" min="0" max="10" step="0.1" />
           <span style={{ fontSize: 12, color: 'var(--text-sub)' }}>—</span>
           <input style={{ ...inpStyle, width: 80 }} value={scoreMax} onChange={e => setScoreMax(e.target.value)} placeholder="≤ 10" type="number" min="0" max="10" step="0.1" />
-          {(search || typeFilter || turmaFilter || exerciseFilter || institutionFilter || scoreMin || scoreMax) && (
+          {(search || disciplinaFilter || turmaFilter || exerciseFilter || institutionFilter || scoreMin || scoreMax) && (
             <button onClick={clearFilters} style={{ ...inpStyle, cursor: 'pointer', color: 'var(--text-muted)' }}>× Limpar</button>
           )}
         </div>
