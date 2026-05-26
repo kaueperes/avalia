@@ -8,7 +8,22 @@ import mammoth from 'mammoth';
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
 let _slotId = 0;
-function newSlot() { return { id: ++_slotId, studentId: '', studentName: '', mediaFiles: [], textContent: '', fileNames: [], result: null, evalId: null, evaluating: false, error: '' }; }
+function newSlot() { return { id: ++_slotId, studentId: '', studentName: '', mediaFiles: [], textContent: '', fileNames: [], youtubeUrl: '', result: null, evalId: null, evaluating: false, error: '' }; }
+
+// Normaliza qualquer variante de URL do YouTube para https://www.youtube.com/watch?v=ID
+function normalizeYoutubeUrl(url) {
+  try {
+    const u = new URL(url.trim());
+    if (u.hostname === 'youtu.be') return `https://www.youtube.com/watch?v=${u.pathname.slice(1)}`;
+    if (u.hostname.includes('youtube.com')) {
+      const v = u.searchParams.get('v');
+      if (v) return `https://www.youtube.com/watch?v=${v}`;
+      const shorts = u.pathname.match(/\/shorts\/([a-zA-Z0-9_-]+)/);
+      if (shorts) return `https://www.youtube.com/watch?v=${shorts[1]}`;
+    }
+    return null;
+  } catch { return null; }
+}
 
 // ── Helpers de arquivo ────────────────────────────────────────────────────────
 async function compressImage(file) {
@@ -94,6 +109,7 @@ const IconCheck = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="no
 const IconPlus = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
 const IconTrash = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>;
 const IconSpinner = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>;
+const IconYoutube = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>;
 const IconPDF = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
 const IconUpload = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>;
 
@@ -141,6 +157,18 @@ function SelectWithAdd({ label, value, onChange, options, placeholder, href, dis
 function StudentSlot({ slot, index, students, onChange, onRemove, canRemove }) {
   const fileRef = useRef(null);
   const [processing, setProcessing] = useState(false);
+  const [showYoutube, setShowYoutube] = useState(false);
+  const [youtubeInput, setYoutubeInput] = useState('');
+  const [youtubeError, setYoutubeError] = useState('');
+
+  function handleYoutubeSubmit() {
+    const normalized = normalizeYoutubeUrl(youtubeInput);
+    if (!normalized) { setYoutubeError('URL inválida. Use um link do YouTube válido.'); return; }
+    onChange({ youtubeUrl: normalized });
+    setShowYoutube(false);
+    setYoutubeInput('');
+    setYoutubeError('');
+  }
 
   async function handleFiles(selectedFiles) {
     setProcessing(true);
@@ -198,6 +226,39 @@ function StudentSlot({ slot, index, students, onChange, onRemove, canRemove }) {
           <input ref={fileRef} type="file" style={{ display: 'none' }} multiple
             accept="image/*,video/*,audio/*,.pdf,.docx,.doc,.txt,.obj"
             onChange={e => handleFiles(e.target.files)} />
+
+          {/* YouTube URL option */}
+          {!slot.youtubeUrl && !showYoutube && (
+            <button
+              onClick={() => setShowYoutube(true)}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: 'none', cursor: 'pointer', color: '#ef4444', fontSize: 12, fontWeight: 500, padding: '2px 0', fontFamily: 'inherit' }}>
+              <IconYoutube /> Ou cole um link do YouTube
+            </button>
+          )}
+          {showYoutube && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  autoFocus
+                  placeholder="https://youtube.com/watch?v=..."
+                  value={youtubeInput}
+                  onChange={e => { setYoutubeInput(e.target.value); setYoutubeError(''); }}
+                  onKeyDown={e => e.key === 'Enter' && handleYoutubeSubmit()}
+                  style={{ flex: 1, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: 'inherit', outline: 'none' }}
+                />
+                <button onClick={handleYoutubeSubmit} style={{ padding: '8px 14px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>OK</button>
+                <button onClick={() => { setShowYoutube(false); setYoutubeInput(''); setYoutubeError(''); }} style={{ padding: '8px 10px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, cursor: 'pointer', color: 'var(--text-muted)', fontFamily: 'inherit' }}>×</button>
+              </div>
+              {youtubeError && <p style={{ color: '#ef4444', fontSize: 12, margin: 0 }}>{youtubeError}</p>}
+            </div>
+          )}
+          {slot.youtubeUrl && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, fontSize: 12 }}>
+              <IconYoutube />
+              <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-main)' }}>{slot.youtubeUrl}</span>
+              <button onClick={() => onChange({ youtubeUrl: '' })} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#ef4444', fontSize: 16, lineHeight: 1, padding: '0 2px', flexShrink: 0 }}>×</button>
+            </div>
+          )}
 
           {slot.error && <p style={{ color: '#ef4444', fontSize: 12, margin: 0 }}>{slot.error}</p>}
 
@@ -392,7 +453,7 @@ export default function AvaliarV2() {
   function updateSlot(id, patch) { setSlots(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s)); }
 
   async function handleEvaluateAll() {
-    const validSlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0);
+    const validSlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0 || s.youtubeUrl);
     if (!validSlots.length) return;
     const controller = new AbortController();
     abortRef.current = controller;
@@ -404,7 +465,7 @@ export default function AvaliarV2() {
     for (let i = 0; i < slots.length; i++) {
       if (controller.signal.aborted) break;
       const slot = slots[i];
-      if (!slot.studentId && !slot.textContent && slot.mediaFiles.length === 0) continue;
+      if (!slot.studentId && !slot.textContent && slot.mediaFiles.length === 0 && !slot.youtubeUrl) continue;
       setEvalProgress(`Avaliando ${slot.studentName || `Aluno ${i + 1}`} (${i + 1} de ${validSlots.length})...`);
       updateSlot(slot.id, { evaluating: true, error: '', result: null, evalId: null });
       try {
@@ -420,6 +481,7 @@ export default function AvaliarV2() {
             profDisc: profile?.discipline || '',
             writingSample: profile?.writingSample || undefined,
             images: (slot.mediaFiles.length > 0 || refFiles.length > 0) ? [...slot.mediaFiles, ...refFiles] : undefined,
+            youtubeUrl: slot.youtubeUrl || undefined,
             referenceWeight: refFiles.length > 0 ? refWeight : undefined,
           }),
         });
@@ -471,7 +533,7 @@ export default function AvaliarV2() {
   }
 
   const canGoToStep2 = !!selectedExerciseId;
-  const readySlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0);
+  const readySlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0 || s.youtubeUrl);
   const doneSlots = slots.filter(s => s.result);
 
   // Design system
