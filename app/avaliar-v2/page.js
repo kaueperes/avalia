@@ -68,7 +68,7 @@ async function processAnyFile(file) {
   const name = file.name.toLowerCase(); const type = file.type;
   if (type.startsWith('image/')) return { kind: 'media', data: await compressImage(file), mediaType: 'image/jpeg', label: 'Trabalho do aluno', name: file.name };
   if (type.startsWith('video/') || type.startsWith('audio/')) {
-    if (file.size > 20 * 1024 * 1024) throw new Error(`"${file.name}" maior que 20MB.`);
+    if (file.size > 20 * 1024 * 1024) throw new Error(`"${file.name}" ultrapassa o limite de 20MB. Comprima o vídeo ou exporte em resolução menor (480p recomendado) antes de enviar.`);
     return { kind: 'media', data: await toBase64(file), mediaType: type, label: 'Trabalho do aluno', name: file.name };
   }
   if (type === 'application/pdf' || name.endsWith('.pdf')) return { kind: 'media', data: await toBase64(file), mediaType: 'application/pdf', label: 'Trabalho do aluno', name: file.name };
