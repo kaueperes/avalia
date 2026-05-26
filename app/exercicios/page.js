@@ -148,7 +148,7 @@ export default function ExerciciosPage() {
                     <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                       <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ex.name}</p>
                       <p style={{ fontSize: 12, color: 'var(--text-sub)' }}>
-                        {TYPES[ex.type]?.label || ex.type} · {ex.criteria?.length || 0} critérios{ex.disciplina ? ` · ${ex.disciplina}` : ''}
+                        {ex.criteria?.length || 0} critérios{ex.disciplina ? ` · ${ex.disciplina}` : ''}
                       </p>
                       {ex.context && (
                         <p style={{ fontSize: 11, color: 'var(--text-sub)', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
