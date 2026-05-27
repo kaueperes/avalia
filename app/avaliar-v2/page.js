@@ -614,8 +614,7 @@ export default function AvaliarV2() {
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Avaliação</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px', margin: 0 }}>Nova Avaliação</h1>
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 0 }}>
-          Selecione o exercício, adicione os trabalhos e gere as avaliações.{' '}
-          <span style={{ background: '#810cfa', color: '#fff', fontSize: 11, fontWeight: 700, padding: '1px 7px', borderRadius: 10 }}>V2</span>
+          Selecione o exercício, adicione os trabalhos e gere as avaliações.
         </p>
       </div>
 
