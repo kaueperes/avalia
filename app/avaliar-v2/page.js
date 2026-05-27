@@ -8,7 +8,7 @@ import mammoth from 'mammoth';
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
 let _slotId = 0;
-function newSlot() { return { id: ++_slotId, studentId: '', studentName: '', mediaFiles: [], textContent: '', fileNames: [], youtubeUrl: '', result: null, evalId: null, evaluating: false, error: '' }; }
+function newSlot() { return { id: ++_slotId, studentId: '', studentName: '', mediaFiles: [], textContent: '', fileNames: [], youtubeUrl: '', result: null, evalId: null, evaluating: false, error: '', processing: false }; }
 
 // Normaliza qualquer variante de URL do YouTube para https://www.youtube.com/watch?v=ID
 function normalizeYoutubeUrl(url) {
@@ -172,12 +172,13 @@ function StudentSlot({ slot, index, students, onChange, onRemove, canRemove }) {
 
   async function handleFiles(selectedFiles) {
     setProcessing(true);
+    onChange({ processing: true });
     const mediaFiles = [], textParts = [], fileNames = [], errors = [];
     for (const file of Array.from(selectedFiles)) {
       try { const r = await processAnyFile(file); fileNames.push(file.name); if (r.kind === 'media') mediaFiles.push(r); else textParts.push(r.content); }
       catch (e) { errors.push(e.message); }
     }
-    onChange({ mediaFiles, textContent: textParts.join('\n\n'), fileNames, error: errors.join(' ') });
+    onChange({ mediaFiles, textContent: textParts.join('\n\n'), fileNames, error: errors.join(' '), processing: false });
     setProcessing(false);
   }
 
@@ -453,7 +454,7 @@ export default function AvaliarV2() {
   function updateSlot(id, patch) { setSlots(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s)); }
 
   async function handleEvaluateAll() {
-    const validSlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0 || s.youtubeUrl);
+    const validSlots = slots.filter(s => s.textContent || s.mediaFiles.length > 0 || s.youtubeUrl);
     if (!validSlots.length) return;
     const controller = new AbortController();
     abortRef.current = controller;
@@ -465,7 +466,7 @@ export default function AvaliarV2() {
     for (let i = 0; i < slots.length; i++) {
       if (controller.signal.aborted) break;
       const slot = slots[i];
-      if (!slot.studentId && !slot.textContent && slot.mediaFiles.length === 0 && !slot.youtubeUrl) continue;
+      if (!slot.textContent && slot.mediaFiles.length === 0 && !slot.youtubeUrl) continue;
       setEvalProgress(`Avaliando ${slot.studentName || `Aluno ${i + 1}`} (${i + 1} de ${validSlots.length})...`);
       updateSlot(slot.id, { evaluating: true, error: '', result: null, evalId: null });
       try {
@@ -485,7 +486,8 @@ export default function AvaliarV2() {
             referenceWeight: refFiles.length > 0 ? refWeight : undefined,
           }),
         });
-        const evalData = await evalRes.json();
+        let evalData;
+        try { evalData = await evalRes.json(); } catch { throw new Error('Arquivo muito grande ou erro de conexão. Tente um vídeo menor ou use o link do YouTube.'); }
         if (!evalRes.ok) throw new Error(evalData.error || 'Erro ao avaliar');
 
         try {
@@ -533,7 +535,8 @@ export default function AvaliarV2() {
   }
 
   const canGoToStep2 = !!selectedExerciseId;
-  const readySlots = slots.filter(s => s.studentId || s.textContent || s.mediaFiles.length > 0 || s.youtubeUrl);
+  const anyProcessing = slots.some(s => s.processing);
+  const readySlots = slots.filter(s => s.textContent || s.mediaFiles.length > 0 || s.youtubeUrl);
   const doneSlots = slots.filter(s => s.result);
 
   // Design system
@@ -785,9 +788,9 @@ export default function AvaliarV2() {
 
             <div style={{ ...sectionLast, display: 'flex', justifyContent: 'space-between' }}>
               <button style={btnSecondary} onClick={() => setStep(2)} disabled={evaluating}>← Voltar</button>
-              <button style={{ ...btnPrimary, opacity: evaluating || readySlots.length === 0 ? 0.6 : 1 }}
-                onClick={handleEvaluateAll} disabled={evaluating || readySlots.length === 0}>
-                {evaluating ? <><IconSpinner /> Avaliando...</> : readySlots.length > 1 ? `Gerar Avaliações (${readySlots.length})` : 'Gerar Avaliação'}
+              <button style={{ ...btnPrimary, opacity: evaluating || readySlots.length === 0 || anyProcessing ? 0.6 : 1 }}
+                onClick={handleEvaluateAll} disabled={evaluating || readySlots.length === 0 || anyProcessing}>
+                {evaluating ? <><IconSpinner /> Avaliando...</> : anyProcessing ? <><IconSpinner /> Carregando arquivo...</> : readySlots.length > 1 ? `Gerar Avaliações (${readySlots.length})` : 'Gerar Avaliação'}
               </button>
             </div>
           </div>
