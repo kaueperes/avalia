@@ -7,6 +7,40 @@ import mammoth from 'mammoth';
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
+// ── Upload de arquivo: Supabase Storage → Gemini Files API ───────────────────
+// 1. Obtém signed URL do servidor (sem passar o arquivo pelo Vercel)
+// 2. PUT direto do browser para Supabase (sem limite de 4,5MB)
+// 3. Servidor baixa do Supabase e sobe para Gemini Files API
+async function uploadFileToGemini(file, label) {
+  // Passo 1: signed URL
+  const urlRes = await fetch('/api/storage/signed-url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+    body: JSON.stringify({ filename: file.name }),
+  });
+  const urlData = await urlRes.json();
+  if (!urlRes.ok) throw new Error(urlData.error || 'Erro ao preparar upload');
+
+  // Passo 2: upload direto para Supabase (bypass do limite do Vercel)
+  const putRes = await fetch(urlData.signedUrl, {
+    method: 'PUT',
+    body: file,
+    headers: { 'Content-Type': file.type },
+  });
+  if (!putRes.ok) throw new Error('Erro ao enviar arquivo para o storage');
+
+  // Passo 3: servidor transfere para Gemini Files API
+  const geminiRes = await fetch('/api/upload-gemini', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+    body: JSON.stringify({ supabasePath: urlData.path, mimeType: file.type, name: file.name, label }),
+  });
+  const geminiData = await geminiRes.json();
+  if (!geminiRes.ok) throw new Error(geminiData.error || 'Erro ao processar arquivo');
+
+  return { fileUri: geminiData.fileUri, mimeType: geminiData.mimeType, label, name: file.name };
+}
+
 let _slotId = 0;
 function newSlot() { return { id: ++_slotId, studentId: '', studentName: '', fileUris: [], textContent: '', fileNames: [], youtubeUrl: '', result: null, evalId: null, evaluating: false, error: '', processing: false }; }
 
@@ -185,18 +219,8 @@ function StudentSlot({ slot, index, students, onChange, onRemove, canRemove }) {
           fileNames.push(file.name);
           if (r.kind === 'text') textParts.push(r.content);
         } else {
-          // Upload direto para Gemini Files API (sem converter para base64)
-          const fd = new FormData();
-          fd.append('file', file);
-          fd.append('label', 'Trabalho do aluno');
-          const res = await fetch('/api/upload-gemini', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token()}` },
-            body: fd,
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Erro ao enviar arquivo');
-          fileUris.push({ fileUri: data.fileUri, mimeType: data.mimeType, label: 'Trabalho do aluno', name: file.name });
+          const result = await uploadFileToGemini(file, 'Trabalho do aluno');
+          fileUris.push(result);
           fileNames.push(file.name);
         }
       } catch (e) { errors.push(e.message); }
@@ -405,18 +429,9 @@ export default function AvaliarV2() {
     const fileUris = [], names = [];
     for (const file of Array.from(selectedFiles)) {
       try {
-        const fd = new FormData();
-        fd.append('file', file);
-        fd.append('label', `Referência para Correção: ${file.name}`);
-        const res = await fetch('/api/upload-gemini', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token()}` },
-          body: fd,
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Erro ao enviar referência');
+        const result = await uploadFileToGemini(file, `Referência para Correção: ${file.name}`);
         names.push(file.name);
-        fileUris.push({ fileUri: data.fileUri, mimeType: data.mimeType, label: `Referência para Correção: ${file.name}`, name: file.name });
+        fileUris.push(result);
       } catch (e) { console.error('handleRefFiles error:', e.message); }
     }
     setRefFiles(fileUris);
