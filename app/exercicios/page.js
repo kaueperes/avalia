@@ -94,7 +94,7 @@ export default function ExerciciosPage() {
       const r = await fetch('/api/exercises/generate', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ exerciseName: form.name, exerciseType: form.type, briefDescription: aiPrompt }),
+        body: JSON.stringify({ exerciseName: form.name, disciplinaName: form.disciplina, briefDescription: aiPrompt }),
       });
       const d = await r.json();
       if (d.context) {

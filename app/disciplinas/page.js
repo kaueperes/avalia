@@ -162,7 +162,7 @@ export default function DisciplinasPage() {
       const r = await fetch('/api/exercises/generate', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ exerciseName: exerciseForm.name, briefDescription: aiPrompt }),
+        body: JSON.stringify({ exerciseName: exerciseForm.name, disciplinaName: disciplines.find(d => d.id === expandedDisc)?.subject, briefDescription: aiPrompt }),
       });
       const d = await r.json();
       if (d.context || d.criteria) {
