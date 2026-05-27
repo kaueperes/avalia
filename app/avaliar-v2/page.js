@@ -315,10 +315,20 @@ function StudentSlot({ slot, index, students, onChange, onRemove, canRemove }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
               <span style={{ ...scoreColor(slot.result.score), padding: '3px 10px', borderRadius: 6, fontSize: 13, fontWeight: 700 }}>{slot.result.score?.toFixed(1)} — {scoreToGrade(slot.result.score)}</span>
               {slot.evalId && (
-                <button onClick={() => window.open(`/relatorio-individual?id=${slot.evalId}&print=1`, '_blank')}
-                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: 'inherit' }}>
-                  <IconPDF /> Baixar PDF
-                </button>
+                <>
+                  <button onClick={() => window.open(`/relatorio-individual?id=${slot.evalId}`, '_blank')}
+                    style={{ padding: '4px 12px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', background: 'var(--bg-card)', color: '#0081f0', fontFamily: 'inherit', fontWeight: 500 }}>
+                    Ver
+                  </button>
+                  <button onClick={() => window.open(`/relatorio-individual?id=${slot.evalId}&print=1`, '_blank')}
+                    style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: 'inherit' }}>
+                    <IconPDF /> Baixar PDF
+                  </button>
+                  <button onClick={() => window.open(`/avaliacoes?edit=${slot.evalId}`, '_blank')}
+                    style={{ padding: '4px 12px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: 'inherit', fontWeight: 500 }}>
+                    Editar
+                  </button>
+                </>
               )}
             </div>
           )}
