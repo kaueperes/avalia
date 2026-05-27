@@ -240,7 +240,7 @@ export default function DisciplinasPage() {
                               <div key={ex.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 9, border: '1px solid var(--border)', background: 'var(--bg-card)', marginBottom: 8 }}>
                                 <div style={{ minWidth: 0, flex: 1 }}>
                                   <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ex.name}</p>
-                                  <p style={{ fontSize: 11, color: 'var(--text-sub)' }}>{TYPES[ex.type]?.label || ex.type} · {ex.criteria?.length || 0} critérios</p>
+                                  <p style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ex.criteria?.length || 0} critérios</p>
                                 </div>
                                 <div style={{ display: 'flex', gap: 6, flexShrink: 0, marginLeft: 10 }}>
                                   <button onClick={() => startEditExercise(ex)}
