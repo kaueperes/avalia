@@ -8,7 +8,7 @@ import mammoth from 'mammoth';
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
 let _slotId = 0;
-function newSlot() { return { id: ++_slotId, studentId: '', studentName: '', mediaFiles: [], textContent: '', fileNames: [], youtubeUrl: '', result: null, evalId: null, evaluating: false, error: '', processing: false }; }
+function newSlot() { return { id: ++_slotId, studentId: '', studentName: '', fileUris: [], textContent: '', fileNames: [], youtubeUrl: '', result: null, evalId: null, evaluating: false, error: '', processing: false }; }
 
 // Normaliza qualquer variante de URL do YouTube para https://www.youtube.com/watch?v=ID
 function normalizeYoutubeUrl(url) {
@@ -173,12 +173,35 @@ function StudentSlot({ slot, index, students, onChange, onRemove, canRemove }) {
   async function handleFiles(selectedFiles) {
     setProcessing(true);
     onChange({ processing: true });
-    const mediaFiles = [], textParts = [], fileNames = [], errors = [];
+    const fileUris = [], textParts = [], fileNames = [], errors = [];
     for (const file of Array.from(selectedFiles)) {
-      try { const r = await processAnyFile(file); fileNames.push(file.name); if (r.kind === 'media') mediaFiles.push(r); else textParts.push(r.content); }
-      catch (e) { errors.push(e.message); }
+      const n = file.name.toLowerCase(); const t = file.type;
+      const isText = t === 'text/plain' || n.endsWith('.txt')
+        || t.includes('wordprocessingml') || n.endsWith('.docx') || n.endsWith('.doc')
+        || n.endsWith('.obj');
+      try {
+        if (isText) {
+          const r = await processAnyFile(file);
+          fileNames.push(file.name);
+          if (r.kind === 'text') textParts.push(r.content);
+        } else {
+          // Upload direto para Gemini Files API (sem converter para base64)
+          const fd = new FormData();
+          fd.append('file', file);
+          fd.append('label', 'Trabalho do aluno');
+          const res = await fetch('/api/upload-gemini', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token()}` },
+            body: fd,
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Erro ao enviar arquivo');
+          fileUris.push({ fileUri: data.fileUri, mimeType: data.mimeType, label: 'Trabalho do aluno', name: file.name });
+          fileNames.push(file.name);
+        }
+      } catch (e) { errors.push(e.message); }
     }
-    onChange({ mediaFiles, textContent: textParts.join('\n\n'), fileNames, error: errors.join(' '), processing: false });
+    onChange({ fileUris, textContent: textParts.join('\n\n'), fileNames, error: errors.join(' '), processing: false });
     setProcessing(false);
   }
 
@@ -379,15 +402,24 @@ export default function AvaliarV2() {
 
   async function handleRefFiles(selectedFiles) {
     setRefProcessing(true);
-    const mediaFiles = [], names = [];
+    const fileUris = [], names = [];
     for (const file of Array.from(selectedFiles)) {
       try {
-        const r = await processAnyFile(file);
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('label', `Referência para Correção: ${file.name}`);
+        const res = await fetch('/api/upload-gemini', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token()}` },
+          body: fd,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erro ao enviar referência');
         names.push(file.name);
-        if (r.kind === 'media') mediaFiles.push({ ...r, label: `Referência para Correção: ${file.name}` });
-      } catch {}
+        fileUris.push({ fileUri: data.fileUri, mimeType: data.mimeType, label: `Referência para Correção: ${file.name}`, name: file.name });
+      } catch (e) { console.error('handleRefFiles error:', e.message); }
     }
-    setRefFiles(mediaFiles);
+    setRefFiles(fileUris);
     setRefFileNames(names);
     setRefProcessing(false);
   }
@@ -454,7 +486,7 @@ export default function AvaliarV2() {
   function updateSlot(id, patch) { setSlots(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s)); }
 
   async function handleEvaluateAll() {
-    const validSlots = slots.filter(s => s.textContent || s.mediaFiles.length > 0 || s.youtubeUrl);
+    const validSlots = slots.filter(s => s.textContent || s.fileUris?.length > 0 || s.youtubeUrl);
     if (!validSlots.length) return;
     const controller = new AbortController();
     abortRef.current = controller;
@@ -466,7 +498,7 @@ export default function AvaliarV2() {
     for (let i = 0; i < slots.length; i++) {
       if (controller.signal.aborted) break;
       const slot = slots[i];
-      if (!slot.textContent && slot.mediaFiles.length === 0 && !slot.youtubeUrl) continue;
+      if (!slot.textContent && !slot.fileUris?.length && !slot.youtubeUrl) continue;
       setEvalProgress(`Avaliando ${slot.studentName || `Aluno ${i + 1}`} (${i + 1} de ${validSlots.length})...`);
       updateSlot(slot.id, { evaluating: true, error: '', result: null, evalId: null });
       try {
@@ -481,7 +513,7 @@ export default function AvaliarV2() {
             tone, profName: profile?.name || '',
             profDisc: profile?.discipline || '',
             writingSample: profile?.writingSample || undefined,
-            images: (slot.mediaFiles.length > 0 || refFiles.length > 0) ? [...slot.mediaFiles, ...refFiles] : undefined,
+            fileUris: (slot.fileUris?.length > 0 || refFiles.length > 0) ? [...(slot.fileUris || []), ...refFiles] : undefined,
             youtubeUrl: slot.youtubeUrl || undefined,
             referenceWeight: refFiles.length > 0 ? refWeight : undefined,
           }),
@@ -536,7 +568,7 @@ export default function AvaliarV2() {
 
   const canGoToStep2 = !!selectedExerciseId;
   const anyProcessing = slots.some(s => s.processing);
-  const readySlots = slots.filter(s => s.textContent || s.mediaFiles.length > 0 || s.youtubeUrl);
+  const readySlots = slots.filter(s => s.textContent || s.fileUris?.length > 0 || s.youtubeUrl);
   const doneSlots = slots.filter(s => s.result);
 
   // Design system
