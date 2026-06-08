@@ -302,8 +302,9 @@ O gabarito é uma ferramenta interna do professor. Jamais mencione sua existênc
       parts.push({ text: `URL do site/portfólio do aluno: ${lUrl}` });
     }
 
-    const config = hasVideoAudio
-      ? { temperature: 0.2 }
+    const isWebsiteUrl = !!(lUrl && !lUrlIsYt);
+    const config = hasVideoAudio || isWebsiteUrl
+      ? { temperature: 0.2, ...(isWebsiteUrl ? { tools: [{ urlContext: {} }] } : {}) }
       : { temperature: 0.2, responseMimeType: 'application/json' };
     const result = await ai.models.generateContent({
       model,
