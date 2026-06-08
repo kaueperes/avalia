@@ -86,8 +86,18 @@ async function screenshotWebsite(url) {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36');
     await page.setExtraHTTPHeaders({ 'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.8' });
+
+    // Remove automation signals so Cloudflare/bot-detection passes
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+      window.chrome = { runtime: {}, loadTimes: () => {}, csi: () => {} };
+      Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
+      Object.defineProperty(navigator, 'languages', { get: () => ['pt-BR', 'pt', 'en-US', 'en'] });
+    });
+
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 });
-    await new Promise(r => setTimeout(r, 2000));
+    // Extra wait for Cloudflare JS challenge to complete and redirect
+    await new Promise(r => setTimeout(r, 4000));
 
     const images = [];
 
