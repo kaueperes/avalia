@@ -69,6 +69,42 @@ async function fetchWebsiteContent(url) {
   return { text, images };
 }
 
+async function screenshotWebsite(url) {
+  const [{ default: chromium }, { default: puppeteer }] = await Promise.all([
+    import('@sparticuz/chromium'),
+    import('puppeteer-core'),
+  ]);
+
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: { width: 1280, height: 900 },
+    executablePath: await chromium.executablePath(),
+    headless: true,
+  });
+
+  try {
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36');
+    await page.setExtraHTTPHeaders({ 'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.8' });
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 });
+    await new Promise(r => setTimeout(r, 2000));
+
+    const images = [];
+
+    const shot1 = await page.screenshot({ type: 'jpeg', quality: 75 });
+    images.push({ data: Buffer.from(shot1).toString('base64'), mediaType: 'image/jpeg', label: 'Screenshot do portfólio (topo da página)' });
+
+    await page.evaluate(() => window.scrollBy(0, window.innerHeight));
+    await new Promise(r => setTimeout(r, 800));
+    const shot2 = await page.screenshot({ type: 'jpeg', quality: 75 });
+    images.push({ data: Buffer.from(shot2).toString('base64'), mediaType: 'image/jpeg', label: 'Screenshot do portfólio (rolagem)' });
+
+    return images;
+  } finally {
+    await browser.close();
+  }
+}
+
 // Selects the model based on evaluation complexity to balance quality and cost.
 // Returns { model, maxTokens }
 function selectModel({ studentWork, criteria, writingSample, exerciseContext, tone }) {
@@ -142,7 +178,13 @@ export async function POST(request) {
 
   let websiteContent = null;
   if (isWebsite) {
-    try { websiteContent = await fetchWebsiteContent(effectiveUrl); } catch { /* proceed without */ }
+    const [fetchResult, screenshotResult] = await Promise.allSettled([
+      fetchWebsiteContent(effectiveUrl),
+      screenshotWebsite(effectiveUrl),
+    ]);
+    const fetched = fetchResult.status === 'fulfilled' ? fetchResult.value : { text: '', images: [] };
+    const shots = screenshotResult.status === 'fulfilled' ? screenshotResult.value : [];
+    websiteContent = { text: fetched.text, images: [...(fetched.images || []), ...shots] };
   }
 
   const typeLabel = TYPES[type]?.label || type;
