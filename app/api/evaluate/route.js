@@ -15,106 +15,6 @@ function isYoutubeUrl(url) {
   } catch { return false; }
 }
 
-async function fetchWebsiteContent(url) {
-  const html = await fetch(url, {
-    signal: AbortSignal.timeout(10000),
-    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36', Referer: url },
-  }).then(r => r.text());
-
-  const text = html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .substring(0, 4000);
-
-  const seen = new Set();
-  const imgUrls = [];
-  const regexes = [
-    /property=["']og:image["'][^>]+content=["']([^"']+)["']/gi,
-    /content=["']([^"']+)["'][^>]+property=["']og:image["']/gi,
-    /<img[^>]+src=["']([^"'?#\s]+\.(?:jpg|jpeg|png|webp))["'?#\s]/gi,
-    /["'](https?:\/\/cdn\.[^"'\s]+\.(?:jpg|jpeg|png|webp)(?:\?[^"'\s]*)?)["']/gi,
-    /["'](https?:\/\/[^"'\s]+\/(?:images?|uploads?|assets?|media)\/[^"'\s]+\.(?:jpg|jpeg|png|webp)(?:\?[^"'\s]*)?)["']/gi,
-  ];
-  for (const re of regexes) {
-    let m;
-    while ((m = re.exec(html)) !== null && imgUrls.length < 10) {
-      const u = m[1];
-      if (u && u.startsWith('http') && !seen.has(u) && !/icon|logo|avatar|favicon|pixel|tracking|banner|badge/i.test(u)) {
-        seen.add(u);
-        imgUrls.push(u);
-      }
-    }
-  }
-
-  const images = [];
-  for (const imgUrl of imgUrls.slice(0, 6)) {
-    try {
-      const res = await fetch(imgUrl, {
-        signal: AbortSignal.timeout(5000),
-        headers: { 'User-Agent': 'Mozilla/5.0', Referer: url },
-      });
-      if (!res.ok) continue;
-      const ct = (res.headers.get('content-type') || '').split(';')[0].trim();
-      if (!ct.startsWith('image/')) continue;
-      const buf = await res.arrayBuffer();
-      if (buf.byteLength > 5 * 1024 * 1024) continue;
-      images.push({ data: Buffer.from(buf).toString('base64'), mediaType: ct, label: 'Imagem do portfólio do aluno' });
-    } catch { /* skip */ }
-  }
-
-  return { text, images };
-}
-
-async function screenshotWebsite(url) {
-  const [{ default: chromium }, { default: puppeteer }] = await Promise.all([
-    import('@sparticuz/chromium'),
-    import('puppeteer-core'),
-  ]);
-
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: { width: 1280, height: 900 },
-    executablePath: await chromium.executablePath(),
-    headless: true,
-  });
-
-  try {
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36');
-    await page.setExtraHTTPHeaders({ 'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.8' });
-
-    // Remove automation signals so Cloudflare/bot-detection passes
-    await page.evaluateOnNewDocument(() => {
-      Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-      window.chrome = { runtime: {}, loadTimes: () => {}, csi: () => {} };
-      Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
-      Object.defineProperty(navigator, 'languages', { get: () => ['pt-BR', 'pt', 'en-US', 'en'] });
-    });
-
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 });
-    // Extra wait for Cloudflare JS challenge to complete and redirect
-    await new Promise(r => setTimeout(r, 4000));
-
-    const images = [];
-
-    const shot1 = await page.screenshot({ type: 'jpeg', quality: 75 });
-    images.push({ data: Buffer.from(shot1).toString('base64'), mediaType: 'image/jpeg', label: 'Screenshot do portfólio (topo da página)' });
-
-    await page.evaluate(() => window.scrollBy(0, window.innerHeight));
-    await new Promise(r => setTimeout(r, 800));
-    const shot2 = await page.screenshot({ type: 'jpeg', quality: 75 });
-    images.push({ data: Buffer.from(shot2).toString('base64'), mediaType: 'image/jpeg', label: 'Screenshot do portfólio (rolagem)' });
-
-    return images;
-  } finally {
-    await browser.close();
-  }
-}
-
 // Selects the model based on evaluation complexity to balance quality and cost.
 // Returns { model, maxTokens }
 function selectModel({ studentWork, criteria, writingSample, exerciseContext, tone }) {
@@ -186,16 +86,9 @@ export async function POST(request) {
   const isYt = isYoutubeUrl(effectiveUrl);
   const isWebsite = !!(effectiveUrl && !isYt);
 
-  let websiteContent = null;
-  if (isWebsite) {
-    const [fetchResult, screenshotResult] = await Promise.allSettled([
-      fetchWebsiteContent(effectiveUrl),
-      screenshotWebsite(effectiveUrl),
-    ]);
-    const fetched = fetchResult.status === 'fulfilled' ? fetchResult.value : { text: '', images: [] };
-    const shots = screenshotResult.status === 'fulfilled' ? screenshotResult.value : [];
-    websiteContent = { text: fetched.text, images: [...(fetched.images || []), ...shots] };
-  }
+  // For website URLs we rely solely on Gemini's urlContext (Google infrastructure,
+  // trusted by Cloudflare) — no server-side fetch/screenshot which would be blocked.
+  const websiteContent = null;
 
   const typeLabel = TYPES[type]?.label || type;
   const toneObj = TONES.find(t => t.id === tone);
