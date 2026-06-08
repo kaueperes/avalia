@@ -7,6 +7,68 @@ import { supabase } from '@/lib/supabase';
 
 export const maxDuration = 60;
 
+function isYoutubeUrl(url) {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    return u.hostname === 'youtu.be' || u.hostname.includes('youtube.com');
+  } catch { return false; }
+}
+
+async function fetchWebsiteContent(url) {
+  const html = await fetch(url, {
+    signal: AbortSignal.timeout(10000),
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36', Referer: url },
+  }).then(r => r.text());
+
+  const text = html
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .substring(0, 4000);
+
+  const seen = new Set();
+  const imgUrls = [];
+  const regexes = [
+    /property=["']og:image["'][^>]+content=["']([^"']+)["']/gi,
+    /content=["']([^"']+)["'][^>]+property=["']og:image["']/gi,
+    /<img[^>]+src=["']([^"'?#\s]+\.(?:jpg|jpeg|png|webp))["'?#\s]/gi,
+    /["'](https?:\/\/cdn\.[^"'\s]+\.(?:jpg|jpeg|png|webp)(?:\?[^"'\s]*)?)["']/gi,
+    /["'](https?:\/\/[^"'\s]+\/(?:images?|uploads?|assets?|media)\/[^"'\s]+\.(?:jpg|jpeg|png|webp)(?:\?[^"'\s]*)?)["']/gi,
+  ];
+  for (const re of regexes) {
+    let m;
+    while ((m = re.exec(html)) !== null && imgUrls.length < 10) {
+      const u = m[1];
+      if (u && u.startsWith('http') && !seen.has(u) && !/icon|logo|avatar|favicon|pixel|tracking|banner|badge/i.test(u)) {
+        seen.add(u);
+        imgUrls.push(u);
+      }
+    }
+  }
+
+  const images = [];
+  for (const imgUrl of imgUrls.slice(0, 6)) {
+    try {
+      const res = await fetch(imgUrl, {
+        signal: AbortSignal.timeout(5000),
+        headers: { 'User-Agent': 'Mozilla/5.0', Referer: url },
+      });
+      if (!res.ok) continue;
+      const ct = (res.headers.get('content-type') || '').split(';')[0].trim();
+      if (!ct.startsWith('image/')) continue;
+      const buf = await res.arrayBuffer();
+      if (buf.byteLength > 5 * 1024 * 1024) continue;
+      images.push({ data: Buffer.from(buf).toString('base64'), mediaType: ct, label: 'Imagem do portfólio do aluno' });
+    } catch { /* skip */ }
+  }
+
+  return { text, images };
+}
+
 // Selects the model based on evaluation complexity to balance quality and cost.
 // Returns { model, maxTokens }
 function selectModel({ studentWork, criteria, writingSample, exerciseContext, tone }) {
@@ -67,10 +129,20 @@ export async function POST(request) {
     }
   }
 
-  const { type, exerciseName, exerciseContext, criteria, studentName, studentWork, tone, profName, profDisc, writingSample, images, fileUris, youtubeUrl, referenceWeight } = await request.json();
+  const { type, exerciseName, exerciseContext, criteria, studentName, studentWork, tone, profName, profDisc, writingSample, images, fileUris, linkUrl, youtubeUrl, referenceWeight } = await request.json();
 
   if (!exerciseName || !criteria?.length) {
     return NextResponse.json({ error: 'Exercício e critérios são obrigatórios.' }, { status: 400 });
+  }
+
+  // linkUrl is the new unified field; youtubeUrl kept for backward compat
+  const effectiveUrl = linkUrl || youtubeUrl || null;
+  const isYt = isYoutubeUrl(effectiveUrl);
+  const isWebsite = !!(effectiveUrl && !isYt);
+
+  let websiteContent = null;
+  if (isWebsite) {
+    try { websiteContent = await fetchWebsiteContent(effectiveUrl); } catch { /* proceed without */ }
   }
 
   const typeLabel = TYPES[type]?.label || type;
@@ -84,12 +156,13 @@ export async function POST(request) {
     : '';
 
   // Detect media type for prompt-level context instructions
-  const promptHasVideoAudio = youtubeUrl
+  const promptHasVideoAudio = isYt
     || fileUris?.some(f => f.mimeType?.startsWith('video/') || f.mimeType?.startsWith('audio/'))
     || images?.some(img => img.mediaType?.startsWith('video/') || img.mediaType?.startsWith('audio/'));
-  const promptHasImageOnly = !promptHasVideoAudio && (
+  const promptHasImageOnly = !promptHasVideoAudio && !isWebsite && (
     fileUris?.some(f => f.mimeType?.startsWith('image/'))
     || images?.some(img => img.mediaType?.startsWith('image/'))
+    || (websiteContent?.images?.length > 0)
   );
 
   const prompt = `Você é ${profName ? `o professor ${profName}` : 'um professor experiente'}${profDisc ? ` de ${profDisc}` : ''}, avaliando o trabalho de um aluno.
@@ -146,7 +219,10 @@ Qualidade obrigatória:
 - Use linguagem clara e acessível, palavras do dia a dia. Se o estilo cadastrado do professor usar vocabulário mais elaborado, siga esse estilo; caso contrário, prefira sempre a palavra mais simples que transmita a mesma ideia${promptHasVideoAudio ? `
 
 CONTEXTO DE MÍDIA — VÍDEO/ÁUDIO:
-Este trabalho é em vídeo ou áudio. Ao escrever o feedback, referencie elementos específicos do que foi visto ou ouvido: timing, fluidez de movimento, transições, entonação, ritmo de fala, composição de cenas, postura, domínio do conteúdo. Para animações: qualidade do movimento, expressividade, sincronia. Para apresentações orais e locuções: clareza, articulação, presença. Nunca avalie "o vídeo" de forma genérica — cite o que foi concretamente observado.` : ''}${promptHasImageOnly ? `
+Este trabalho é em vídeo ou áudio. Ao escrever o feedback, referencie elementos específicos do que foi visto ou ouvido: timing, fluidez de movimento, transições, entonação, ritmo de fala, composição de cenas, postura, domínio do conteúdo. Para animações: qualidade do movimento, expressividade, sincronia. Para apresentações orais e locuções: clareza, articulação, presença. Nunca avalie "o vídeo" de forma genérica — cite o que foi concretamente observado.` : ''}${isWebsite ? `
+
+CONTEXTO DE TRABALHO — SITE/PORTFÓLIO ONLINE:
+O trabalho do aluno é um site ou portfólio online (${effectiveUrl}). Analise o conteúdo extraído abaixo — textos, estrutura e imagens dos projetos apresentados. Avalie qualidade dos trabalhos, organização, apresentação visual e domínio da técnica demonstrado. Cite elementos concretos que você conseguiu observar no portfólio.` : ''}${promptHasImageOnly ? `
 
 CONTEXTO DE MÍDIA — IMAGEM:
 Este trabalho é visual. Ao escrever o feedback, referencie elementos visuais concretos: composição, proporções, uso de cor e luz, detalhes técnicos, acabamento, escolhas estilísticas. Nunca avalie "a imagem" de forma genérica — cite o que foi concretamente observado.` : ''}${images?.length > 0 ? `
@@ -178,19 +254,32 @@ O gabarito é uma ferramenta interna do professor. Jamais mencione sua existênc
     throw new Error('invalid_json');
   }
 
-  // Helper: call Gemini with prompt + optional files + optional YouTube URL.
-  // fileUris: array of { fileUri, mimeType, label } — uploaded via Gemini Files API (preferred).
-  // images:   array of { data, mediaType, label }   — base64 inlineData (legacy fallback).
-  // ytUrl:    YouTube URL, fetched natively by Gemini.
+  // Helper: call Gemini with prompt + optional files + optional link URL.
+  // fileUris:       array of { fileUri, mimeType, label } — uploaded via Gemini Files API (preferred).
+  // images:         array of { data, mediaType, label }   — base64 inlineData (legacy fallback).
+  // lUrl:           YouTube URL (native fileData) or generic website URL (text + extracted images).
+  // siteContent:    pre-fetched { text, images } for generic website URLs.
   // responseMimeType: 'application/json' is omitted for video/audio inputs.
-  async function callGemini(promptText, { fileUris: fUris, images: imgs } = {}, ytUrl, model = 'gemini-2.5-flash') {
+  async function callGemini(promptText, { fileUris: fUris, images: imgs } = {}, lUrl, siteContent, model = 'gemini-2.5-flash') {
     if (!process.env.GEMINI_API_KEY) throw new Error('no_gemini_key');
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const hasVideoAudio = ytUrl
+    const lUrlIsYt = isYoutubeUrl(lUrl);
+    const hasVideoAudio = lUrlIsYt
       || fUris?.some(f => f.mimeType?.startsWith('video/') || f.mimeType?.startsWith('audio/'))
       || imgs?.some(f => f.mediaType?.startsWith('video/') || f.mediaType?.startsWith('audio/'));
 
     const parts = [{ text: promptText }];
+
+    // Website: inject extracted text and images before other content
+    if (lUrl && !lUrlIsYt && siteContent) {
+      if (siteContent.text) {
+        parts.push({ text: `\nConteúdo extraído do site (${lUrl}):\n${siteContent.text}` });
+      }
+      for (const img of (siteContent.images || [])) {
+        parts.push({ text: img.label || 'Imagem do portfólio do aluno:' });
+        parts.push({ inlineData: { mimeType: img.mediaType, data: img.data } });
+      }
+    }
 
     // Preferred path: Gemini Files API URIs
     for (const f of (fUris || [])) {
@@ -204,9 +293,13 @@ O gabarito é uma ferramenta interna do professor. Jamais mencione sua existênc
       parts.push({ inlineData: { mimeType: img.mediaType, data: img.data } });
     }
 
-    if (ytUrl) {
+    if (lUrlIsYt) {
       parts.push({ text: 'Trabalho do aluno (vídeo do YouTube):' });
-      parts.push({ fileData: { fileUri: ytUrl, mimeType: 'video/mp4' } });
+      parts.push({ fileData: { fileUri: lUrl, mimeType: 'video/mp4' } });
+    }
+
+    if (lUrl && !lUrlIsYt) {
+      parts.push({ text: `URL do site/portfólio do aluno: ${lUrl}` });
     }
 
     const config = hasVideoAudio
@@ -278,7 +371,7 @@ O gabarito é uma ferramenta interna do professor. Jamais mencione sua existênc
 
         for (let attempt = 1; attempt <= 2; attempt++) {
           try {
-            parsed = await callGemini(prompt, geminiFiles, youtubeUrl || null, model);
+            parsed = await callGemini(prompt, geminiFiles, effectiveUrl || null, websiteContent, model);
             modelErr = null;
             break;
           } catch (err) {
@@ -308,13 +401,17 @@ O gabarito é uma ferramenta interna do professor. Jamais mencione sua existênc
         statusText: geminiErr?.statusText,
         errorDetails: JSON.stringify(geminiErr?.errorDetails ?? geminiErr?.error ?? ''),
       });
-      const hasVideoAudio = youtubeUrl
+      const hasVideoAudio = isYt
         || fileUris?.some(f => f.mimeType?.startsWith('video/') || f.mimeType?.startsWith('audio/'))
         || images?.some(img => img.mediaType?.startsWith('video/') || img.mediaType?.startsWith('audio/'));
       if (hasVideoAudio) throw new Error('video_gemini_unavailable');
       // fileUris are Gemini-only (Claude can't access Google file storage)
       if (hasFileUris) throw new Error('video_gemini_unavailable');
-      if (hasImages) {
+      if (isWebsite && websiteContent?.images?.length > 0) {
+        parsed = await callClaude(prompt, websiteContent.images, { model: 'claude-sonnet-4-6', maxTokens: 3000 });
+      } else if (isWebsite && websiteContent?.text) {
+        parsed = await callClaude(`${prompt}\n\nConteúdo do site (${effectiveUrl}):\n${websiteContent.text}`, null, { model: selectedModel, maxTokens: selectedMaxTokens });
+      } else if (hasImages) {
         parsed = await callClaude(prompt, images, { model: 'claude-sonnet-4-6', maxTokens: 3000 });
       } else {
         parsed = await callClaude(prompt, null, { model: selectedModel, maxTokens: selectedMaxTokens });
