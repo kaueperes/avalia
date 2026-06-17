@@ -573,7 +573,7 @@ export default function DisciplinasPage() {
                               <button onClick={openTestModal}
                                 title="Teste como a IA avalia com esses critérios (não consome suas cotas)"
                                 style={{ padding: '9px 16px', border: '1px solid #0081f0', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer', background: 'transparent', color: '#0081f0', fontFamily: 'inherit' }}>
-                                🧪 Testar
+                                Testar
                               </button>
                               <button onClick={() => { setShowExerciseForm(false); setExerciseForm(BLANK_EXERCISE); setEditingExerciseId(null); setShowAiPrompt(false); }}
                                 style={{ padding: '9px 16px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
@@ -644,7 +644,7 @@ export default function DisciplinasPage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 24px', borderBottom: '1px solid var(--border)' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#0081f0' }}>🧪 Modo Teste</span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#0081f0' }}>Modo Teste</span>
                   {quotaTestes !== null && (
                     <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 6, background: quotaTestes <= 2 ? '#fef2f2' : '#eff6ff', color: quotaTestes <= 2 ? '#dc2626' : '#0081f0', border: `1px solid ${quotaTestes <= 2 ? '#fca5a5' : '#bfdbfe'}` }}>
                       {quotaTestes}/10 testes restantes este mês
@@ -747,7 +747,7 @@ export default function DisciplinasPage() {
                 disabled={testLoading || testProcessing || quotaTestes === 0}
                 style={{ padding: '11px 20px', background: testLoading || testProcessing || quotaTestes === 0 ? 'var(--border)' : 'linear-gradient(135deg, #0081f0, #0033ad)', color: testLoading || testProcessing || quotaTestes === 0 ? 'var(--text-muted)' : 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: testLoading || testProcessing || quotaTestes === 0 ? 'not-allowed' : 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
               >
-                {testLoading ? <><IconSpinner /> Avaliando...</> : quotaTestes === 0 ? 'Sem testes disponíveis este mês' : '🧪 Testar agora'}
+                {testLoading ? <><IconSpinner /> Avaliando...</> : quotaTestes === 0 ? 'Sem testes disponíveis este mês' : 'Testar agora'}
               </button>
 
               {/* Resultado */}
