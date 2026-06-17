@@ -98,7 +98,7 @@ export function EvaluationReport({ data }) {
   const mainColor = scoreColor(d.score);
 
   return (
-    <div style={{
+    <div className="rpt-outer" style={{
       fontFamily: "'Inter', sans-serif",
       background: '#f8fafc',
       minHeight: '100vh',
@@ -196,8 +196,8 @@ export function EvaluationReport({ data }) {
 
         {/* ── Feedback ── */}
         {d.feedback && (
-          <div style={{ padding: '28px 40px', borderBottom: '1px solid #f1f5f9' }}>
-            <div style={{
+          <div className="rpt-feedback" style={{ padding: '28px 40px', borderBottom: '1px solid #f1f5f9' }}>
+            <div className="rpt-feedback-inner" style={{
               background: '#f8fafc',
               borderRadius: 14,
               borderLeft: '4px solid #0081f0',
@@ -296,7 +296,10 @@ export function EvaluationReport({ data }) {
           .no-print { display: none !important; }
           body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          .rpt-card { overflow: visible !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding-top: 24px; padding-bottom: 24px; }
+          .rpt-outer { min-height: 0 !important; background: white !important; }
+          .rpt-card { overflow: visible !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding-top: 24px; padding-bottom: 28px; border-bottom: 2px solid #e2e8f0; }
+          .rpt-feedback { break-inside: auto !important; page-break-inside: auto !important; }
+          .rpt-feedback-inner { break-inside: auto !important; page-break-inside: auto !important; }
         }
       `}</style>
     </div>
