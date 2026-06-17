@@ -66,9 +66,13 @@ export async function POST(request) {
         if (plan) {
           const periodEnd = invoice.lines?.data?.[0]?.period?.end;
           const resetDate = periodEnd ? new Date(periodEnd * 1000).toISOString() : null;
+          const nextTesteReset = new Date();
+          nextTesteReset.setMonth(nextTesteReset.getMonth() + 1);
           await supabase.from('users').update({
             quota_ciclo: plan.limits.avaliacoes ?? 9999,
             quota_relatorios_ciclo: plan.limits.relatorios ?? 0,
+            quota_testes: 10,
+            quota_testes_reset_date: nextTesteReset.toISOString(),
             ...(resetDate && { quota_reset_date: resetDate }),
           }).eq('id', user.id);
         }

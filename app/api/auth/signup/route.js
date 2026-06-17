@@ -20,8 +20,10 @@ export async function POST(request) {
     }
 
     const hashed = await bcrypt.hash(password, 10);
+    const nextTesteReset = new Date();
+    nextTesteReset.setMonth(nextTesteReset.getMonth() + 1);
     const { data: user, error } = await supabase.from('users')
-      .insert({ name, email, password: hashed, plan: 'gratuito', quota_ciclo: 5, quota_extra: 0, quota_relatorios_ciclo: 0, quota_relatorios_extra: 0 })
+      .insert({ name, email, password: hashed, plan: 'gratuito', quota_ciclo: 5, quota_extra: 0, quota_relatorios_ciclo: 0, quota_relatorios_extra: 0, quota_testes: 10, quota_testes_reset_date: nextTesteReset.toISOString() })
       .select().single();
 
     if (error) throw error;

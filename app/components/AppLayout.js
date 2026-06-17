@@ -124,6 +124,13 @@ const EditIcon = () => (
 
 // ── Nav Items ────────────────────────────────────────────────────────────────
 
+const FlaskIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 3h6l1 7H8L9 3z"/><path d="M8 10l-4 9a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1l-4-9"/>
+    <line x1="12" y1="3" x2="12" y2="10"/>
+  </svg>
+);
+
 const navItems = [
   { Icon: HomeIcon,      label: 'Início',                    href: '/inicio' },
   { Icon: UserIcon,      label: 'Perfil do Professor',       href: '/perfis' },
@@ -131,6 +138,7 @@ const navItems = [
   { Icon: ClipboardIcon, label: 'Cadastro de Disciplinas/Exercícios', href: '/disciplinas' },
   { Icon: ReportIcon,    label: 'Cadastro de Turmas',        href: '/turmas' },
   { Icon: PlusIcon,      label: 'Nova Avaliação',            href: '/avaliar-v2', highlight: true },
+  { Icon: FlaskIcon,     label: 'Testar Prompt',             href: '/testar-prompt' },
   { Icon: ClipboardIcon, label: 'Gerenciar Avaliações',      href: '/avaliacoes' },
   { Icon: ReportIcon,    label: 'Gerenciar Relatórios',      href: '/relatorios' },
   { Icon: HelpIcon,      label: 'Ajuda',                     href: '/ajuda' },
