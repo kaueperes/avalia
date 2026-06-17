@@ -54,10 +54,10 @@ export async function POST(request) {
 
   // Quota enforcement: check and decrement before calling AI.
   // Wrapped with a 5s timeout so a paused/slow DB never blocks the AI call.
-  let dbUser = null, dbErr = null;
+  let dbUser = null, dbErr = null, orgData = null;
   try {
     const dbResult = await Promise.race([
-      supabase.from('users').select('quota_ciclo, quota_extra').eq('id', user.userId).single(),
+      supabase.from('users').select('quota_ciclo, quota_extra, org_id, org_quota_limit, org_quota_used').eq('id', user.userId).single(),
       new Promise((_, reject) => setTimeout(() => reject(new Error('db_timeout')), 5000)),
     ]);
     dbUser = dbResult.data;
@@ -67,11 +67,27 @@ export async function POST(request) {
   }
 
   if (!dbErr && dbUser) {
-    const ciclo = typeof dbUser.quota_ciclo === 'number' ? dbUser.quota_ciclo : null;
-    const extra = typeof dbUser.quota_extra === 'number' ? dbUser.quota_extra : null;
-    // Only block if quota fields exist and both are zero
-    if (ciclo !== null && ciclo <= 0 && (extra === null || extra <= 0)) {
-      return NextResponse.json({ error: 'Você não tem avaliações disponíveis. Adquira mais para continuar.' }, { status: 402 });
+    if (dbUser.org_id) {
+      // Usuário de organização: verifica pool da org
+      const { data: org } = await supabase.from('organizations').select('quota_pool, quota_used, active').eq('id', dbUser.org_id).single();
+      orgData = org;
+      if (org && !org.active) {
+        return NextResponse.json({ error: 'Sua organização está inativa. Entre em contato com o administrador.' }, { status: 402 });
+      }
+      if (org && (org.quota_pool - org.quota_used) <= 0) {
+        return NextResponse.json({ error: 'Sua instituição não tem avaliações disponíveis. Fale com o administrador.' }, { status: 402 });
+      }
+      if (dbUser.org_quota_limit != null && (dbUser.org_quota_used || 0) >= dbUser.org_quota_limit) {
+        return NextResponse.json({ error: 'Você atingiu seu limite de avaliações nesta organização. Fale com o administrador.' }, { status: 402 });
+      }
+    } else {
+      // Usuário individual: lógica existente
+      const ciclo = typeof dbUser.quota_ciclo === 'number' ? dbUser.quota_ciclo : null;
+      const extra = typeof dbUser.quota_extra === 'number' ? dbUser.quota_extra : null;
+      // Only block if quota fields exist and both are zero
+      if (ciclo !== null && ciclo <= 0 && (extra === null || extra <= 0)) {
+        return NextResponse.json({ error: 'Você não tem avaliações disponíveis. Adquira mais para continuar.' }, { status: 402 });
+      }
     }
   }
 
@@ -371,12 +387,21 @@ O gabarito é uma ferramenta interna do professor. Jamais mencione sua existênc
 
     // Decrement quota in Supabase
     if (!dbErr && dbUser) {
-      const ciclo = typeof dbUser.quota_ciclo === 'number' ? dbUser.quota_ciclo : null;
-      const extra = typeof dbUser.quota_extra === 'number' ? dbUser.quota_extra : null;
-      if (ciclo !== null && ciclo > 0) {
-        await supabase.from('users').update({ quota_ciclo: ciclo - 1 }).eq('id', user.userId);
-      } else if (extra !== null && extra > 0) {
-        await supabase.from('users').update({ quota_extra: extra - 1 }).eq('id', user.userId);
+      if (dbUser.org_id && orgData) {
+        // Usuário de org: decrementa pool da org e contador individual
+        await Promise.all([
+          supabase.from('organizations').update({ quota_used: (orgData.quota_used || 0) + 1 }).eq('id', dbUser.org_id),
+          supabase.from('users').update({ org_quota_used: (dbUser.org_quota_used || 0) + 1 }).eq('id', user.userId),
+        ]);
+      } else {
+        // Usuário individual: lógica existente
+        const ciclo = typeof dbUser.quota_ciclo === 'number' ? dbUser.quota_ciclo : null;
+        const extra = typeof dbUser.quota_extra === 'number' ? dbUser.quota_extra : null;
+        if (ciclo !== null && ciclo > 0) {
+          await supabase.from('users').update({ quota_ciclo: ciclo - 1 }).eq('id', user.userId);
+        } else if (extra !== null && extra > 0) {
+          await supabase.from('users').update({ quota_extra: extra - 1 }).eq('id', user.userId);
+        }
       }
     }
 

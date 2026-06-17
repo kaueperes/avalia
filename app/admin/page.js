@@ -47,12 +47,20 @@ export default function AdminPage() {
           <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Administração</h1>
           <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Visão geral do negócio e gestão de usuários.</p>
         </div>
-        <button
-          onClick={() => router.push('/admin/usuarios')}
-          style={{ padding: '10px 22px', background: 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
-        >
-          Gerenciar Usuários
-        </button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={() => router.push('/admin/usuarios')}
+            style={{ padding: '10px 22px', background: 'linear-gradient(135deg, #0081f0, #810cfa)', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+          >
+            Gerenciar Usuários
+          </button>
+          <button
+            onClick={() => router.push('/admin/organizacoes')}
+            style={{ padding: '10px 22px', background: 'var(--bg-card)', color: 'var(--text-main)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+          >
+            Organizações
+          </button>
+        </div>
       </div>
 
       {loading && <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)', fontSize: 14 }}>Carregando...</div>}
