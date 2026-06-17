@@ -126,7 +126,7 @@ export default function AdminOrganizacoesPage() {
                     <input style={{ ...inputStyle, marginBottom: 0 }} value={editing.name} onChange={e => setEditing(v => ({ ...v, name: e.target.value }))} autoFocus />
                     <input type="number" min="0" style={{ ...inputStyle, width: 120, marginBottom: 0 }} value={editing.quotaPool} onChange={e => setEditing(v => ({ ...v, quotaPool: e.target.value }))} />
                     <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                      <input type="checkbox" checked={editing.active} onChange={e => setEditing(v => ({ ...v, active: e.target.checked })} style={{ width: 14, height: 14 }} />
+                      <input type="checkbox" checked={editing.active} onChange={e => setEditing(v => ({ ...v, active: e.target.checked }))} style={{ width: 14, height: 14 }} />
                       Ativa
                     </label>
                     <div style={{ display: 'flex', gap: 6 }}>

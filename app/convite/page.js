@@ -12,6 +12,7 @@ function ConvitePage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [accepting, setAccepting] = useState(false);
   const [loggedEmail, setLoggedEmail] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     if (!token) { setStatus('error'); setErrorMsg('Token inválido.'); return; }
@@ -19,6 +20,7 @@ function ConvitePage() {
     try {
       const u = JSON.parse(localStorage.getItem('user') || '{}');
       if (u.email) setLoggedEmail(u.email);
+      if (localStorage.getItem('token')) setIsLoggedIn(true);
     } catch {}
 
     fetch(`/api/org/accept-invite?token=${token}`)
@@ -59,8 +61,6 @@ function ConvitePage() {
       }
     } finally { setAccepting(false); }
   }
-
-  const isLoggedIn = !!localStorage.getItem('token');
 
   return (
     <div style={{
