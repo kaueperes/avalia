@@ -256,15 +256,15 @@ export default function TestarPromptPage() {
 
             {/* Categorias */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: selectedCat ? 12 : 0 }}>
-              {CATEGORIES.map(cat => (
+              {Object.entries(CATEGORIES).map(([id, cat]) => (
                 <button
-                  key={cat.id}
-                  onClick={() => { setSelectedCat(selectedCat === cat.id ? null : cat.id); setSelectedType(''); }}
+                  key={id}
+                  onClick={() => { setSelectedCat(selectedCat === id ? null : id); setSelectedType(''); }}
                   style={{
                     padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500,
-                    border: `1px solid ${selectedCat === cat.id ? '#0081f0' : 'var(--border)'}`,
-                    background: selectedCat === cat.id ? '#eff6ff' : 'transparent',
-                    color: selectedCat === cat.id ? '#0081f0' : 'var(--text-muted)',
+                    border: `1px solid ${selectedCat === id ? '#0081f0' : 'var(--border)'}`,
+                    background: selectedCat === id ? '#eff6ff' : 'transparent',
+                    color: selectedCat === id ? '#0081f0' : 'var(--text-muted)',
                     cursor: 'pointer', fontFamily: 'inherit',
                   }}
                 >
