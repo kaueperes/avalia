@@ -367,8 +367,15 @@ O gabarito é uma ferramenta interna do professor. Jamais mencione sua existênc
         || fileUris?.some(f => f.mimeType?.startsWith('video/') || f.mimeType?.startsWith('audio/'))
         || images?.some(img => img.mediaType?.startsWith('video/') || img.mediaType?.startsWith('audio/'));
       if (hasVideoAudio) throw new Error('video_gemini_unavailable');
-      // fileUris are Gemini-only (Claude can't access Google file storage)
-      if (hasFileUris) throw new Error('video_gemini_unavailable');
+      // fileUris are Gemini-only (Claude can't access Google file storage).
+      // For image-only fileUris, we can still fall back to Claude using any available text content.
+      if (hasFileUris) {
+        if (studentWork || hasImages) {
+          parsed = await callClaude(prompt, hasImages ? images : null, hasImages ? { model: 'claude-sonnet-4-6', maxTokens: 3000 } : { model: selectedModel, maxTokens: selectedMaxTokens });
+        } else {
+          throw new Error('file_gemini_unavailable');
+        }
+      }
       if (isWebsite && websiteContent?.images?.length > 0) {
         parsed = await callClaude(prompt, websiteContent.images, { model: 'claude-sonnet-4-6', maxTokens: 3000 });
       } else if (isWebsite && websiteContent?.text) {
@@ -413,6 +420,9 @@ O gabarito é uma ferramenta interna do professor. Jamais mencione sua existênc
     }
     if (err?.message === 'video_gemini_unavailable') {
       return NextResponse.json({ error: 'Os servidores de avaliação de vídeo e áudio estão indisponíveis no momento. Tente novamente em alguns instantes.' }, { status: 503 });
+    }
+    if (err?.message === 'file_gemini_unavailable') {
+      return NextResponse.json({ error: 'Os servidores de avaliação de arquivos estão indisponíveis no momento. Tente novamente em alguns instantes.' }, { status: 503 });
     }
     return NextResponse.json({ error: 'Ocorreu um erro nos servidores. Tente novamente.' }, { status: 500 });
   }

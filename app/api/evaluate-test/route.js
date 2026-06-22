@@ -292,8 +292,14 @@ Este trabalho é visual. Ao escrever o feedback, referencie elementos visuais co
       const hasVideoAudio = isYt
         || fileUris?.some(f => f.mimeType?.startsWith('video/') || f.mimeType?.startsWith('audio/'))
         || images?.some(img => img.mediaType?.startsWith('video/') || img.mediaType?.startsWith('audio/'));
-      if (hasVideoAudio || hasFileUris) throw new Error('video_gemini_unavailable');
-      if (hasImages) {
+      if (hasVideoAudio) throw new Error('video_gemini_unavailable');
+      if (hasFileUris) {
+        if (studentWork || hasImages) {
+          parsed = await callClaude(prompt, hasImages ? images : null, hasImages ? { model: 'claude-sonnet-4-6', maxTokens: 3000 } : { model: selectedModel, maxTokens: selectedMaxTokens });
+        } else {
+          throw new Error('file_gemini_unavailable');
+        }
+      } else if (hasImages) {
         parsed = await callClaude(prompt, images, { model: 'claude-sonnet-4-6', maxTokens: 3000 });
       } else {
         parsed = await callClaude(prompt, null, { model: selectedModel, maxTokens: selectedMaxTokens });
@@ -355,6 +361,9 @@ Este trabalho é visual. Ao escrever o feedback, referencie elementos visuais co
     }
     if (err?.message === 'video_gemini_unavailable') {
       return NextResponse.json({ error: 'Vídeo e áudio não estão disponíveis no modo teste. Use texto ou imagens.' }, { status: 503 });
+    }
+    if (err?.message === 'file_gemini_unavailable') {
+      return NextResponse.json({ error: 'Os servidores de avaliação de arquivos estão indisponíveis no momento. Tente novamente em alguns instantes.' }, { status: 503 });
     }
     return NextResponse.json({ error: 'Ocorreu um erro. Tente novamente.' }, { status: 500 });
   }
