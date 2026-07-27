@@ -124,10 +124,29 @@ const ShieldIcon = () => (
   </svg>
 );
 
-const OrgIcon = () => (
+const BuildingIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-    <polyline points="9 22 9 12 15 12 15 22"/>
+    <line x1="3" y1="22" x2="21" y2="22"/>
+    <line x1="6" y1="18" x2="6" y2="11"/>
+    <line x1="10" y1="18" x2="10" y2="11"/>
+    <line x1="14" y1="18" x2="14" y2="11"/>
+    <line x1="18" y1="18" x2="18" y2="11"/>
+    <polygon points="12 2 20 7 4 7"/>
+  </svg>
+);
+
+const GraduationCapIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 10 12 5 2 10l10 5 10-5Z"/>
+    <path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>
+  </svg>
+);
+
+const BarChartIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="6" y1="20" x2="6" y2="14"/>
+    <line x1="12" y1="20" x2="12" y2="10"/>
+    <line x1="18" y1="20" x2="18" y2="4"/>
   </svg>
 );
 
@@ -156,17 +175,17 @@ const EditIcon = () => (
 // ── Nav Items ────────────────────────────────────────────────────────────────
 
 const navItems = [
-  { Icon: HomeIcon,      label: 'Início',                    href: '/inicio' },
-  { Icon: ZapIcon,       label: 'Nova Avaliação Básica',     href: '/avaliar-basica', highlight: true, divider: true },
-  { Icon: PlusIcon,      label: 'Nova Avaliação Avançada',   href: '/avaliar-avancado', highlight: true },
-  { Icon: FileTextIcon,  label: 'Gerador de Provas',         href: '/gerador-provas' },
-  { Icon: UserIcon,      label: 'Perfil do Professor',       href: '/perfis', divider: true },
-  { Icon: BookIcon,      label: 'Cadastro de Instituição',   href: '/instituicao' },
-  { Icon: ClipboardIcon, label: 'Cadastro de Disciplinas/Exercícios', href: '/disciplinas' },
-  { Icon: ReportIcon,    label: 'Cadastro de Turmas',        href: '/turmas' },
-  { Icon: ClipboardIcon, label: 'Gerenciar Avaliações',      href: '/avaliacoes', divider: true },
-  { Icon: ReportIcon,    label: 'Gerenciar Relatórios',      href: '/relatorios' },
-  { Icon: HelpIcon,      label: 'Ajuda',                     href: '/ajuda' },
+  { Icon: HomeIcon,          label: 'Início',                    href: '/inicio' },
+  { Icon: ZapIcon,           label: 'Nova Avaliação Básica',     href: '/avaliar-basica', divider: true },
+  { Icon: PlusIcon,          label: 'Nova Avaliação Avançada',   href: '/avaliar-avancado' },
+  { Icon: FileTextIcon,      label: 'Gerador de Provas',         href: '/gerador-provas' },
+  { Icon: UserIcon,          label: 'Perfil do Professor',       href: '/perfis', divider: true },
+  { Icon: BuildingIcon,      label: 'Cadastro de Instituição',   href: '/instituicao' },
+  { Icon: BookIcon,          label: 'Cadastro de Disciplinas/Exercícios', href: '/disciplinas' },
+  { Icon: GraduationCapIcon, label: 'Cadastro de Turmas',        href: '/turmas' },
+  { Icon: ClipboardIcon,     label: 'Gerenciar Avaliações',      href: '/avaliacoes', divider: true },
+  { Icon: BarChartIcon,      label: 'Gerenciar Relatórios',      href: '/relatorios' },
+  { Icon: HelpIcon,          label: 'Ajuda',                     href: '/ajuda' },
 ];
 
 // ── Layout ───────────────────────────────────────────────────────────────────
@@ -437,7 +456,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
               {[
                 ...navItems,
                 ...(orgRole === 'admin' ? [
-                  { Icon: OrgIcon,    label: 'Painel da Instituição', href: '/org/dashboard' },
+                  { Icon: BuildingIcon, label: 'Painel da Instituição', href: '/org/dashboard' },
                   { Icon: PeopleIcon, label: 'Professores',           href: '/org/professores' },
                   { Icon: ClipboardIcon, label: 'Avaliações da Instituição', href: '/org/avaliacoes' },
                 ] : []),
