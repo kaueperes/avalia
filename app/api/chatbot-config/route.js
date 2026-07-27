@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { DEFAULT_BOT_NAME, DEFAULT_WELCOME } from '@/lib/chatbot';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const { data } = await supabase
     .from('settings')
