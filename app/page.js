@@ -696,7 +696,7 @@ export default function Home() {
                     Criar conta grátis
                   </button>
                   <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['5 avaliações/mês', '1 perfil de avaliação', '3 exercícios salvos', 'Avaliação individual', 'PDF individual', 'Histórico de avaliações'].map(item => (
+                    {['5 avaliações/mês', 'Nova Avaliação Básica', '1 perfil de avaliação', '3 exercícios salvos', 'Avaliação individual', 'PDF individual', 'Histórico de avaliações'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                         <CheckMark /> {item}
                       </div>
@@ -719,7 +719,7 @@ export default function Home() {
                     Assinar Essencial
                   </button>
                   <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['120 avaliações/mês', '4 perfis de avaliação', 'Exercícios ilimitados', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (50 msg)', 'Histórico completo'].map(item => (
+                    {['120 avaliações/mês', 'Nova Avaliação Básica', '4 perfis de avaliação', 'Exercícios ilimitados', 'Gerador de Provas (10/mês)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (50 msg)', 'Histórico completo'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
                         <CheckMark color="#66b3ff" /> {item}
                       </div>
@@ -739,7 +739,7 @@ export default function Home() {
                     Assinar Pro
                   </button>
                   <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['180 avaliações/mês', '6 perfis de avaliação', 'Exercícios ilimitados', '10 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (150 msg)', 'Filtros avançados'].map(item => (
+                    {['180 avaliações/mês', 'Nova Avaliação Básica', '6 perfis de avaliação', 'Exercícios ilimitados', 'Gerador de Provas (10/mês)', '10 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (150 msg)', 'Filtros avançados'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                         <CheckMark /> {item}
                       </div>
@@ -759,7 +759,7 @@ export default function Home() {
                     Assinar Premium
                   </button>
                   <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['240 avaliações/mês', '10 perfis de avaliação', 'Exercícios ilimitados', '30 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (300 msg)', 'Filtros avançados', 'Suporte prioritário'].map(item => (
+                    {['240 avaliações/mês', 'Nova Avaliação Básica', '10 perfis de avaliação', 'Exercícios ilimitados', 'Gerador de Provas (10/mês)', '30 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (300 msg)', 'Filtros avançados', 'Suporte prioritário'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                         <CheckMark color="#d97706" /> {item}
                       </div>
@@ -775,83 +775,19 @@ export default function Home() {
                 <p style={{ textAlign: 'center', fontSize: 14, color: '#6B7280', marginBottom: 40 }}>
                   Gerencie toda a sua equipe em um só lugar. Um coordenador distribui avaliações, relatórios e permissões para cada usuário.
                 </p>
-                <div className="grid-plans" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, alignItems: 'start' }}>
-
-                  {/* STARTER */}
-                  <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Starter</p>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-                      <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 1.090</span>
-                    </div>
-                    <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
-                    <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para pequenas equipes</p>
-                    <a href="mailto:contato@kriteria.education?subject=Plano Institucional Starter" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: 'transparent', color: '#00173f', border: '2px solid #00173f', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
-                      Solicitar proposta
-                    </a>
-                    <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {['10 usuários', '2.400 avaliações/mês', 'Perfis de avaliação ilimitados', '300 relatórios/mês (IA)', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte prioritário'].map(item => (
-                        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
-                          <CheckMark /> {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* MÉDIO */}
-                  <div className="plan-card" style={{ background: '#00173f', border: '1px solid #00173f', position: 'relative', transform: 'scale(1.03)' }}>
-                    <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#810cfa', color: 'white', padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: 0.5 }}>
-                      MAIS POPULAR
-                    </div>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Médio</p>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-                      <span style={{ fontSize: 40, fontWeight: 800, color: 'white', letterSpacing: '-1px', lineHeight: 1 }}>R$ 2.150</span>
-                    </div>
-                    <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)' }}>/mês</span>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 28, marginTop: 6 }}>Para escolas e cursos</p>
-                    <a href="mailto:contato@kriteria.education?subject=Plano Institucional Médio" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
-                      Solicitar proposta
-                    </a>
-                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {['20 usuários', '4.800 avaliações/mês', 'Perfis de avaliação ilimitados', '600 relatórios/mês (IA)', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte prioritário'].map(item => (
-                        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
-                          <CheckMark color="#66b3ff" /> {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* PLUS */}
-                  <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Plus</p>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
-                      <span style={{ fontSize: 40, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>R$ 4.190</span>
-                    </div>
-                    <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
-                    <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para faculdades e institutos</p>
-                    <a href="mailto:contato@kriteria.education?subject=Plano Institucional Plus" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: 'transparent', color: '#00173f', border: '2px solid #00173f', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
-                      Solicitar proposta
-                    </a>
-                    <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {['40 usuários', '9.600 avaliações/mês', 'Perfis de avaliação ilimitados', '1.200 relatórios/mês (IA)', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte prioritário'].map(item => (
-                        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
-                          <CheckMark /> {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
                   {/* PERSONALIZADO */}
-                  <div className="plan-card" style={{ background: 'white', border: '2px solid #d97706' }}>
+                  <div className="plan-card" style={{ background: 'white', border: '2px solid #d97706', maxWidth: 340, width: '100%' }}>
                     <p style={{ fontSize: 12, fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Personalizado</p>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
                       <span style={{ fontSize: 32, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>Sob consulta</span>
                     </div>
-                    <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para grandes instituições</p>
+                    <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para instituições de qualquer porte</p>
                     <a href="mailto:contato@kriteria.education?subject=Plano Institucional Personalizado" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: '#d97706', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
                       Fale conosco
                     </a>
                     <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {['+40 usuários', 'Volume personalizado', 'Perfis de avaliação ilimitados', 'Relatórios ilimitados', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte dedicado'].map(item => (
+                      {['Volume personalizado de usuários', 'Nova Avaliação Básica', 'Perfis de avaliação ilimitados', 'Gerador de Provas', 'Relatórios ilimitados', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte dedicado'].map(item => (
                         <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                           <CheckMark color="#d97706" /> {item}
                         </div>
