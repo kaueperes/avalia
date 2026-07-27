@@ -161,7 +161,7 @@ const navItems = [
   { Icon: BookIcon,      label: 'Cadastro de Instituição',   href: '/instituicao' },
   { Icon: ClipboardIcon, label: 'Cadastro de Disciplinas/Exercícios', href: '/disciplinas' },
   { Icon: ReportIcon,    label: 'Cadastro de Turmas',        href: '/turmas' },
-  { Icon: PlusIcon,      label: 'Nova Avaliação Avançada',   href: '/avaliar-v2', highlight: true },
+  { Icon: PlusIcon,      label: 'Nova Avaliação Avançada',   href: '/avaliar-avancado', highlight: true },
   { Icon: ZapIcon,       label: 'Nova Avaliação Básica',     href: '/avaliar-basica', highlight: true },
   { Icon: FileTextIcon,  label: 'Gerador de Provas',         href: '/gerador-provas' },
   { Icon: ClipboardIcon, label: 'Gerenciar Avaliações',      href: '/avaliacoes' },

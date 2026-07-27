@@ -407,6 +407,7 @@ function ResultCard({ slot }) {
 
 // ── Página principal ──────────────────────────────────────────────────────────
 export default function AvaliarV2() {
+  const [userName, setUserName] = useState('Professor');
   const [step, setStep] = useState(1);
   const [exerciseName, setExerciseName] = useState('');
   const [exerciseContext, setExerciseContext] = useState('');
@@ -458,6 +459,14 @@ export default function AvaliarV2() {
   }
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (u.name) setUserName(u.name);
+      }
+    } catch {}
+
     const h = { Authorization: `Bearer ${token()}` };
     Promise.all([
       fetch('/api/profiles',     { headers: h }).then(r => r.ok ? r.json() : []).catch(() => []),
@@ -615,12 +624,12 @@ export default function AvaliarV2() {
   const card = { background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 16, overflow: 'hidden' };
 
   return (
-    <AppLayout>
+    <AppLayout userName={userName}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       <div style={{ marginBottom: 32 }}>
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Avaliação</p>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px', margin: 0 }}>Nova Avaliação</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px', margin: 0 }}>Nova Avaliação Avançada</h1>
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 0 }}>
           Selecione o exercício, adicione os trabalhos e gere as avaliações.
         </p>
