@@ -19,21 +19,21 @@ const PLANS = [
     label: 'Essencial',
     price: 'R$ 29/mês',
     color: '#2563eb',
-    features: ['120 avaliações/mês', '3 perfis de professor', 'Exercícios ilimitados', 'PDF + CSV', 'Chatbot (50 msgs/mês)'],
+    features: ['120 avaliações/mês', '4 perfis de professor', 'Exercícios ilimitados', 'PDF + CSV', 'Gerador de Provas (10/mês)', 'Chatbot (50 msgs/mês)'],
   },
   {
     id: 'pro',
     label: 'Pro',
     price: 'R$ 59/mês',
     color: '#7c3aed',
-    features: ['300 avaliações/mês', 'Perfis ilimitados', '10 relatórios/mês', 'Chatbot (150 msgs/mês)', 'Filtros avançados'],
+    features: ['180 avaliações/mês', '6 perfis de professor', 'Exercícios ilimitados', 'PDF + CSV', '10 relatórios/mês', 'Gerador de Provas (10/mês)', 'Chatbot (150 msgs/mês)'],
   },
   {
     id: 'premium',
     label: 'Premium',
     price: 'R$ 119/mês',
     color: '#d97706',
-    features: ['600 avaliações/mês', 'Perfis ilimitados', '30 relatórios/mês', 'Chatbot (300 msgs/mês)', 'Suporte prioritário'],
+    features: ['240 avaliações/mês', '10 perfis de professor', 'Exercícios ilimitados', 'PDF + CSV', '30 relatórios/mês', 'Gerador de Provas (10/mês)', 'Chatbot (300 msgs/mês)', 'Suporte prioritário'],
   },
 ];
 

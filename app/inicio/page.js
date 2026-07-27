@@ -297,7 +297,7 @@ export default function InicioPage() {
           <p style={{ fontSize: 36, marginBottom: 12 }}>🎯</p>
           <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 8 }}>Nenhuma avaliação ainda</p>
           <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24 }}>Faça sua primeira avaliação e os resultados aparecerão aqui.</p>
-          <button onClick={() => router.push('/avaliar')} style={{ padding: '11px 28px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={() => router.push('/avaliar-avancado')} style={{ padding: '11px 28px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
             Fazer primeira avaliação
           </button>
         </div>

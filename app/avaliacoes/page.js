@@ -682,7 +682,7 @@ export default function AvaliacoesPage() {
               {evaluations.length === 0 ? 'Nenhuma avaliação ainda.' : 'Nenhuma avaliação encontrada com esses filtros.'}
             </p>
             {evaluations.length === 0 && (
-              <button onClick={() => router.push('/avaliar')} style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+              <button onClick={() => router.push('/avaliar-avancado')} style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                 Criar primeira avaliação
               </button>
             )}

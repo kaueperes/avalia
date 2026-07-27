@@ -2,7 +2,7 @@ import './globals.css';
 
 export const metadata = {
   title: 'Kriteria — Avaliação Inteligente para Educadores',
-  description: 'Avaliação educacional com IA',
+  description: 'O Kriteria corrige trabalhos de alunos com os critérios e o estilo do professor — mais rápido, com qualidade e consistência.',
   icons: { icon: '/imagens/favicon.svg' },
 };
 
