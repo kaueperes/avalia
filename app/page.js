@@ -696,7 +696,7 @@ export default function Home() {
                     Criar conta grátis
                   </button>
                   <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['5 avaliações/mês', 'Nova Avaliação Básica', '1 perfil de avaliação', '3 exercícios salvos', 'Avaliação individual', 'PDF individual', 'Histórico de avaliações'].map(item => (
+                    {['5 avaliações/mês', '1 perfil de avaliação', '3 exercícios salvos', 'Avaliação individual', 'PDF individual', 'Histórico de avaliações'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                         <CheckMark /> {item}
                       </div>
@@ -719,7 +719,7 @@ export default function Home() {
                     Assinar Essencial
                   </button>
                   <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['120 avaliações/mês', 'Nova Avaliação Básica', '4 perfis de avaliação', 'Exercícios ilimitados', 'Gerador de Provas (10/mês)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (50 msg)', 'Histórico completo'].map(item => (
+                    {['120 avaliações/mês', '4 perfis de avaliação', 'Exercícios ilimitados', 'Gerador de Provas (10/mês)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (50 msg)', 'Histórico completo'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
                         <CheckMark color="#66b3ff" /> {item}
                       </div>
@@ -739,7 +739,7 @@ export default function Home() {
                     Assinar Pro
                   </button>
                   <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['180 avaliações/mês', 'Nova Avaliação Básica', '6 perfis de avaliação', 'Exercícios ilimitados', 'Gerador de Provas (10/mês)', '10 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (150 msg)', 'Filtros avançados'].map(item => (
+                    {['180 avaliações/mês', '6 perfis de avaliação', 'Exercícios ilimitados', 'Gerador de Provas (10/mês)', '10 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (150 msg)', 'Filtros avançados'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                         <CheckMark /> {item}
                       </div>
@@ -759,7 +759,7 @@ export default function Home() {
                     Assinar Premium
                   </button>
                   <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['240 avaliações/mês', 'Nova Avaliação Básica', '10 perfis de avaliação', 'Exercícios ilimitados', 'Gerador de Provas (10/mês)', '30 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (300 msg)', 'Filtros avançados', 'Suporte prioritário'].map(item => (
+                    {['240 avaliações/mês', '10 perfis de avaliação', 'Exercícios ilimitados', 'Gerador de Provas (10/mês)', '30 relatórios/mês (IA)', 'Avaliação em lote', 'PDF + exportação CSV', 'Chatbot (300 msg)', 'Filtros avançados', 'Suporte prioritário'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                         <CheckMark color="#d97706" /> {item}
                       </div>
@@ -787,7 +787,7 @@ export default function Home() {
                       Fale conosco
                     </a>
                     <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {['Volume personalizado de usuários', 'Nova Avaliação Básica', 'Perfis de avaliação ilimitados', 'Gerador de Provas', 'Relatórios ilimitados', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte dedicado'].map(item => (
+                      {['Volume personalizado de usuários', 'Perfis de avaliação ilimitados', 'Gerador de Provas', 'Relatórios ilimitados', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte dedicado'].map(item => (
                         <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                           <CheckMark color="#d97706" /> {item}
                         </div>
