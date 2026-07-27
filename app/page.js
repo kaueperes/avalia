@@ -212,7 +212,7 @@ export default function Home() {
             </h1>
 
             <p className="hero-sub" style={{ fontSize: 20, color: '#94A3B8', lineHeight: 1.65, maxWidth: 560, margin: '0 auto 44px', fontWeight: 400 }}>
-              Você gasta horas avaliando redações, vídeos, projetos e códigos — e ainda se pergunta se está sendo consistente. O Kriteria avalia com seus critérios, no seu estilo, em qualquer disciplina.
+              Você gasta horas avaliando redações, vídeos, projetos e códigos — e ainda se pergunta se está sendo consistente. O Kriteria corrige mais rápido, com seus critérios e no seu estilo. Você continua no controle — revisa e ajusta o que for preciso antes de entregar.
             </p>
 
             <div className="hero-ctas" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
@@ -310,7 +310,13 @@ export default function Home() {
 
         {/* ── PRODUCT EXPLANATION ────────────────────────────────────────────── */}
         <section id="como-funciona" style={{ padding: '96px 32px', background: 'white' }}>
-          <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 96 }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 72 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Como funciona</p>
+              <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', marginBottom: 16 }}>Simples pra você, rigoroso na correção</h2>
+              <p style={{ fontSize: 18, color: '#6B7280', maxWidth: 560, margin: '0 auto' }}>Poucos passos, do jeito que você já avalia — só que sem tomar seu fim de semana. E a palavra final é sempre sua: o Kriteria sugere, você decide.</p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 96 }}>
             {[
               {
                 tag: '01 — Perfil',
@@ -480,17 +486,57 @@ export default function Home() {
                 <div style={{ direction: 'ltr' }}>{item.visual}</div>
               </div>
             ))}
+            </div>
           </div>
         </section>
 
         {/* ── DISCIPLINAS ────────────────────────────────────────────────────── */}
         <section id="disciplinas" style={{ padding: '96px 32px', background: '#00173f' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: 64 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Para todas as disciplinas</p>
-              <h2 style={{ fontSize: 44, fontWeight: 800, color: 'white', letterSpacing: '-1px', marginBottom: 16 }}>Vai muito além de redações</h2>
-              <p style={{ fontSize: 18, color: '#94A3B8', maxWidth: 520, margin: '0 auto' }}>60+ tipos de trabalho em 11 categorias — incluindo avaliação de vídeo.</p>
+            <div style={{ textAlign: 'center', marginBottom: 56 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Como o Kriteria corrige</p>
+              <h2 style={{ fontSize: 44, fontWeight: 800, color: 'white', letterSpacing: '-1px', marginBottom: 16 }}>Pra cada correção, o caminho certo</h2>
+              <p style={{ fontSize: 18, color: '#94A3B8', maxWidth: 560, margin: '0 auto' }}>Da prova rápida de matemática ao TCC mais complexo — sem perder tempo montando processo pra cada tipo de trabalho.</p>
             </div>
+
+            <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 56 }}>
+              <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '32px 28px' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 14 }}>Rápida · Provas objetivas</p>
+                <h3 style={{ fontSize: 24, fontWeight: 800, color: 'white', marginBottom: 12 }}>Correção Básica</h3>
+                <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.7, marginBottom: 22 }}>
+                  Matemática, português, qualquer prova objetiva. Tira uma foto ou cola o texto — sem cadastrar exercício, sem configurar critério. O Kriteria aponta o que está certo, errado, e avisa quando algo precisa da sua conferência.
+                </p>
+                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {['Sem nenhum cadastro antes', 'Vários alunos de uma vez', 'Resultado na hora, pra escrever direto na prova'].map(p => (
+                    <li key={p} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: '#CBD5E1' }}>
+                      <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(96,165,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <CheckMark color="#60a5fa" />
+                      </span>
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: '32px 28px' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#c084fc', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 14 }}>Completa · Trabalhos com critério</p>
+                <h3 style={{ fontSize: 24, fontWeight: 800, color: 'white', marginBottom: 12 }}>Correção Avançada</h3>
+                <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.7, marginBottom: 22 }}>
+                  Redação, projeto, código, TCC, modelagem 3D, música — mais de 60 tipos em 11 categorias, cada um avaliado com os critérios que você definir.
+                </p>
+                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {['Critérios e pesos do seu jeito', 'Feedback completo, no seu tom', 'PDF, histórico e relatórios de turma'].map(p => (
+                    <li key={p} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: '#CBD5E1' }}>
+                      <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(192,132,252,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <CheckMark color="#c084fc" />
+                      </span>
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <p style={{ textAlign: 'center', fontSize: 14, color: '#64748B', marginBottom: 24, textTransform: 'uppercase', letterSpacing: 1.5, fontWeight: 700 }}>O que a Correção Avançada já cobre</p>
             <div className="cat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
               {[
                 { label: '3D e Animação',            types: ['Modelagem 3D', 'Animação', 'Rigging', 'VFX'],          color: '#818cf8', icon: <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><line x1="12" y1="22.08" x2="12" y2="12"/></> },
@@ -532,7 +578,7 @@ export default function Home() {
                 <p style={{ fontSize: 12, fontWeight: 600, color: '#810cfa', letterSpacing: 1, marginBottom: 16, textTransform: 'uppercase' }}>Para coordenadores e gestores</p>
                 <h2 style={{ fontSize: 38, fontWeight: 800, color: '#00173f', lineHeight: 1.15, letterSpacing: '-1px', marginBottom: 20 }}>Dados pedagógicos reais para decisões assertivas</h2>
                 <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, marginBottom: 32 }}>
-                  O Kriteria não é só uma ferramenta de correção — é uma plataforma de inteligência pedagógica. Coordenadores e gestores têm acesso a dados consolidados que antes exigiam horas de tabulação manual.
+                  O Kriteria não é só uma ferramenta de correção — é uma central de dados pedagógicos. Coordenadores e gestores têm acesso a informações consolidadas que antes exigiam horas de tabulação manual.
                 </p>
                 <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {[
@@ -554,7 +600,7 @@ export default function Home() {
               <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E5E7EB', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
                 <div style={{ padding: '14px 20px', background: '#F9FAFB', borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#810cfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Relatório de Turma — IA</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Relatório de Turma</span>
                   <span style={{ marginLeft: 'auto', fontSize: 11, padding: '3px 8px', borderRadius: 6, background: '#f3e8ff', color: '#810cfa', fontWeight: 600 }}>Pro / Premium</span>
                 </div>
                 <div style={{ padding: '16px 20px', borderBottom: '1px solid #F3F4F6' }}>
@@ -644,7 +690,7 @@ export default function Home() {
             </div>
             <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
               {[
-                { Ic: BrainIcon,    title: 'Avaliação pedagógica',  desc: 'Treinada para educação. Entende contexto, disciplina e objetivos pedagógicos reais.' },
+                { Ic: BrainIcon,    title: 'Avaliação pedagógica',  desc: 'Feito para educação, não é um corretor genérico. Entende contexto, disciplina e objetivos pedagógicos reais.' },
                 { Ic: UsersIcon,    title: 'Múltiplos perfis',      desc: 'Gerencie disciplinas e turmas distintas com perfis completamente independentes.' },
                 { Ic: FileTextIcon, title: '60+ tipos de trabalho',  desc: 'Texto, vídeo, imagem, código, partitura, 3D e muito mais — 11 categorias para todas as disciplinas.' },
                 { Ic: BarChartIcon, title: 'Relatórios de turma',   desc: 'Dados consolidados por turma: média, aprovação, critérios abaixo da meta e alunos que precisam de atenção.' },
