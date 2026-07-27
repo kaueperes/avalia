@@ -776,23 +776,24 @@ export default function Home() {
                   Gerencie toda a sua equipe em um só lugar. Um coordenador distribui avaliações, relatórios e permissões para cada usuário.
                 </p>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  {/* PERSONALIZADO */}
+                  {/* INSTITUCIONAL */}
                   <div className="plan-card" style={{ background: 'white', border: '2px solid #d97706', maxWidth: 340, width: '100%' }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Personalizado</p>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Institucional</p>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
                       <span style={{ fontSize: 32, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>Sob consulta</span>
                     </div>
                     <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para instituições de qualquer porte</p>
-                    <a href="mailto:contato@kriteria.education?subject=Plano Institucional Personalizado" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: '#d97706', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
+                    <a href="mailto:contato@kriteria.education?subject=Plano Institucional" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: '#d97706', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
                       Fale conosco
                     </a>
                     <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {['Volume personalizado de usuários', 'Perfis de avaliação ilimitados', 'Gerador de Provas', 'Relatórios ilimitados', 'Dashboard do coordenador', 'Controle de permissões', 'Chatbot ilimitado', 'Suporte dedicado'].map(item => (
+                      {['Dashboard do coordenador', 'Professores convidados*', 'Controle de permissões', 'Avaliações/mês*', 'Perfis de avaliação*', 'Exercícios ilimitados', 'Avaliação individual', 'Avaliação em lote', 'Histórico de avaliações', 'PDF de avaliação', 'Relatórios avançados*', 'Gerenciamento de relatórios', 'PDF de relatórios', 'Gerador de Provas*', 'Chatbot ilimitado', 'Suporte prioritário'].map(item => (
                         <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                           <CheckMark color="#d97706" /> {item}
                         </div>
                       ))}
                     </div>
+                    <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 16 }}>*itens sob demanda</p>
                   </div>
                 </div>
               </>
