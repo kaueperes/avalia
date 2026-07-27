@@ -15,8 +15,10 @@ SaaS educacional brasileiro para professores avaliarem trabalhos de alunos com I
 | Banco de dados | Supabase (PostgreSQL) |
 | Auth | JWT customizado — `lib/auth.js` |
 | IA principal | Claude API (Anthropic) |
-| IA para vídeo/áudio | Google Gemini 2.0 Flash |
+| IA para vídeo/áudio/avaliação primária | Google Gemini (cascata 2.5-flash → 2.5-flash-lite → 3.5-flash) |
 | Pagamentos | Stripe (assinaturas + avulsos) |
+| Email transacional | Resend (`noreply@kriteria.education`) |
+| Email de suporte | Hostinger Titan (`contato@kriteria.education`) |
 | Deploy | Vercel |
 
 ---
@@ -34,20 +36,22 @@ Variáveis de ambiente necessárias (configuradas no Vercel):
 - `GEMINI_API_KEY`
 - `SUPABASE_URL` + `SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY`
 - `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`
-- `JWT_SECRET`
+- `JWT_SECRET` — `lib/auth.js` lança erro no boot se não estiver definida (sem fallback inseguro)
+- `RESEND_API_KEY`
+- `NEXT_PUBLIC_APP_URL` — usada para montar links absolutos (redefinição de senha, convites, portal Stripe)
 
 ---
 
 ## Arquitetura de roteamento de IA
 
-Gemini primeiro, Claude como fallback. Gemini 2.0 Flash tem 1.500 avaliações gratuitas/dia e suporta todos os tipos de mídia — evita dependência de um único provedor.
+Gemini primeiro, Claude como fallback. Gemini tem tier gratuito generoso e suporta todos os tipos de mídia — evita dependência de um único provedor.
 
 ```
-Qualquer avaliação       → Gemini 2.0 Flash (primário, gratuito)
-Se Gemini falhar         → Claude Sonnet (imagens) ou Haiku/Sonnet (texto)
+Qualquer avaliação       → Gemini (cascata: 2.5-flash → 2.5-flash-lite → 3.5-flash)
+Se todos os Gemini falharem → Claude Sonnet (imagens) ou Haiku/Sonnet (texto)
 ```
 
-A lógica fica em `app/api/evaluate/route.js`:
+A lógica fica em `app/api/evaluate/route.js` (mesmo padrão em `evaluate-basica/`, `evaluate-test/` e `generate-exam/`):
 ```js
 try {
   parsed = await callGemini(prompt, images);
@@ -55,6 +59,8 @@ try {
   parsed = await callClaude(prompt, images, modelConfig);
 }
 ```
+
+**Modelos 1.x e 2.0 do Gemini foram descontinuados pelo Google** — por isso a cascata começa em 2.5-flash. Cada modelo recebe 2 tentativas antes de cascatear pro próximo, tanto em erro 503 (sobrecarga) quanto 404 (modelo descontinuado).
 
 **Por que não Whisper?** Whisper só transcreve fala — perde entonação, ritmo e dicção. Para locução, apresentação oral, etc., o Gemini ouve o áudio e avalia diretamente. Qualidade superior.
 
@@ -68,28 +74,32 @@ try {
 
 ## Sistema de cotas
 
-Cada avaliação gerada consome 1 cota, independente da IA usada (Claude ou Gemini).
+Cada avaliação gerada (Avançada ou Básica) consome 1 cota, independente da IA usada (Claude ou Gemini). Gerador de Provas e Modo Teste têm cotas próprias, independentes da cota de avaliações.
 
 **Tabela `users` no Supabase:**
-- `quota_ciclo` — renova mensalmente via webhook Stripe
-- `quota_extra` — compradas avulsas, **nunca expiram**, acumulam
-- `quota_relatorios_ciclo` — relatórios de turma, renova mensalmente
+- `quota_ciclo` — avaliações do ciclo do plano, renova mensalmente via webhook Stripe
+- `quota_extra` — avaliações compradas avulsas, **nunca expiram**, acumulam
+- `quota_relatorios_ciclo` — relatórios de turma/aluno, renova mensalmente
 - `quota_relatorios_extra` — relatórios extras, nunca expiram
+- `quota_provas` + `quota_provas_reset_date` — Gerador de Provas, 10/mês fixo pra todo plano pago (nenhuma no Gratuito), reset mensal *lazy* (verificado a cada request em `generate-exam/route.js`, não depende só do webhook Stripe)
+- `quota_testes` + `quota_testes_reset_date` — Modo Teste, 10/mês pra todos os planos (inclusive Gratuito), mesmo padrão de reset lazy em `evaluate-test/route.js`
 
-**Regra de consumo:** sempre consome `quota_ciclo` primeiro; só usa `quota_extra` quando ciclo chega a zero.
+**Regra de consumo (avaliações e relatórios):** sempre consome a cota do ciclo primeiro; só usa a extra quando o ciclo chega a zero.
 
-**Bloqueio:** só bloqueia quando AMBAS (ciclo e extra) são zero ou nulas.
+**Bloqueio:** só bloqueia quando AMBAS (ciclo e extra) são zero ou nulas. Organizações institucionais têm uma camada extra de bloqueio: pool de cota da organização (`organizations.quota_pool`/`quota_used`) e, opcionalmente, um limite individual por professor (`users.org_quota_limit`/`org_quota_used`).
 
 ---
 
 ## Planos (`lib/types.js` → `PLANS`)
 
-| Plano | Preço | Avaliações | Relatórios | Chatbot |
-|---|---|---|---|---|
-| Gratuito | R$ 0 | 5/mês | — | — |
-| Essencial | R$ 29 | 120/mês | — | 50 msg |
-| Pro | R$ 59 | 300/mês | 10/mês | 150 msg |
-| Premium | R$ 119 | 600/mês | 30/mês | 300 msg |
+| Plano | Preço | Avaliações | Relatórios | Chatbot | Gerador de Provas |
+|---|---|---|---|---|---|
+| Gratuito | R$ 0 | 5/mês | — | — | — |
+| Essencial | R$ 29 | 120/mês | — | 50 msg | 10/mês |
+| Pro | R$ 59 | 180/mês | 10/mês | 150 msg | 10/mês |
+| Premium | R$ 119 | 240/mês | 30/mês | 300 msg | 10/mês |
+
+A **Nova Avaliação Básica** não tem cota própria — usa a mesma cota de avaliações do plano (`quota_ciclo`/`quota_extra`), disponível inclusive no Gratuito.
 
 **Addons one-time (Stripe):**
 - `extra_50`: 50 avaliações — R$15
@@ -111,24 +121,78 @@ Cada avaliação gerada consome 1 cota, independente da IA usada (Claude ou Gemi
 
 **TCC/Monografia:** aceita até 15 arquivos extras. Para ABNT, professor deve enviar páginas-chave como imagem; para conteúdo, cola texto ou envia .docx (processado via mammoth.js no cliente).
 
+Esses tipos e critérios valem só para a **Nova Avaliação Avançada**. A **Nova Avaliação Básica** não usa `TYPES`/critérios — é uma correção livre por foto ou texto, com prompt próprio focado em certo/errado por questão.
+
+---
+
+## Novas Avaliações: Básica vs. Avançada
+
+Duas entradas separadas no menu, ambas consumindo a mesma cota de avaliações:
+
+**Nova Avaliação Básica** (`/avaliar-basica`, API `evaluate-basica/`)
+- Sem cadastro prévio: sem exercício, sem critérios, sem turma/aluno cadastrado
+- Suporta vários alunos de uma vez (slots), cada um com nome opcional + foto/texto
+- Contexto/gabarito opcional, em texto e/ou foto (rotulado "Gabarito/Referência do professor" pra IA não confundir com a prova do aluno)
+- Resultado por questão: `certo` | `errado` | `incerto` — a IA resolve questões objetivas sozinha, mas marca `incerto` quando a resposta depende do que foi ensinado em aula e não há gabarito fornecido
+- **Não salva nada** — sem histórico, sem PDF. Pensada pra o professor ler na tela e escrever direto na prova física
+
+**Nova Avaliação Avançada** (`/avaliar-avancado`, API `evaluate/`)
+- Fluxo completo: perfil de professor, disciplina/exercício com critérios com pesos, tom de feedback, upload de arquivos, gabarito de referência com peso ajustável
+- Salva histórico (`evaluations`), gera PDF, alimenta relatórios de turma/aluno
+
+---
+
+## Gerador de Provas (`/gerador-provas`, API `generate-exam/`)
+
+Gera o **texto** de uma prova (matéria, tema, nível, quantidade e tipo de questão, com gabarito opcional ao final) pra o professor copiar e colar — sem layout, sem PDF, sem exportação.
+
+Disponível a partir do plano Essencial (bloqueado no Gratuito, checado por `plan` no backend). Cota fixa de 10/mês pra todo plano pago (não escalona por plano) — decisão consciente pra evitar abuso (ex: um professor gerando provas pra vários colegas) sem precisar diferenciar por tier.
+
+---
+
+## Modo Teste (`evaluate-test/`, lightbox em `/disciplinas`)
+
+Permite testar critérios/prompt antes de usar em avaliações reais, sem consumir a cota de avaliações e sem salvar no histórico de avaliações (fica em `evaluation_drafts`). Cota própria: `quota_testes`, 10/mês, disponível em todos os planos inclusive o Gratuito.
+
+---
+
+## Organizações institucionais (`api/org/`, páginas `/org/*`)
+
+Plano institucional para coordenadores administrarem uma equipe de professores com cota compartilhada:
+- `organizations.quota_pool`/`quota_used` — pool de cota compartilhado entre todos os professores da organização
+- `users.org_id`/`org_role`/`org_quota_limit`/`org_quota_used` — vínculo do professor à organização, papel (admin/membro) e limite individual opcional dentro do pool
+- Convite por email via Resend (`api/org/invites/`), aceito em `/convite`
+- Painel da Instituição (`/org/dashboard`), gestão de professores (`/org/professores`) e avaliações da instituição (`/org/avaliacoes`) — visíveis no menu só para `org_role === 'admin'`
+
 ---
 
 ## API Routes (`app/api/`)
 
 | Rota | Função |
 |---|---|
-| `evaluate/` | Avaliação principal (Claude ou Gemini) |
+| `evaluate/` | Avaliação Avançada (Claude ou Gemini) |
+| `evaluate-basica/` | Correção rápida sem cadastro, mesma cota de `evaluate/`, sem persistência |
+| `evaluate-test/` | Modo Teste — cota própria, sem consumir cota de avaliação |
+| `generate-exam/` | Gerador de Provas — cota própria, só planos pagos |
+| `generate-criteria/` | Sugere critérios de avaliação via IA para um exercício |
 | `chat/` | Chatbot Luca (Claude Haiku por padrão) |
 | `analyze-class/` | Relatório de turma com IA |
 | `analyze-student/` | Relatório individual de aluno |
-| `auth/` | Login, signup, refresh JWT |
+| `auth/` | Login, signup, refresh JWT, esqueci/redefinir senha |
+| `institutions/` | CRUD de instituições (nome + logo) |
+| `disciplines/` | CRUD de disciplinas |
 | `exercises/` | CRUD de exercícios |
+| `classes/` | CRUD de turmas |
+| `students/` | CRUD de alunos |
 | `profiles/` | CRUD de perfis de professor |
-| `evaluations/` | Histórico de avaliações |
+| `evaluations/` | Histórico de avaliações (Avançada) |
 | `reports/` | Histórico de relatórios |
 | `me/` | Dados do usuário logado |
+| `contact/` | Formulário público `/contato`, envia via Resend para `contato@kriteria.education` |
+| `storage/` + `upload-gemini/` | Upload de arquivo: Supabase Storage → Gemini Files API (contorna limite de 4,5MB do Vercel) |
 | `stripe/` | Checkout, webhook, portal |
-| `admin/` | Painel administrativo (restrito) |
+| `org/` | Organizações institucionais: convites, membros, dashboard |
+| `admin/` | Painel administrativo (restrito, `is_admin` reconfirmado no backend) |
 | `chatbot-config/` | Configurações do chatbot (admin) |
 | `onboarding/` | Fluxo de primeiro acesso |
 
@@ -138,7 +202,7 @@ Cada avaliação gerada consome 1 cota, independente da IA usada (Claude ou Gemi
 
 - Assistente virtual da plataforma, disponível no Essencial em diante
 - Model padrão: `claude-haiku-4-5-20251001` (configurável via admin)
-- System prompt: `DEFAULT_SYSTEM_PROMPT` em `lib/chatbot.js`
+- System prompt: `DEFAULT_SYSTEM_PROMPT` em `lib/chatbot.js` — documenta o menu completo, Avaliação Básica/Avançada, Gerador de Provas, Modo Teste, organizações institucionais, planos e cotas
 - Configurações (nome, prompt, model, on/off) ficam na tabela `settings` do Supabase
 - **Proibições absolutas no prompt:** nunca avaliar trabalhos de alunos, nunca dar gabaritos
 
@@ -147,9 +211,9 @@ Cada avaliação gerada consome 1 cota, independente da IA usada (Claude ou Gemi
 ## Stripe — fluxo de pagamento
 
 1. Usuário escolhe plano → `api/stripe/checkout` cria sessão
-2. Pagamento confirmado → webhook `api/stripe/webhook` atualiza `users.plan` e `quota_ciclo`
-3. Renovação mensal → webhook `invoice.paid` renova `quota_ciclo`
-4. Cancelamento → webhook `customer.subscription.deleted` volta para gratuito
+2. Pagamento confirmado → webhook `checkout.session.completed` atualiza `users.plan`, `quota_ciclo`, `quota_relatorios_ciclo` e `quota_provas`
+3. Renovação mensal → webhook `invoice.payment_succeeded` (só em `billing_reason === 'subscription_cycle'`) renova `quota_ciclo`, `quota_relatorios_ciclo`, `quota_testes` e `quota_provas`
+4. Cancelamento → webhook `customer.subscription.deleted` volta para gratuito (zera `quota_provas` também)
 5. Addons (one-time) → webhook `checkout.session.completed` incrementa `quota_extra` ou `quota_relatorios_extra`
 
 ---
@@ -157,7 +221,8 @@ Cada avaliação gerada consome 1 cota, independente da IA usada (Claude ou Gemi
 ## Estrutura de páginas públicas
 
 Páginas sem autenticação (landing + suporte):
-- `/` — landing page (app/page.js)
+- `/` — landing page (app/page.js). Se já houver token válido no `localStorage`, redireciona automaticamente para `/inicio` (ou `/onboarding`)
+- `/login` — mesmo redirecionamento automático se já houver sessão válida
 - `/central-de-ajuda` — FAQ e guia de uso
 - `/contato` — formulário envia via Resend (`api/contact`) para `contato@kriteria.education`
 - `/privacidade` — política de privacidade
@@ -167,15 +232,29 @@ Todas têm o mesmo navbar com 5 links: Funcionalidades · Tipos de Trabalho · P
 
 ---
 
+## Domínio e email
+
+- Domínio de produção: `kriteria.education` (migrado de `avalia.education`, que hoje só existe como **redirect permanente 308** para `www.kriteria.education` — configurado no Vercel, não no código)
+- Email transacional (cadastro, redefinição de senha, convite de organização, formulário de contato): Resend, remetente `noreply@kriteria.education` — domínio verificado no Resend via DKIM (`resend._domainkey`) e SPF/MX no subdomínio `send.kriteria.education`, sem conflito com os registros de email da Hostinger
+- Email de suporte real (recebe respostas e o formulário de contato): `contato@kriteria.education`, hospedado na Hostinger (Titan Email) — MX, DKIM e SPF próprios da Hostinger no domínio raiz, sem tocar nos registros do Resend
+
+---
+
 ## Decisões que já foram tomadas — não questionar
 
-- **JWT customizado** em vez de NextAuth: mais controle sobre o payload e sem dependência extra
+- **JWT customizado** em vez de NextAuth: mais controle sobre o payload e sem dependência extra. Sem fallback de secret hardcoded — o app falha no boot se `JWT_SECRET` não estiver definida, em vez de aceitar silenciosamente um segredo público
 - **Gemini para vídeo/áudio** em vez de processar tudo no Claude: Claude não processa vídeo; Gemini tem tier gratuito generoso
 - **mammoth.js no cliente** para .docx: extrai texto sem precisar de servidor; sem custo de storage
 - **Sem Whisper:** qualidade inferior ao Gemini para avaliação de fala (perde prosódia)
 - **Sem ElevenLabs:** não agrega à qualidade de avaliação; TTS é feature cosmética
 - **Grid de 2 colunas** nos botões de tipo de trabalho (era 3): labels longas quebravam linha ao ficar em negrito
 - **Sidebar vertical** para categorias (era horizontal): 11 categorias não cabiam em tabs horizontais
+- **Avaliação Básica não persiste dados** (sem histórico, sem PDF): mantém o modo simples de verdade; se precisar de histórico/PDF, o professor usa a Avançada
+- **Avaliação Básica dentro dos planos existentes** (sem plano novo mais barato): evita canibalizar o Essencial; os dois modos consomem a mesma cota
+- **Gerador de Provas com cota fixa (10/mês) igual para todo plano pago**, em vez de escalonar por tier: resolve o receio de abuso (gerar provas pra terceiros) sem precisar diferenciar plano
+- **Menu ordenado por frequência de uso**: ações do dia a dia (Avaliação Básica/Avançada, Gerador de Provas) ficam acima dos cadastros (Perfil, Instituição, Disciplinas, Turmas), que são configuração feita uma vez
+- **Formspree removido do `/contato`** em favor de envio direto via Resend: só fazia sentido enquanto a plataforma não tinha domínio de email próprio
+- **Portfólio pessoal removido do repositório**: não fazia parte do produto, ficava em `/portfolio` só por conveniência de deploy
 
 ---
 
@@ -186,3 +265,4 @@ Todas têm o mesmo navbar com 5 links: Funcionalidades · Tipos de Trabalho · P
 - Componentes compartilhados: `app/components/` (AppLayout, Tooltip, useAuthGuard...)
 - Sem TypeScript — projeto em JavaScript puro
 - Sem testes automatizados atualmente
+- HTML gerado dinamicamente (PDFs via `document.write`, emails) deve sempre escapar valores de usuário/IA (`esc()`/`_esc()`) antes de interpolar — evita XSS que poderia expor o token JWT do `localStorage`
