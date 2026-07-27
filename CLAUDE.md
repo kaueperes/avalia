@@ -83,6 +83,7 @@ Cada avaliação gerada (Avançada ou Básica) consome 1 cota, independente da I
 - `quota_relatorios_extra` — relatórios extras, nunca expiram
 - `quota_provas` + `quota_provas_reset_date` — Gerador de Provas, 10/mês fixo pra todo plano pago (nenhuma no Gratuito), reset mensal *lazy* (verificado a cada request em `generate-exam/route.js`, não depende só do webhook Stripe)
 - `quota_testes` + `quota_testes_reset_date` — Modo Teste, 10/mês pra todos os planos (inclusive Gratuito), mesmo padrão de reset lazy em `evaluate-test/route.js`
+- `chatbot_msgs_used` + `chatbot_msgs_reset_date` — mensagens do chatbot no mês, mesmo padrão de reset lazy, checado em `api/chat/route.js` contra `plan.limits.chatbot` (50/150/300 conforme o plano)
 
 **Regra de consumo (avaliações e relatórios):** sempre consome a cota do ciclo primeiro; só usa a extra quando o ciclo chega a zero.
 
@@ -106,6 +107,14 @@ A **Nova Avaliação Básica** não tem cota própria — usa a mesma cota de av
 - `extra_100`: 100 avaliações — R$25
 - `extra_rel_5`: 5 relatórios — R$19
 - `extra_rel_10`: 10 relatórios — R$35
+
+**Quais campos de `PLANS[x].features` são realmente checados no backend** (antes de adicionar um novo, confirme se vale a pena aplicar de verdade — vários já foram só texto de marketing por um tempo):
+- `chatbot` (on/off) → `api/chat/route.js`; `limits.chatbot` (nº de mensagens) → idem, aplicado com contador real
+- `relatorioAluno`/`relatorioTurma` → `api/analyze-student/` e `api/analyze-class/`
+- `exportCSV` → checado no frontend em `app/avaliacoes/page.js` antes de habilitar o botão (não há chamada de API pra exportar, é só formatação local — por isso a checagem é só client-side)
+- `limits.perfis` → `api/profiles/route.js`; `limits.exercicios` → `api/exercises/route.js`
+- **`avaliacaoLote` não é mais tratado como diferencial de plano** — múltiplos alunos de uma vez nunca foi de fato restrito, e a Avaliação Básica já oferece isso pra todo mundo por decisão de produto. A UI mostra "Avaliação Individual e em Lote" igual em todos os planos, sem checagem de plano nenhuma
+- **`filtrosAvancados` não existe em lugar nenhum da interface** — é só um campo de dados sem função nenhuma associada. Não construir a partir dele sem antes decidir se vale investir na feature de verdade
 
 ---
 
@@ -203,16 +212,18 @@ Plano institucional para coordenadores administrarem uma equipe de professores c
 - Assistente virtual da plataforma, disponível no Essencial em diante
 - Model padrão: `claude-haiku-4-5-20251001` (configurável via admin)
 - System prompt: `DEFAULT_SYSTEM_PROMPT` em `lib/chatbot.js` — documenta o menu completo, Avaliação Básica/Avançada, Gerador de Provas, Modo Teste, organizações institucionais, planos e cotas
-- Configurações (nome, prompt, model, on/off) ficam na tabela `settings` do Supabase
+- Configurações (nome, prompt, model, on/off) ficam na tabela `settings` do Supabase — se alteradas pelo admin, sobrescrevem os defaults do código pra sempre (não recebem atualizações futuras do `DEFAULT_SYSTEM_PROMPT` automaticamente). Botão "Restaurar padrão" em `/admin/chatbot` resolve isso quando o prompt salvo ficar desatualizado
 - **Proibições absolutas no prompt:** nunca avaliar trabalhos de alunos, nunca dar gabaritos
+- Limite de mensagens/mês por plano (50/150/300) é aplicado de verdade via `chatbot_msgs_used` — antes só existia como número no marketing, sem checagem nenhuma
+- **`api/chatbot-config/route.js` precisa de `export const dynamic = 'force-dynamic'`** — sem isso o Next.js gera a rota como estática no build (ela não lê nada do `request`), e mudanças salvas no admin ficam "congeladas" até o próximo deploy. Já corrigido, mas cuidado ao mexer nessa rota de novo
 
 ---
 
 ## Stripe — fluxo de pagamento
 
 1. Usuário escolhe plano → `api/stripe/checkout` cria sessão
-2. Pagamento confirmado → webhook `checkout.session.completed` atualiza `users.plan`, `quota_ciclo`, `quota_relatorios_ciclo` e `quota_provas`
-3. Renovação mensal → webhook `invoice.payment_succeeded` (só em `billing_reason === 'subscription_cycle'`) renova `quota_ciclo`, `quota_relatorios_ciclo`, `quota_testes` e `quota_provas`
+2. Pagamento confirmado → webhook `checkout.session.completed` atualiza `users.plan`, `quota_ciclo`, `quota_relatorios_ciclo`, `quota_provas` e zera `chatbot_msgs_used`
+3. Renovação mensal → webhook `invoice.payment_succeeded` (só em `billing_reason === 'subscription_cycle'`) renova `quota_ciclo`, `quota_relatorios_ciclo`, `quota_testes`, `quota_provas` e `chatbot_msgs_used`
 4. Cancelamento → webhook `customer.subscription.deleted` volta para gratuito (zera `quota_provas` também)
 5. Addons (one-time) → webhook `checkout.session.completed` incrementa `quota_extra` ou `quota_relatorios_extra`
 
@@ -229,6 +240,8 @@ Páginas sem autenticação (landing + suporte):
 - `/termos` — termos de uso
 
 Todas têm o mesmo navbar com 5 links: Funcionalidades · Tipos de Trabalho · Para Coordenadores · Planos · Ajuda
+
+**Cuidado ao criar/editar página pública:** nenhuma delas pode usar `useAuthGuard()` (hook de `app/components/useAuthGuard.js`) — ele redireciona pra `/login` se não houver token, o que já aconteceu por engano em `/central-de-ajuda` (corrigido). Esse hook é só pra páginas dentro do app autenticado.
 
 ---
 
@@ -255,6 +268,10 @@ Todas têm o mesmo navbar com 5 links: Funcionalidades · Tipos de Trabalho · P
 - **Menu ordenado por frequência de uso**: ações do dia a dia (Avaliação Básica/Avançada, Gerador de Provas) ficam acima dos cadastros (Perfil, Instituição, Disciplinas, Turmas), que são configuração feita uma vez
 - **Formspree removido do `/contato`** em favor de envio direto via Resend: só fazia sentido enquanto a plataforma não tinha domínio de email próprio
 - **Portfólio pessoal removido do repositório**: não fazia parte do produto, ficava em `/portfolio` só por conveniência de deploy
+- **`/avaliar`, `/dashboard` e `/painel` removidos**: versões antigas do fluxo de avaliação e do painel, de antes da reestruturação pra `/inicio` e `/avaliar-avancado`. Não estavam mais em nenhum menu, só acessíveis por link direto — vários pontos do código (email de boas-vindas, botões de "primeira avaliação") ainda apontavam pra `/avaliar` por engano antes da correção
+- **Copy pública nunca cita "IA"/"inteligência artificial"** (home, meta description, títulos de botão): muitos professores ainda têm resistência a ferramentas de IA. Sempre "o Kriteria corrige/avalia/sugere", nunca a tecnologia como sujeito da frase
+- **Home reforça que o Kriteria não substitui o professor** ("o Kriteria sugere, você decide"): é honesto sobre a experiência real de quem já testou (parte das correções precisa de ajuste manual) e funciona como argumento de confiança pra quem é cético com IA
+- **Limites de plano só valem a pena se forem de fato aplicados**: cota de chatbot, exportação CSV e "filtros avançados" ficaram um tempo existindo só como texto de marketing sem checagem no backend — ver seção Planos acima pra saber o que já foi corrigido
 
 ---
 
@@ -266,3 +283,11 @@ Todas têm o mesmo navbar com 5 links: Funcionalidades · Tipos de Trabalho · P
 - Sem TypeScript — projeto em JavaScript puro
 - Sem testes automatizados atualmente
 - HTML gerado dinamicamente (PDFs via `document.write`, emails) deve sempre escapar valores de usuário/IA (`esc()`/`_esc()`) antes de interpolar — evita XSS que poderia expor o token JWT do `localStorage`
+
+---
+
+## Pendências (retomar na próxima sessão)
+
+- **Limite de avaliações/mês pode estar baixo demais** para professores com muitos alunos (ex: 5 turmas de 35 alunos = 175 avaliações só numa rodada, o que já estoura o Essencial e quase o Pro). Kaué está levantando com a irmã dele, que é professora, quantas avaliações ela precisaria de verdade por mês antes de decidir se os números de `PLANS` em `lib/types.js` devem mudar. Também vale considerar se falta um meio-termo entre plano individual e institucional pra professor sozinho com muitos alunos
+- **Duas badges "IA"** ainda aparecem em `app/avaliacoes/page.js` (nos botões de gerar "Relatório de Turma" e "Parecer Individual do Aluno") — não foram removidas ainda, só as da home e do metadata. Achado durante o pente-fino, não corrigido por estar fora do escopo pedido no momento
+- **`portfolio-avalia.html`** — arquivo estático solto na raiz do repositório (não é servido pelo Next.js, não faz parte de nenhuma rota). Parece resquício de um export antigo de antes do rebrand. Não foi apagado nem investigado a fundo — perguntar se pode remover
