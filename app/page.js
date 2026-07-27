@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // ── Lucide-style SVG icons ────────────────────────────────────────────────────
 const Icon = ({ d, size = 20 }) => (
@@ -40,6 +40,16 @@ const Star = () => (
 export default function Home() {
   const router = useRouter();
   const [planTab, setPlanTab] = useState('individual');
+
+  useEffect(() => {
+    if (!localStorage.getItem('token')) return;
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      router.replace(u.onboarding_done ? '/inicio' : '/onboarding');
+    } catch {
+      router.replace('/inicio');
+    }
+  }, [router]);
 
   return (
     <>
