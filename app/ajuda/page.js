@@ -105,7 +105,7 @@ export default function AjudaPage() {
           Entre em contato pelo e-mail de suporte. Respondemos em até 1 dia útil.
         </p>
         <a
-          href="mailto:suporte@avalia.education"
+          href="mailto:contato@kriteria.education"
           style={{
             display: 'inline-block', padding: '10px 22px',
             background: 'linear-gradient(135deg, #0081f0, #0033ad)',
@@ -113,7 +113,7 @@ export default function AjudaPage() {
             textDecoration: 'none',
           }}
         >
-          suporte@avalia.education
+          contato@kriteria.education
         </a>
       </div>
     </AppLayout>

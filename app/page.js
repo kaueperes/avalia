@@ -227,7 +227,7 @@ export default function Home() {
                 {['#FF5F57','#FEBC2E','#28C840'].map(c => <div key={c} style={{ width: 11, height: 11, borderRadius: '50%', background: c }} />)}
               </div>
               <div style={{ flex: 1, background: 'white', borderRadius: 6, height: 26, maxWidth: 280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #E5E5E5' }}>
-                <span style={{ fontSize: 11, color: '#9CA3AF', fontFamily: 'monospace' }}>avalia.education/avaliar</span>
+                <span style={{ fontSize: 11, color: '#9CA3AF', fontFamily: 'monospace' }}>kriteria.education/avaliar</span>
               </div>
             </div>
             {/* App interface */}
@@ -775,7 +775,7 @@ export default function Home() {
                     </div>
                     <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
                     <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para pequenas equipes</p>
-                    <a href="mailto:contato@avalia.education?subject=Plano Institucional Starter" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: 'transparent', color: '#00173f', border: '2px solid #00173f', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
+                    <a href="mailto:contato@kriteria.education?subject=Plano Institucional Starter" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: 'transparent', color: '#00173f', border: '2px solid #00173f', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
                       Solicitar proposta
                     </a>
                     <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -798,7 +798,7 @@ export default function Home() {
                     </div>
                     <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)' }}>/mês</span>
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 28, marginTop: 6 }}>Para escolas e cursos</p>
-                    <a href="mailto:contato@avalia.education?subject=Plano Institucional Médio" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
+                    <a href="mailto:contato@kriteria.education?subject=Plano Institucional Médio" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
                       Solicitar proposta
                     </a>
                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -818,7 +818,7 @@ export default function Home() {
                     </div>
                     <span style={{ fontSize: 15, color: '#9CA3AF' }}>/mês</span>
                     <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para faculdades e institutos</p>
-                    <a href="mailto:contato@avalia.education?subject=Plano Institucional Plus" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: 'transparent', color: '#00173f', border: '2px solid #00173f', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
+                    <a href="mailto:contato@kriteria.education?subject=Plano Institucional Plus" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: 'transparent', color: '#00173f', border: '2px solid #00173f', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
                       Solicitar proposta
                     </a>
                     <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -837,7 +837,7 @@ export default function Home() {
                       <span style={{ fontSize: 32, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', lineHeight: 1 }}>Sob consulta</span>
                     </div>
                     <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28, marginTop: 6 }}>Para grandes instituições</p>
-                    <a href="mailto:contato@avalia.education?subject=Plano Institucional Personalizado" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: '#d97706', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
+                    <a href="mailto:contato@kriteria.education?subject=Plano Institucional Personalizado" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 28, padding: '13px', background: '#d97706', color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'none', boxSizing: 'border-box' }}>
                       Fale conosco
                     </a>
                     <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -923,7 +923,7 @@ export default function Home() {
               </div>
             </div>
             <div style={{ borderTop: '1px solid #001025', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-              <span style={{ fontSize: 13, color: '#4B5563' }}>© 2026 Kriteria · avalia.education</span>
+              <span style={{ fontSize: 13, color: '#4B5563' }}>© 2026 Kriteria · kriteria.education</span>
               <span style={{ fontSize: 13, color: '#4B5563' }}>Todos os direitos reservados</span>
             </div>
           </div>

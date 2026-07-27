@@ -52,16 +52,16 @@ export async function POST(request) {
 
   if (error) return NextResponse.json({ error: 'Erro ao criar convite' }, { status: 500 });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.avalia.education';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.kriteria.education';
   const inviteUrl = `${appUrl}/convite?token=${invite.token}`;
 
   resend.emails.send({
-    from: 'Kriteria <noreply@avalia.education>',
+    from: 'Kriteria <noreply@kriteria.education>',
     to: normalizedEmail,
     subject: `Convite para ${org?.name || 'sua instituição'} no Kriteria`,
     html: `
       <div style="font-family: 'Inter', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px; background: #ffffff;">
-        <p style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 32px; letter-spacing: -0.5px;">Aval<span style="color: #0081f0;">iA</span></p>
+        <p style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 32px; letter-spacing: -0.5px;">Kriteria</p>
         <h2 style="font-size: 22px; font-weight: 800; color: #111827; margin-bottom: 12px;">Você foi convidado!</h2>
         <p style="font-size: 15px; color: #4B5563; line-height: 1.6; margin-bottom: 28px;">
           ${admin.name} convidou você para fazer parte de <strong>${org?.name || 'sua instituição'}</strong> no Kriteria — a plataforma de avaliação educacional com IA.

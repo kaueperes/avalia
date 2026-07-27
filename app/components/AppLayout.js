@@ -475,7 +475,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
 
             {/* Bottom section */}
             <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: `1px solid ${border}` }}>
-              <p style={{ fontSize: 11, color: textMuted, textAlign: 'center' }}>Kriteria · avalia.education</p>
+              <p style={{ fontSize: 11, color: textMuted, textAlign: 'center' }}>Kriteria · kriteria.education</p>
             </div>
           </aside>
 

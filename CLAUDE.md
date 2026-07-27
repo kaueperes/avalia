@@ -1,7 +1,7 @@
 # KriterIA — Guia para o Claude Code
 
 SaaS educacional brasileiro para professores avaliarem trabalhos de alunos com IA.
-- **Produção:** https://www.avalia.education
+- **Produção:** https://www.kriteria.education
 - **Repositório:** https://github.com/kaueperes/avalia
 - **Deploy:** Vercel (auto-deploy ao push em `main`)
 
@@ -159,7 +159,7 @@ Cada avaliação gerada consome 1 cota, independente da IA usada (Claude ou Gemi
 Páginas sem autenticação (landing + suporte):
 - `/` — landing page (app/page.js)
 - `/central-de-ajuda` — FAQ e guia de uso
-- `/contato` — formulário via Formspree (`FORMSPREE_ID = 'xqeyqlly'`)
+- `/contato` — formulário envia via Resend (`api/contact`) para `contato@kriteria.education`
 - `/privacidade` — política de privacidade
 - `/termos` — termos de uso
 

@@ -59,7 +59,7 @@ export default function Privacidade() {
 
           <Section title="1. Quem somos">
             <P>O Kriteria é uma plataforma SaaS de avaliação educacional com inteligência artificial, desenvolvida para auxiliar professores na correção e análise de trabalhos de alunos.</P>
-            <P>Para dúvidas sobre esta política, entre em contato pelo e-mail: <a href="mailto:contato@avalia.education" style={{ color: '#0081f0' }}>contato@avalia.education</a></P>
+            <P>Para dúvidas sobre esta política, entre em contato pelo e-mail: <a href="mailto:contato@kriteria.education" style={{ color: '#0081f0' }}>contato@kriteria.education</a></P>
           </Section>
 
           <Section title="2. Dados que coletamos">
@@ -107,7 +107,7 @@ export default function Privacidade() {
               <Li>• Solicitar a exclusão da sua conta e todos os dados associados</Li>
               <Li>• Exportar seus dados (avaliações e exercícios)</Li>
             </ul>
-            <P>Para exercer qualquer um desses direitos, entre em contato: <a href="mailto:contato@avalia.education" style={{ color: '#0081f0' }}>contato@avalia.education</a></P>
+            <P>Para exercer qualquer um desses direitos, entre em contato: <a href="mailto:contato@kriteria.education" style={{ color: '#0081f0' }}>contato@kriteria.education</a></P>
           </Section>
 
           <Section title="8. Cookies">

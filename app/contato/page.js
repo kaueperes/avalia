@@ -2,12 +2,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Substitua FORMSPREE_ID pelo ID do seu formulário em formspree.io
-// Exemplo: se a URL for https://formspree.io/f/xabc1234, o ID é "xabc1234"
-const FORMSPREE_ID = 'xqeyqlly';
-// ─────────────────────────────────────────────────────────────────────────────
-
 const inputStyle = {
   width: '100%',
   padding: '13px 16px',
@@ -32,15 +26,11 @@ export default function Contato() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (FORMSPREE_ID === 'SEU_ID_AQUI') {
-      setStatus('success'); // modo demo para portfólio
-      return;
-    }
     setStatus('sending');
     try {
-      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      const res = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
       setStatus(res.ok ? 'success' : 'error');
@@ -101,7 +91,7 @@ export default function Contato() {
             <div style={{ background: 'white', borderRadius: 20, padding: '28px', border: '1px solid #E5E7EB', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: '#E6F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 16 }}>✉️</div>
               <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', marginBottom: 6 }}>E-mail direto</h3>
-              <a href="mailto:contato@avalia.education" style={{ fontSize: 13, color: '#0081f0', textDecoration: 'none', fontWeight: 500 }}>contato@avalia.education</a>
+              <a href="mailto:contato@kriteria.education" style={{ fontSize: 13, color: '#0081f0', textDecoration: 'none', fontWeight: 500 }}>contato@kriteria.education</a>
               <p style={{ fontSize: 13, color: '#9CA3AF', marginTop: 6 }}>Respondemos em até 24h úteis</p>
             </div>
 
@@ -201,7 +191,7 @@ export default function Contato() {
 
                   {status === 'error' && (
                     <div style={{ padding: '12px 16px', background: '#FEF2F2', borderRadius: 10, border: '1px solid #FECACA', fontSize: 13, color: '#DC2626' }}>
-                      Ocorreu um erro ao enviar. Tente novamente ou envie diretamente para contato@avalia.education
+                      Ocorreu um erro ao enviar. Tente novamente ou envie diretamente para contato@kriteria.education
                     </div>
                   )}
 

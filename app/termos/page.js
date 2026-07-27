@@ -110,7 +110,7 @@ export default function Termos() {
           </Section>
 
           <Section title="9. Encerramento de conta">
-            <P>Podemos suspender ou encerrar contas que violem estes termos. Você pode solicitar a exclusão da sua conta a qualquer momento pelo e-mail <a href="mailto:contato@avalia.education" style={{ color: '#0081f0' }}>contato@avalia.education</a>.</P>
+            <P>Podemos suspender ou encerrar contas que violem estes termos. Você pode solicitar a exclusão da sua conta a qualquer momento pelo e-mail <a href="mailto:contato@kriteria.education" style={{ color: '#0081f0' }}>contato@kriteria.education</a>.</P>
           </Section>
 
           <Section title="10. Alterações nos termos">
@@ -123,7 +123,7 @@ export default function Termos() {
 
           <div style={{ marginTop: 48, padding: '24px 28px', background: '#F9FAFB', borderRadius: 14, border: '1px solid #F3F4F6', textAlign: 'center' }}>
             <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 16 }}>Dúvidas sobre estes termos?</p>
-            <a href="mailto:contato@avalia.education" style={{ color: '#0081f0', fontWeight: 600, fontSize: 15 }}>contato@avalia.education</a>
+            <a href="mailto:contato@kriteria.education" style={{ color: '#0081f0', fontWeight: 600, fontSize: 15 }}>contato@kriteria.education</a>
           </div>
 
         </div>

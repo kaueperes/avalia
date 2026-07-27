@@ -234,8 +234,8 @@ export default function CentralDeAjuda() {
             <button onClick={() => router.push('/contato')} style={{ background: '#0081f0', color: 'white', border: 'none', borderRadius: 10, padding: '13px 28px', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
               Fale conosco
             </button>
-            <a href="mailto:contato@avalia.education" style={{ display: 'inline-flex', alignItems: 'center', background: 'white', color: '#374151', border: '1.5px solid #E5E7EB', borderRadius: 10, padding: '13px 28px', fontSize: 15, fontWeight: 500, textDecoration: 'none' }}>
-              contato@avalia.education
+            <a href="mailto:contato@kriteria.education" style={{ display: 'inline-flex', alignItems: 'center', background: 'white', color: '#374151', border: '1.5px solid #E5E7EB', borderRadius: 10, padding: '13px 28px', fontSize: 15, fontWeight: 500, textDecoration: 'none' }}>
+              contato@kriteria.education
             </a>
           </div>
         </div>

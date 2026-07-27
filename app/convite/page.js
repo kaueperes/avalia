@@ -71,7 +71,7 @@ function ConvitePage() {
       <div style={{ background: '#fff', borderRadius: 20, padding: '48px 40px', maxWidth: 460, width: '100%', boxShadow: '0 4px 40px rgba(0,0,0,0.10)', textAlign: 'center' }}>
         {/* Logo */}
         <p style={{ fontSize: 24, fontWeight: 900, color: '#111827', marginBottom: 32, letterSpacing: '-0.5px' }}>
-          Aval<span style={{ color: '#0081f0' }}>iA</span>
+          Kriteria
         </p>
 
         {status === 'loading' && (
