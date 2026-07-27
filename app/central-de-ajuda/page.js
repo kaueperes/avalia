@@ -26,11 +26,15 @@ const faqs = [
     items: [
       {
         q: 'Como funciona a avaliação com IA?',
-        a: 'Vá em "Nova Avaliação", selecione o perfil de professor, o exercício correspondente e cole o texto do trabalho do aluno. Em segundos a IA gera nota por critério, nota final e feedback personalizado no seu estilo.',
+        a: 'Vá em "Nova Avaliação Avançada", selecione o perfil de professor, o exercício correspondente e cole o texto ou envie o trabalho do aluno. Em segundos a IA gera nota por critério, nota final e feedback personalizado no seu estilo.',
       },
       {
         q: 'Quantos tipos de trabalho são suportados?',
-        a: 'O Kriteria suporta mais de 25 tipos, incluindo redações, relatórios, projetos, provas dissertativas, estudos de caso, trabalhos de TCC, seminários, análises críticas e muito mais.',
+        a: 'O Kriteria suporta mais de 60 tipos organizados em 11 categorias, incluindo redações, relatórios, projetos, código, modelagem 3D, design, música, provas dissertativas, TCC, seminários e muito mais.',
+      },
+      {
+        q: 'O que é a Nova Avaliação Básica?',
+        a: 'É um modo de correção rápida por foto ou texto, sem precisar cadastrar exercício, critérios ou aluno antes. Ideal para provas objetivas (matemática, português etc). A IA analisa questão por questão e diz o que está certo, errado ou incerto, com nota sugerida. Não gera histórico nem PDF — é pra você ler na tela e escrever direto na prova do aluno. Está disponível em todos os planos, inclusive o Gratuito.',
       },
       {
         q: 'O feedback da IA pode ser editado?',
@@ -39,6 +43,19 @@ const faqs = [
       {
         q: 'Como exportar as avaliações?',
         a: 'Dentro de cada avaliação concluída, há botões para exportar em PDF ou CSV. O PDF inclui cabeçalho com o nome do exercício, nota, critérios e feedback completo.',
+      },
+    ],
+  },
+  {
+    cat: 'Gerador de Provas',
+    items: [
+      {
+        q: 'Como funciona o Gerador de Provas?',
+        a: 'Você informa a matéria, o tema, o nível/série, a quantidade de questões e o tipo (múltipla escolha, dissertativa, verdadeiro/falso ou mista). A IA gera o texto completo da prova, com gabarito opcional ao final, para você copiar e colar onde precisar.',
+      },
+      {
+        q: 'Em quais planos o Gerador de Provas está disponível?',
+        a: 'A partir do plano Essencial. O plano Gratuito não tem acesso. Ele tem uma cota própria de 10 gerações por mês, separada da cota de avaliações.',
       },
     ],
   },

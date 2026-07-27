@@ -5,16 +5,28 @@ import AppLayout from '../components/AppLayout';
 
 const faqs = [
   {
+    q: 'Qual a diferença entre Avaliação Básica e Avançada?',
+    a: 'A Básica é pra correção rápida por foto ou texto, sem cadastrar nada antes — ideal pra provas objetivas de matemática, português etc. Ela não salva histórico nem gera PDF, só mostra na tela o que está certo, errado ou incerto em cada questão. A Avançada é a avaliação completa: critérios personalizados, perfil de professor, tom de feedback, PDF e histórico salvo. As duas consomem a mesma cota de avaliações do seu plano.',
+  },
+  {
     q: 'Como criar meu primeiro perfil de professor?',
-    a: 'Vá em "Perfil do Professor" no menu lateral. Preencha seu nome, disciplina e escolha o tom de feedback. Opcionalmente, adicione uma amostra do seu estilo de escrita — a IA vai imitar seu jeito de escrever. Se trabalhar em mais de uma instituição, crie um perfil para cada uma com o logo correspondente.',
+    a: 'Vá em "Perfil do Professor" no menu lateral. Preencha seu nome, disciplina e escolha o tom de feedback. Opcionalmente, adicione uma amostra do seu estilo de escrita — a IA vai imitar seu jeito de escrever.',
   },
   {
     q: 'Como funciona a avaliação com IA?',
-    a: 'Em "Nova Avaliação", você escolhe o tipo de trabalho (3D, Design, Redação etc.), seleciona um perfil de professor e envia o arquivo do aluno. A IA analisa o trabalho com base nos critérios da disciplina e gera um feedback detalhado com notas por critério, nota final e comentários personalizados no seu estilo.',
+    a: 'Em "Nova Avaliação Avançada", você escolhe o tipo de trabalho (3D, Design, Redação etc.), seleciona um perfil de professor e envia o arquivo do aluno. A IA analisa o trabalho com base nos critérios da disciplina e gera um feedback detalhado com notas por critério, nota final e comentários personalizados no seu estilo.',
   },
   {
     q: 'O que são exercícios?',
-    a: 'Exercícios são enunciados ou briefings que você cria e reutiliza em várias avaliações. Por exemplo: "Modelagem de personagem low-poly com no máximo 1.500 polígonos". Você cria uma vez em "Gerenciar Exercícios" e depois seleciona na hora de avaliar — a IA leva o enunciado em conta na análise.',
+    a: 'Exercícios são enunciados ou briefings que você cria e reutiliza em várias avaliações. Por exemplo: "Modelagem de personagem low-poly com no máximo 1.500 polígonos". Você cria uma vez em "Cadastro de Disciplinas/Exercícios" e depois seleciona na hora de avaliar — a IA leva o enunciado em conta na análise.',
+  },
+  {
+    q: 'Como funciona o Gerador de Provas?',
+    a: 'Em "Gerador de Provas", você informa matéria, tema, nível/série, quantidade e tipo de questões. A IA gera o texto completo da prova (com gabarito opcional) pra você copiar e colar. Disponível a partir do plano Essencial, com cota própria de 10 gerações por mês.',
+  },
+  {
+    q: 'Como cadastro o logo da minha instituição?',
+    a: 'Vá em "Cadastro de Instituição" e cadastre o nome e o logo. Ele aparece automaticamente nos PDFs de avaliação e nos relatórios, sem precisar repetir em cada perfil.',
   },
   {
     q: 'Posso usar o mesmo perfil para turmas diferentes?',
@@ -22,22 +34,22 @@ const faqs = [
   },
   {
     q: 'Como exportar as avaliações em PDF?',
-    a: 'Dentro de cada avaliação concluída, há um botão de exportar PDF. Se o seu perfil tiver o logo da instituição cadastrado, ele aparece no cabeçalho do documento automaticamente.',
+    a: 'Dentro de cada avaliação concluída em "Gerenciar Avaliações", há um botão de exportar PDF. Se a sua instituição tiver logo cadastrado, ele aparece no cabeçalho do documento automaticamente.',
   },
   {
     q: 'Os dados ficam salvos?',
-    a: 'Sim. Todos os perfis, exercícios e avaliações ficam salvos no banco de dados e estarão disponíveis mesmo após fechar o navegador ou reiniciar o computador.',
+    a: 'Sim, com exceção da Avaliação Básica. Perfis, exercícios e avaliações da Avaliação Avançada ficam salvos no banco de dados e disponíveis mesmo após fechar o navegador. Já a Avaliação Básica não salva nada — é só pra correção rápida na hora.',
   },
   {
     q: 'Qual o limite de avaliações no plano gratuito?',
-    a: 'O plano gratuito permite até 10 avaliações por mês. Para uso ilimitado, assine o plano Pro.',
+    a: 'O plano gratuito permite até 5 avaliações por mês. Para mais avaliações, relatórios e Gerador de Provas, assine o Essencial, Pro ou Premium.',
   },
 ];
 
 const steps = [
-  { num: '01', title: 'Crie seu perfil', desc: 'Vá em "Perfil do Professor" e configure nome, disciplina, tom de feedback e logo da sua instituição.' },
-  { num: '02', title: 'Cadastre um exercício', desc: 'Em "Gerenciar Exercícios", adicione o enunciado do trabalho que os alunos devem entregar.' },
-  { num: '03', title: 'Avalie um trabalho', desc: 'Clique em "Nova Avaliação", selecione o perfil e exercício, envie o arquivo do aluno e aguarde a IA gerar o feedback.' },
+  { num: '01', title: 'Crie seu perfil', desc: 'Vá em "Perfil do Professor" e configure nome, disciplina e tom de feedback.' },
+  { num: '02', title: 'Cadastre um exercício', desc: 'Em "Cadastro de Disciplinas/Exercícios", adicione o enunciado do trabalho que os alunos devem entregar.' },
+  { num: '03', title: 'Avalie um trabalho', desc: 'Clique em "Nova Avaliação Avançada", selecione o perfil e exercício, envie o arquivo do aluno e aguarde a IA gerar o feedback. Pra correção rápida sem cadastro, use a "Nova Avaliação Básica".' },
   { num: '04', title: 'Exporte e compartilhe', desc: 'Com a avaliação pronta, exporte em PDF timbrado ou copie o feedback para enviar ao aluno.' },
 ];
 
