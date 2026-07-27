@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AppLayout from '../components/AppLayout';
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
@@ -46,6 +46,7 @@ const STATUS_META = {
 };
 
 export default function AvaliarBasica() {
+  const [userName, setUserName] = useState('Professor');
   const [context, setContext] = useState('');
   const [mode, setMode] = useState('foto');
   const [studentWork, setStudentWork] = useState('');
@@ -56,6 +57,16 @@ export default function AvaliarBasica() {
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
   const fileRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (u.name) setUserName(u.name);
+      }
+    } catch {}
+  }, []);
 
   async function handleFiles(selectedFiles) {
     setProcessing(true);
@@ -124,7 +135,7 @@ export default function AvaliarBasica() {
   const canCorrect = (!!studentWork || fileUris.length > 0) && !processing && !evaluating;
 
   return (
-    <AppLayout>
+    <AppLayout userName={userName}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       <div style={{ marginBottom: 32 }}>

@@ -16,6 +16,7 @@ const QUESTION_TYPES = [
 ];
 
 export default function GeradorProvas() {
+  const [userName, setUserName] = useState('Professor');
   const [loadingMe, setLoadingMe] = useState(true);
   const [plan, setPlan] = useState('gratuito');
   const [quotaProvas, setQuotaProvas] = useState(0);
@@ -34,6 +35,14 @@ export default function GeradorProvas() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (u.name) setUserName(u.name);
+      }
+    } catch {}
+
     fetch('/api/me', { headers: { Authorization: `Bearer ${token()}` } })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
@@ -88,7 +97,7 @@ export default function GeradorProvas() {
   const isGratuito = plan === 'gratuito';
 
   return (
-    <AppLayout>
+    <AppLayout userName={userName}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       <div style={{ marginBottom: 32 }}>
