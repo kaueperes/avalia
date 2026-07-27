@@ -174,8 +174,12 @@ function SlotCard({ slot, index, onChange, onRemove, canRemove }) {
 export default function AvaliarBasica() {
   const [userName, setUserName] = useState('Professor');
   const [context, setContext] = useState('');
+  const [contextFileUris, setContextFileUris] = useState([]);
+  const [contextFileNames, setContextFileNames] = useState([]);
+  const [contextProcessing, setContextProcessing] = useState(false);
   const [slots, setSlots] = useState([newSlot()]);
   const [correcting, setCorrecting] = useState(false);
+  const contextFileRef = useRef(null);
 
   useEffect(() => {
     try {
@@ -191,7 +195,32 @@ export default function AvaliarBasica() {
   function addSlot() { setSlots(prev => [...prev, newSlot()]); }
   function removeSlot(id) { setSlots(prev => prev.filter(s => s.id !== id)); }
 
+  async function handleContextFiles(selectedFiles) {
+    setContextProcessing(true);
+    const uris = [], names = [];
+    for (const file of Array.from(selectedFiles)) {
+      try {
+        const r = await uploadFileToGemini(file, 'Gabarito/Referência do professor');
+        uris.push(r);
+        names.push(file.name);
+      } catch (e) {
+        console.error('handleContextFiles error:', e.message);
+      }
+    }
+    setContextFileUris(prev => [...prev, ...uris]);
+    setContextFileNames(prev => [...prev, ...names]);
+    setContextProcessing(false);
+  }
+
+  function removeContextFile(i) {
+    setContextFileUris(prev => prev.filter((_, idx) => idx !== i));
+    setContextFileNames(prev => prev.filter((_, idx) => idx !== i));
+  }
+
   function resetAll() {
+    setContext('');
+    setContextFileUris([]);
+    setContextFileNames([]);
     setSlots([newSlot()]);
   }
 
@@ -209,6 +238,7 @@ export default function AvaliarBasica() {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
           body: JSON.stringify({
             context: context || undefined,
+            contextFileUris: contextFileUris.length ? contextFileUris : undefined,
             studentWork: slot.studentWork || undefined,
             fileUris: slot.fileUris.length ? slot.fileUris : undefined,
           }),
@@ -224,7 +254,7 @@ export default function AvaliarBasica() {
     setCorrecting(false);
   }
 
-  const anyProcessing = slots.some(s => s.processing);
+  const anyProcessing = contextProcessing || slots.some(s => s.processing);
   const readySlots = slots.filter(s => s.studentWork || s.fileUris.length > 0);
   const canCorrect = readySlots.length > 0 && !anyProcessing && !correcting;
   const anyResult = slots.some(s => s.result);
@@ -247,7 +277,27 @@ export default function AvaliarBasica() {
             <div style={secLabel}>Contexto ou gabarito (opcional)</div>
             <textarea value={context} onChange={e => setContext(e.target.value)} rows={3}
               placeholder="Ex: 7 questões sobre equação de 2º grau. Ou cole o gabarito, se tiver."
-              style={inp} />
+              style={{ ...inp, marginBottom: 10 }} />
+
+            <input ref={contextFileRef} type="file" accept="image/*" multiple style={{ display: 'none' }}
+              onChange={e => { if (e.target.files.length) handleContextFiles(e.target.files); e.target.value = ''; }} />
+            {contextFileNames.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                {contextFileNames.map((n, i) => (
+                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 8px', fontSize: 12, color: 'var(--text-main)' }}>
+                    {n}
+                    <span onClick={() => removeContextFile(i)} style={{ display: 'flex', color: 'var(--text-sub)', cursor: 'pointer' }}><IconTrash /></span>
+                  </span>
+                ))}
+                <button onClick={() => contextFileRef.current?.click()} disabled={contextProcessing} style={{ ...btnSecondary, padding: '4px 10px', fontSize: 12 }}>
+                  {contextProcessing ? <><IconSpinner /> Processando...</> : '+ adicionar foto'}
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => contextFileRef.current?.click()} disabled={contextProcessing} style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}>
+                {contextProcessing ? <><IconSpinner /> Processando...</> : <><IconUpload /> Anexar foto do gabarito</>}
+              </button>
+            )}
           </div>
         </div>
 

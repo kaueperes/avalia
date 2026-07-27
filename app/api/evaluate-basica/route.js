@@ -49,7 +49,7 @@ export async function POST(request) {
     }
   }
 
-  const { context, studentWork, images, fileUris } = await request.json();
+  const { context, studentWork, images, fileUris, contextFileUris } = await request.json();
 
   if (!studentWork && !images?.length && !fileUris?.length) {
     return NextResponse.json({ error: 'Envie uma foto ou o texto da prova.' }, { status: 400 });
@@ -57,8 +57,8 @@ export async function POST(request) {
 
   const prompt = `Você é um professor corrigindo rapidamente uma prova escolar (matemática, português, ou outra matéria de conteúdo objetivo), para o professor escrever o resultado direto na prova do aluno.
 
-${context ? `Contexto/gabarito fornecido pelo professor:\n${context}\n` : ''}
-${studentWork ? `Prova do aluno (texto):\n${studentWork}\n` : 'Prova do aluno: veja a(s) imagem(ns) anexada(s).'}
+${context ? `Contexto/gabarito fornecido pelo professor:\n${context}\n` : ''}${contextFileUris?.length ? `O professor também anexou foto(s) do gabarito, identificadas como "Gabarito/Referência do professor" — use apenas para calibrar a correção, nunca as confunda com a prova do aluno.\n` : ''}
+${studentWork ? `Prova do aluno (texto):\n${studentWork}\n` : 'Prova do aluno: veja a(s) imagem(ns) anexada(s) identificadas como "Prova do aluno".'}
 
 Analise questão por questão e responda APENAS com JSON válido (sem markdown, sem texto fora do JSON):
 {
@@ -142,9 +142,10 @@ Regras importantes:
 
   try {
     let parsed;
-    const hasFileUris = fileUris?.length > 0;
+    const allFileUris = [...(contextFileUris || []), ...(fileUris || [])];
+    const hasFileUris = allFileUris.length > 0;
     const hasImages = images?.length > 0;
-    const geminiFiles = { fileUris: hasFileUris ? fileUris : undefined, images: hasImages ? images : undefined };
+    const geminiFiles = { fileUris: hasFileUris ? allFileUris : undefined, images: hasImages ? images : undefined };
 
     try {
       const geminiModels = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-3.5-flash'];
