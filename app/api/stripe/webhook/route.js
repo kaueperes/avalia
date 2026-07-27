@@ -49,6 +49,8 @@ export async function POST(request) {
           plan: planKey,
           quota_ciclo: plan.limits.avaliacoes ?? 9999,
           quota_relatorios_ciclo: plan.limits.relatorios ?? 0,
+          quota_provas: 10,
+          quota_provas_reset_date: resetDate,
           stripe_subscription_id: session.subscription,
           quota_reset_date: resetDate,
         }).eq('id', userId);
@@ -73,6 +75,8 @@ export async function POST(request) {
             quota_relatorios_ciclo: plan.limits.relatorios ?? 0,
             quota_testes: 10,
             quota_testes_reset_date: nextTesteReset.toISOString(),
+            quota_provas: 10,
+            quota_provas_reset_date: resetDate || nextTesteReset.toISOString(),
             ...(resetDate && { quota_reset_date: resetDate }),
           }).eq('id', user.id);
         }
@@ -89,6 +93,7 @@ export async function POST(request) {
         plan: 'gratuito',
         quota_ciclo: gratuito.limits.avaliacoes,
         quota_relatorios_ciclo: 0,
+        quota_provas: 0,
         stripe_subscription_id: null,
       }).eq('id', user.id);
     }
