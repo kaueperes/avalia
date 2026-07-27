@@ -157,13 +157,13 @@ const EditIcon = () => (
 
 const navItems = [
   { Icon: HomeIcon,      label: 'Início',                    href: '/inicio' },
+  { Icon: ZapIcon,       label: 'Nova Avaliação Básica',     href: '/avaliar-basica', highlight: true },
+  { Icon: PlusIcon,      label: 'Nova Avaliação Avançada',   href: '/avaliar-avancado', highlight: true },
+  { Icon: FileTextIcon,  label: 'Gerador de Provas',         href: '/gerador-provas' },
   { Icon: UserIcon,      label: 'Perfil do Professor',       href: '/perfis' },
   { Icon: BookIcon,      label: 'Cadastro de Instituição',   href: '/instituicao' },
   { Icon: ClipboardIcon, label: 'Cadastro de Disciplinas/Exercícios', href: '/disciplinas' },
   { Icon: ReportIcon,    label: 'Cadastro de Turmas',        href: '/turmas' },
-  { Icon: ZapIcon,       label: 'Nova Avaliação Básica',     href: '/avaliar-basica', highlight: true },
-  { Icon: PlusIcon,      label: 'Nova Avaliação Avançada',   href: '/avaliar-avancado', highlight: true },
-  { Icon: FileTextIcon,  label: 'Gerador de Provas',         href: '/gerador-provas' },
   { Icon: ClipboardIcon, label: 'Gerenciar Avaliações',      href: '/avaliacoes' },
   { Icon: ReportIcon,    label: 'Gerenciar Relatórios',      href: '/relatorios' },
   { Icon: HelpIcon,      label: 'Ajuda',                     href: '/ajuda' },
