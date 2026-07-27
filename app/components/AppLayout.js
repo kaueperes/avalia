@@ -157,14 +157,14 @@ const EditIcon = () => (
 
 const navItems = [
   { Icon: HomeIcon,      label: 'Início',                    href: '/inicio' },
-  { Icon: ZapIcon,       label: 'Nova Avaliação Básica',     href: '/avaliar-basica', highlight: true },
+  { Icon: ZapIcon,       label: 'Nova Avaliação Básica',     href: '/avaliar-basica', highlight: true, divider: true },
   { Icon: PlusIcon,      label: 'Nova Avaliação Avançada',   href: '/avaliar-avancado', highlight: true },
   { Icon: FileTextIcon,  label: 'Gerador de Provas',         href: '/gerador-provas' },
-  { Icon: UserIcon,      label: 'Perfil do Professor',       href: '/perfis' },
+  { Icon: UserIcon,      label: 'Perfil do Professor',       href: '/perfis', divider: true },
   { Icon: BookIcon,      label: 'Cadastro de Instituição',   href: '/instituicao' },
   { Icon: ClipboardIcon, label: 'Cadastro de Disciplinas/Exercícios', href: '/disciplinas' },
   { Icon: ReportIcon,    label: 'Cadastro de Turmas',        href: '/turmas' },
-  { Icon: ClipboardIcon, label: 'Gerenciar Avaliações',      href: '/avaliacoes' },
+  { Icon: ClipboardIcon, label: 'Gerenciar Avaliações',      href: '/avaliacoes', divider: true },
   { Icon: ReportIcon,    label: 'Gerenciar Relatórios',      href: '/relatorios' },
   { Icon: HelpIcon,      label: 'Ajuda',                     href: '/ajuda' },
 ];
@@ -442,31 +442,33 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
                   { Icon: ClipboardIcon, label: 'Avaliações da Instituição', href: '/org/avaliacoes' },
                 ] : []),
                 ...(isAdmin ? [{ Icon: ShieldIcon, label: 'Administração', href: '/admin' }] : []),
-              ].map(({ Icon, label, href, highlight }) => {
+              ].map(({ Icon, label, href, highlight, divider }) => {
                 const isActive = pathname === href;
                 const baseBg = isActive ? navActive : highlight ? 'linear-gradient(135deg, #0081f0 0%, #810cfa 100%)' : 'none';
                 return (
-                  <button
-                    key={href}
-                    onClick={() => { router.push(href); setMenuOpen(false); }}
-                    onMouseEnter={e => { if (!isActive && !highlight) e.currentTarget.style.background = navHover; }}
-                    onMouseLeave={e => { if (!isActive && !highlight) e.currentTarget.style.background = 'none'; }}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 10,
-                      padding: '9px 14px', borderRadius: 10,
-                      fontSize: 14, fontWeight: isActive || highlight ? 600 : 500,
-                      cursor: 'pointer', border: 'none', width: '100%', textAlign: 'left',
-                      background: baseBg,
-                      color: isActive ? '#0081f0' : highlight ? 'white' : textMain,
-                      marginBottom: highlight ? 8 : 0,
-                      transition: 'background .15s',
-                    }}
-                  >
-                    <span style={{ opacity: isActive || highlight ? 1 : 0.6, display: 'flex' }}>
-                      <Icon />
-                    </span>
-                    {label}
-                  </button>
+                  <div key={href}>
+                    {divider && <div style={{ height: 1, background: border, margin: '8px 6px' }} />}
+                    <button
+                      onClick={() => { router.push(href); setMenuOpen(false); }}
+                      onMouseEnter={e => { if (!isActive && !highlight) e.currentTarget.style.background = navHover; }}
+                      onMouseLeave={e => { if (!isActive && !highlight) e.currentTarget.style.background = 'none'; }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '9px 14px', borderRadius: 10,
+                        fontSize: 14, fontWeight: isActive || highlight ? 600 : 500,
+                        cursor: 'pointer', border: 'none', width: '100%', textAlign: 'left',
+                        background: baseBg,
+                        color: isActive ? '#0081f0' : highlight ? 'white' : textMain,
+                        marginBottom: highlight ? 8 : 0,
+                        transition: 'background .15s',
+                      }}
+                    >
+                      <span style={{ opacity: isActive || highlight ? 1 : 0.6, display: 'flex' }}>
+                        <Icon />
+                      </span>
+                      {label}
+                    </button>
+                  </div>
                 );
               })}
             </nav>
