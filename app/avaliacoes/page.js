@@ -6,7 +6,7 @@ import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
 
 // ── Chart helpers ─────────────────────────────────────────────────────────────
-function _esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function _cc(v) { return v >= 7 ? '#16a34a' : v >= 5 ? '#d97706' : '#ef4444'; }
 function _barsSVG(items, width = 420) {
   if (!items?.length) return '';
@@ -184,13 +184,13 @@ export default function AvaliacoesPage() {
     const scoreNum = typeof e.score === 'number' ? e.score.toFixed(1) : e.score;
     const scoreHex = e.score >= 7 ? '#16a34a' : e.score >= 5 ? '#ca8a04' : '#dc2626';
     const scoreBg = e.score >= 7 ? '#dcfce7' : e.score >= 5 ? '#fef9c3' : '#fee2e2';
-    const disciplina = e.disciplina || '';
-    const tipoTrabalho = TYPES[e.type]?.label || e.type || '';
+    const disciplina = _esc(e.disciplina || '');
+    const tipoTrabalho = _esc(TYPES[e.type]?.label || e.type || '');
 
     const metaItems = [
       disciplina && `<div style="display:inline-block;background:#f5f3ff;color:#7c3aed;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;margin-right:6px">${disciplina}</div>`,
       tipoTrabalho && `<span style="font-size:13px;color:#374151;font-weight:600">${tipoTrabalho}</span>`,
-      e.exerciseName && `<span style="font-size:13px;color:#6b7280"> · ${e.exerciseName}</span>`,
+      e.exerciseName && `<span style="font-size:13px;color:#6b7280"> · ${_esc(e.exerciseName)}</span>`,
     ].filter(Boolean).join('');
 
     const criteriaRows = (e.criteria || []).map(c => {
@@ -198,7 +198,7 @@ export default function AvaliacoesPage() {
       const color = c.score >= 7 ? '#16a34a' : c.score >= 5 ? '#ca8a04' : '#dc2626';
       const bg = c.score >= 7 ? '#dcfce7' : c.score >= 5 ? '#fef9c3' : '#fee2e2';
       return `<tr>
-        <td style="padding:10px 0;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;width:55%">${c.name}</td>
+        <td style="padding:10px 0;font-size:13px;color:#374151;border-bottom:1px solid #f3f4f6;width:55%">${_esc(c.name)}</td>
         <td style="padding:10px 12px;border-bottom:1px solid #f3f4f6;width:35%">
           <div style="background:#e5e7eb;border-radius:99px;height:6px;overflow:hidden">
             <div style="width:${pct}%;height:100%;background:${color};border-radius:99px"></div>
@@ -211,7 +211,7 @@ export default function AvaliacoesPage() {
     }).join('');
 
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
-    <title>Avaliação — ${e.studentName}</title>
+    <title>Avaliação — ${_esc(e.studentName)}</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 740px; margin: 0 auto; }
@@ -220,12 +220,12 @@ export default function AvaliacoesPage() {
       <!-- Header -->
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #e5e7eb">
         <div style="flex:1">
-          ${logo ? `<img src="${logo}" style="max-height:44px;max-width:160px;object-fit:contain;margin-bottom:10px;display:block" />` : ''}
+          ${logo ? `<img src="${_esc(logo)}" style="max-height:44px;max-width:160px;object-fit:contain;margin-bottom:10px;display:block" />` : ''}
           <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:#7c3aed;font-weight:700;margin-bottom:6px">Avaliação Individual</div>
-          <div style="font-size:26px;font-weight:800;color:#111;margin-bottom:6px">${e.studentName}</div>
+          <div style="font-size:26px;font-weight:800;color:#111;margin-bottom:6px">${_esc(e.studentName)}</div>
           <div style="margin-bottom:4px">${metaItems}</div>
           <div style="font-size:12px;color:#9ca3af;margin-top:6px">
-            ${e.turma ? `Turma ${e.turma}` : ''}${e.turma && e.profileName ? ' · ' : ''}${e.profileName ? `Prof. ${e.profileName}` : ''}${(e.turma || e.profileName) && e.institution ? ' · ' : ''}${e.institution || ''}
+            ${e.turma ? `Turma ${_esc(e.turma)}` : ''}${e.turma && e.profileName ? ' · ' : ''}${e.profileName ? `Prof. ${_esc(e.profileName)}` : ''}${(e.turma || e.profileName) && e.institution ? ' · ' : ''}${_esc(e.institution || '')}
           </div>
           <div style="font-size:12px;color:#9ca3af;margin-top:2px">${new Date(e.createdAt).toLocaleDateString('pt-BR')}</div>
         </div>
@@ -245,7 +245,7 @@ export default function AvaliacoesPage() {
       ${e.feedback ? `
       <div>
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;margin-bottom:12px">Feedback</div>
-        <div style="background:#f9fafb;border-radius:12px;padding:20px 24px;font-size:14px;line-height:1.85;color:#374151;white-space:pre-wrap;border-left:3px solid #7c3aed">${e.feedback}</div>
+        <div style="background:#f9fafb;border-radius:12px;padding:20px 24px;font-size:14px;line-height:1.85;color:#374151;white-space:pre-wrap;border-left:3px solid #7c3aed">${_esc(e.feedback)}</div>
       </div>` : ''}
     </body></html>`;
 
@@ -290,8 +290,8 @@ export default function AvaliacoesPage() {
     const avgScore = evalsForPDF.length ? (evalsForPDF.reduce((s,e)=>s+e.score,0)/evalsForPDF.length).toFixed(1) : '—';
     const passing = evalsForPDF.filter(e=>e.score>=5).length;
     const turmas_ = [...new Set(evalsForPDF.map(e => e.turma).filter(Boolean))];
-    const turmaTitle = turmas_.length === 1 ? turmas_[0] : (turmaFilter || 'Turma');
-    const exerciseTitle = exerciseFilter ? ` · ${exerciseFilter}` : '';
+    const turmaTitle = _esc(turmas_.length === 1 ? turmas_[0] : (turmaFilter || 'Turma'));
+    const exerciseTitle = exerciseFilter ? ` · ${_esc(exerciseFilter)}` : '';
     const date = new Date().toLocaleDateString('pt-BR');
 
     // Build chart data from evaluations
@@ -312,13 +312,13 @@ export default function AvaliacoesPage() {
 
     const suggestionsHtml = (report.sugestoes || []).map((s, i) => `
       <div style="margin-bottom:16px;padding:16px 20px;background:#f9fafb;border-radius:10px;border-left:3px solid #0081f0">
-        <div style="font-size:13px;font-weight:700;color:#111;margin-bottom:4px">${i+1}. ${s.titulo}</div>
-        <div style="font-size:13px;color:#374151;margin-bottom:6px">${s.descricao}</div>
-        <div style="font-size:12px;color:#6b7280;font-style:italic">${s.impacto}</div>
+        <div style="font-size:13px;font-weight:700;color:#111;margin-bottom:4px">${i+1}. ${_esc(s.titulo)}</div>
+        <div style="font-size:13px;color:#374151;margin-bottom:6px">${_esc(s.descricao)}</div>
+        <div style="font-size:12px;color:#6b7280;font-style:italic">${_esc(s.impacto)}</div>
       </div>`).join('');
 
-    const strongItems = (report.pontosFortes || []).map(p => `<li style="margin-bottom:4px;color:#374151;font-size:13px">${p}</li>`).join('');
-    const weakItems = (report.pontosAtencao || []).map(p => `<li style="margin-bottom:4px;color:#374151;font-size:13px">${p}</li>`).join('');
+    const strongItems = (report.pontosFortes || []).map(p => `<li style="margin-bottom:4px;color:#374151;font-size:13px">${_esc(p)}</li>`).join('');
+    const weakItems = (report.pontosAtencao || []).map(p => `<li style="margin-bottom:4px;color:#374151;font-size:13px">${_esc(p)}</li>`).join('');
 
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
     <title>Relatório da Turma — ${turmaTitle}</title>
@@ -362,7 +362,7 @@ export default function AvaliacoesPage() {
 
       <div style="margin-bottom:28px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Resumo Geral</div>
-        <div style="font-size:14px;line-height:1.8;color:#374151">${report.resumo}</div>
+        <div style="font-size:14px;line-height:1.8;color:#374151">${_esc(report.resumo)}</div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px">
@@ -379,7 +379,7 @@ export default function AvaliacoesPage() {
       ${report.analiseDetalhada ? `
       <div style="margin-bottom:28px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Análise Detalhada</div>
-        <div style="font-size:14px;line-height:1.8;color:#374151">${report.analiseDetalhada}</div>
+        <div style="font-size:14px;line-height:1.8;color:#374151">${_esc(report.analiseDetalhada)}</div>
       </div>` : ''}
 
       ${report.sugestoes?.length ? `
@@ -401,10 +401,10 @@ export default function AvaliacoesPage() {
     const rows = evalsForQuick.map(e => {
       const c = e.score >= 7 ? '#16a34a' : e.score >= 5 ? '#ca8a04' : '#dc2626';
       return `<tr>
-        <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;font-weight:600;color:#111">${e.studentName}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#6b7280">${TYPES[e.type]?.label || e.type}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#6b7280">${e.exerciseName || '—'}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#6b7280">${e.turma || '—'}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;font-weight:600;color:#111">${_esc(e.studentName)}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#6b7280">${_esc(TYPES[e.type]?.label || e.type)}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#6b7280">${_esc(e.exerciseName || '—')}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#6b7280">${_esc(e.turma || '—')}</td>
         <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:14px;font-weight:800;color:${c}">${e.score.toFixed(1)}</td>
         <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6"><span style="background:${e.score>=7?'#dcfce7':e.score>=5?'#fef9c3':'#fee2e2'};color:${c};padding:2px 10px;border-radius:6px;font-size:12px;font-weight:700">${scoreToGrade(e.score)}</span></td>
         <td style="padding:10px 14px;border-bottom:1px solid #f3f4f6;font-size:12px;color:#9ca3af">${new Date(e.createdAt).toLocaleDateString('pt-BR')}</td>
@@ -419,7 +419,7 @@ export default function AvaliacoesPage() {
       <div style="border-bottom:2px solid #e5e7eb;padding-bottom:20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-end">
         <div>
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-weight:600;margin-bottom:6px">Registro de Avaliações</div>
-          <div style="font-size:24px;font-weight:800;color:#111">${turmaFilter || 'Todas as Turmas'}${exerciseFilter ? ` · ${exerciseFilter}` : ''}</div>
+          <div style="font-size:24px;font-weight:800;color:#111">${_esc(turmaFilter || 'Todas as Turmas')}${exerciseFilter ? ` · ${_esc(exerciseFilter)}` : ''}</div>
           <div style="font-size:13px;color:#9ca3af;margin-top:4px">Gerado em ${date}</div>
         </div>
         <div style="text-align:right">
@@ -483,23 +483,23 @@ export default function AvaliacoesPage() {
     const studentName = selectedStudents[0] || 'Aluno';
     const date = new Date().toLocaleDateString('pt-BR');
     const scoresOverTime = selectedEvals.slice().sort((a,b) => new Date(a.createdAt)-new Date(b.createdAt)).map(e =>
-      `${new Date(e.createdAt).toLocaleDateString('pt-BR')}: ${e.score.toFixed(1)}${e.exerciseName ? ` (${e.exerciseName})` : ''}`
+      `${new Date(e.createdAt).toLocaleDateString('pt-BR')}: ${e.score.toFixed(1)}${e.exerciseName ? ` (${_esc(e.exerciseName)})` : ''}`
     ).join('<br>');
 
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
-    <title>Parecer Individual — ${studentName}</title>
+    <title>Parecer Individual — ${_esc(studentName)}</title>
     <style>* { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 720px; margin: 0 auto; } @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }</style>
     </head><body>
       <div style="border-bottom:2px solid #e5e7eb;padding-bottom:24px;margin-bottom:32px">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-weight:600;margin-bottom:6px">Parecer Individual do Aluno</div>
-        <div style="font-size:26px;font-weight:800;color:#111">${studentName}</div>
+        <div style="font-size:26px;font-weight:800;color:#111">${_esc(studentName)}</div>
         <div style="font-size:13px;color:#9ca3af;margin-top:4px">Gerado em ${date} · ${selectedEvals.length} avaliação(ões) analisada(s)</div>
       </div>
       ${report.evolucao ? `<div style="margin-bottom:24px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Evolução das Notas</div><div style="font-size:13px;line-height:2;color:#374151">${scoresOverTime}</div></div>` : ''}
-      <div style="margin-bottom:24px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Resumo do Desempenho</div><div style="font-size:14px;line-height:1.8;color:#374151">${report.resumo}</div></div>
-      ${report.pontosFortes?.length ? `<div style="margin-bottom:20px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#16a34a;margin-bottom:8px">Pontos Fortes</div><ul style="padding-left:18px">${report.pontosFortes.map(p=>`<li style="font-size:13px;color:#374151;margin-bottom:4px">${p}</li>`).join('')}</ul></div>` : ''}
-      ${report.pontosDesenvolver?.length ? `<div style="margin-bottom:20px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#dc2626;margin-bottom:8px">A Desenvolver</div><ul style="padding-left:18px">${report.pontosDesenvolver.map(p=>`<li style="font-size:13px;color:#374151;margin-bottom:4px">${p}</li>`).join('')}</ul></div>` : ''}
-      ${report.parecer ? `<div style="margin-bottom:24px;padding:20px;background:#f9fafb;border-radius:10px;border-left:3px solid #0081f0"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Parecer Final</div><div style="font-size:14px;line-height:1.8;color:#374151">${report.parecer}</div></div>` : ''}
+      <div style="margin-bottom:24px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Resumo do Desempenho</div><div style="font-size:14px;line-height:1.8;color:#374151">${_esc(report.resumo)}</div></div>
+      ${report.pontosFortes?.length ? `<div style="margin-bottom:20px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#16a34a;margin-bottom:8px">Pontos Fortes</div><ul style="padding-left:18px">${report.pontosFortes.map(p=>`<li style="font-size:13px;color:#374151;margin-bottom:4px">${_esc(p)}</li>`).join('')}</ul></div>` : ''}
+      ${report.pontosDesenvolver?.length ? `<div style="margin-bottom:20px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#dc2626;margin-bottom:8px">A Desenvolver</div><ul style="padding-left:18px">${report.pontosDesenvolver.map(p=>`<li style="font-size:13px;color:#374151;margin-bottom:4px">${_esc(p)}</li>`).join('')}</ul></div>` : ''}
+      ${report.parecer ? `<div style="margin-bottom:24px;padding:20px;background:#f9fafb;border-radius:10px;border-left:3px solid #0081f0"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;margin-bottom:10px">Parecer Final</div><div style="font-size:14px;line-height:1.8;color:#374151">${_esc(report.parecer)}</div></div>` : ''}
     </body></html>`;
 
     const w = window.open('', '_blank');
