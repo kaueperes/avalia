@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import useAuthGuard from '../components/useAuthGuard';
 
 const faqs = [
   {
@@ -120,7 +119,6 @@ const steps = [
 
 export default function CentralDeAjuda() {
   const router = useRouter();
-  const ready = useAuthGuard();
   const [activecat, setActivecat] = useState(faqs[0].cat);
 
   const scrollToSection = (cat) => {
@@ -145,8 +143,6 @@ export default function CentralDeAjuda() {
     });
     return () => observers.forEach(o => o?.disconnect());
   }, []);
-
-  if (!ready) return null;
 
   return (
     <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: 'white', color: '#111827', minHeight: '100vh' }}>
