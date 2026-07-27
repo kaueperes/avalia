@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { TYPES, scoreToGrade, scoreColor } from '@/lib/types';
+import { TYPES, scoreToGrade, scoreColor, PLANS } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
 
@@ -25,6 +25,7 @@ function _histSVG(dist) {
 export default function AvaliacoesPage() {
   const router = useRouter();
   const [userName, setUserName] = useState('Professor');
+  const [userPlan, setUserPlan] = useState('gratuito');
   const [evaluations, setEvaluations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -62,7 +63,7 @@ export default function AvaliacoesPage() {
 
   useEffect(() => {
     if (!token()) { router.push('/login'); return; }
-    try { const u = JSON.parse(localStorage.getItem('user') || '{}'); if (u.name) setUserName(u.name); } catch {}
+    try { const u = JSON.parse(localStorage.getItem('user') || '{}'); if (u.name) setUserName(u.name); if (u.plan) setUserPlan(u.plan); } catch {}
     fetch('/api/evaluations', { headers: { Authorization: `Bearer ${token()}` } })
       .then(r => r.json())
       .then(data => {
@@ -167,6 +168,8 @@ export default function AvaliacoesPage() {
     a.download = `avaliacoes-${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
   }
+
+  const canExportCSV = PLANS[userPlan]?.features?.exportCSV ?? false;
 
   const scores = evaluations.map(e => e.score);
   const avg = scores.length ? (scores.reduce((a,b) => a+b,0)/scores.length).toFixed(1) : '—';
@@ -609,7 +612,7 @@ export default function AvaliacoesPage() {
             )}
           </div>
 
-          <button onClick={exportCSV} disabled={filtered.length === 0} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '9px 16px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, fontWeight: 500, cursor: filtered.length === 0 ? 'not-allowed' : 'pointer', background: 'var(--bg-card)', color: 'var(--text-main)', opacity: filtered.length === 0 ? 0.4 : 1 }}>
+          <button onClick={exportCSV} disabled={filtered.length === 0 || !canExportCSV} title={canExportCSV ? undefined : 'Disponível a partir do plano Essencial'} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '9px 16px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, fontWeight: 500, cursor: (filtered.length === 0 || !canExportCSV) ? 'not-allowed' : 'pointer', background: 'var(--bg-card)', color: 'var(--text-main)', opacity: (filtered.length === 0 || !canExportCSV) ? 0.4 : 1 }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Exportar CSV
           </button>

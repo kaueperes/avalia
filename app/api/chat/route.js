@@ -13,10 +13,28 @@ export async function POST(request) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada.' }, { status: 503 });
   }
 
-  const { data: dbUser } = await supabase.from('users').select('plan').eq('id', user.userId).single();
+  const { data: dbUser } = await supabase.from('users').select('plan, chatbot_msgs_used, chatbot_msgs_reset_date').eq('id', user.userId).single();
   const plan = PLANS[dbUser?.plan] || PLANS.gratuito;
   if (!plan.features.chatbot) {
     return NextResponse.json({ error: 'O assistente virtual não está disponível no seu plano. Faça upgrade para acessar.' }, { status: 402 });
+  }
+
+  // Reset mensal lazy: se a data de reset passou, zera o contador
+  const resetDate = dbUser.chatbot_msgs_reset_date ? new Date(dbUser.chatbot_msgs_reset_date) : null;
+  let msgsUsed = dbUser.chatbot_msgs_used ?? 0;
+  if (!resetDate || resetDate < new Date()) {
+    const nextReset = new Date();
+    nextReset.setMonth(nextReset.getMonth() + 1);
+    msgsUsed = 0;
+    await supabase.from('users').update({
+      chatbot_msgs_used: 0,
+      chatbot_msgs_reset_date: nextReset.toISOString(),
+    }).eq('id', user.userId);
+  }
+
+  const maxMsgs = plan.limits.chatbot;
+  if (maxMsgs != null && msgsUsed >= maxMsgs) {
+    return NextResponse.json({ error: `Você atingiu o limite de ${maxMsgs} mensagens do assistente este mês. Faça upgrade para continuar ou aguarde a renovação do ciclo.` }, { status: 402 });
   }
 
   const { messages, botName: clientBotName } = await request.json();
@@ -49,6 +67,9 @@ export async function POST(request) {
     });
 
     const text = response.content[0]?.text || '';
+
+    await supabase.from('users').update({ chatbot_msgs_used: msgsUsed + 1 }).eq('id', user.userId);
+
     return NextResponse.json({ reply: text });
   } catch (err) {
     console.error('chat error:', err);
