@@ -105,6 +105,7 @@ export default function RelatoriosPage() {
   const [userPlan, setUserPlan] = useState('gratuito');
   const [reports, setReports] = useState([]);
   const [profiles, setProfiles] = useState([]);
+  const [institutionObjects, setInstitutionObjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState('');
   const [turmaFilter, setTurmaFilter] = useState('');
@@ -129,6 +130,8 @@ export default function RelatoriosPage() {
       .catch(() => setLoading(false));
     fetch('/api/profiles', { headers: { Authorization: `Bearer ${token()}` } })
       .then(r => r.json()).then(data => setProfiles(Array.isArray(data) ? data : [])).catch(() => {});
+    fetch('/api/institutions', { headers: { Authorization: `Bearer ${token()}` } })
+      .then(r => r.json()).then(data => setInstitutionObjects(Array.isArray(data) ? data : [])).catch(() => {});
   }, [router]);
 
   const canUseReports = ['pro', 'premium'].includes(userPlan);
@@ -188,7 +191,8 @@ export default function RelatoriosPage() {
   // ── PDF helpers ─────────────────────────────────────────────────────────────
   function getLogoMarkup(profileName, institution) {
     const profile = profiles.find(p => p.name === profileName) || {};
-    const logo = profile.institutionLogo || '';
+    const institutionObj = institutionObjects.find(i => i.name === institution);
+    const logo = institutionObj?.logoUrl || profile.institutionLogo || '';
     if (logo) return `<img src="${logo}" style="max-height:52px;max-width:160px;object-fit:contain" />`;
     if (institution) return `<span style="font-size:18px;font-weight:800;color:#0f172a">${esc(institution)}</span>`;
     return '';
