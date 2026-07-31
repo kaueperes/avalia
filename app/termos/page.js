@@ -42,7 +42,7 @@ export default function Termos() {
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
           <p style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 16 }}>Legal</p>
           <h1 style={{ fontSize: 52, fontWeight: 800, color: 'white', lineHeight: 1.1, letterSpacing: '-1.5px', marginBottom: 20 }}>Termos de Uso</h1>
-          <p style={{ fontSize: 15, color: '#64748B' }}>Última atualização: março de 2025</p>
+          <p style={{ fontSize: 15, color: '#64748B' }}>Última atualização: julho de 2026</p>
         </div>
       </section>
 
@@ -90,34 +90,47 @@ export default function Termos() {
             <P><strong>Mudança de plano:</strong> upgrades têm efeito imediato; downgrades têm efeito no próximo ciclo de cobrança.</P>
           </Section>
 
-          <Section title="5. Cotas de avaliação">
-            <P>Cada plano possui um número máximo de avaliações por ciclo mensal. As cotas são renovadas automaticamente a cada período de cobrança. Avaliações extras adquiridas separadamente não expiram e são consumidas após o esgotamento da cota do plano.</P>
+          <Section title="5. Cotas de uso">
+            <P>Cada plano possui limites de uso mensal, renovados automaticamente a cada ciclo de cobrança:</P>
+            <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+              <Li>• <strong>Avaliações</strong> (Básica e Avançada): cota do ciclo definida pelo plano; avaliações extras compradas avulsamente não expiram e só são consumidas após o esgotamento da cota do ciclo</Li>
+              <Li>• <strong>Relatórios de turma e de aluno</strong> (planos Pro e Premium): mesma lógica — cota do ciclo primeiro, depois relatórios extras avulsos, que também não expiram</Li>
+              <Li>• <strong>Gerador de Provas:</strong> cota fixa de 10 gerações por mês, igual para todos os planos pagos (não disponível no plano Gratuito)</Li>
+              <Li>• <strong>Modo Teste:</strong> cota fixa de 10 testes por mês, disponível em todos os planos, inclusive o Gratuito</Li>
+              <Li>• <strong>Chatbot:</strong> limite de mensagens por mês conforme o plano</Li>
+            </ul>
+            <P>Cotas do ciclo não utilizadas não acumulam para o mês seguinte, exceto quando adquiridas como avaliações ou relatórios extras avulsos.</P>
           </Section>
 
-          <Section title="6. Propriedade intelectual">
+          <Section title="6. Organizações institucionais">
+            <P>No plano institucional, o coordenador ou administrador da organização tem acesso ao painel da instituição, à lista de professores vinculados e às avaliações realizadas por todos os professores da equipe — incluindo nome de aluno, nota e feedback gerado.</P>
+            <P>Ao aceitar o convite para ingressar em uma organização, o professor concorda com essa visibilidade por parte do administrador. A cota de avaliações da organização é compartilhada entre os professores vinculados, podendo o administrador definir um limite individual de uso para cada um.</P>
+          </Section>
+
+          <Section title="7. Propriedade intelectual">
             <P>O Kriteria e todo o seu conteúdo (código, design, textos, marca) são propriedade de seus criadores e protegidos por leis de propriedade intelectual.</P>
             <P>O conteúdo que você cria na plataforma (exercícios, perfis, avaliações) permanece de sua propriedade. Você nos concede licença para processar esse conteúdo com o único objetivo de fornecer o serviço.</P>
           </Section>
 
-          <Section title="7. Disponibilidade do serviço">
+          <Section title="8. Disponibilidade do serviço">
             <P>Buscamos manter o Kriteria disponível 24/7, mas não garantimos disponibilidade ininterrupta. Manutenções programadas serão comunicadas com antecedência quando possível.</P>
             <P>Não nos responsabilizamos por perdas decorrentes de indisponibilidade temporária do serviço.</P>
           </Section>
 
-          <Section title="8. Limitação de responsabilidade">
+          <Section title="9. Limitação de responsabilidade">
             <P>O Kriteria é uma ferramenta de apoio pedagógico. Os feedbacks e notas gerados pela IA são sugestões e não substituem o julgamento profissional do professor.</P>
             <P>Não nos responsabilizamos por decisões pedagógicas tomadas com base exclusivamente nos resultados gerados pela plataforma.</P>
           </Section>
 
-          <Section title="9. Encerramento de conta">
+          <Section title="10. Encerramento de conta">
             <P>Podemos suspender ou encerrar contas que violem estes termos. Você pode solicitar a exclusão da sua conta a qualquer momento pelo e-mail <a href="mailto:contato@kriteria.education" style={{ color: '#0081f0' }}>contato@kriteria.education</a>.</P>
           </Section>
 
-          <Section title="10. Alterações nos termos">
+          <Section title="11. Alterações nos termos">
             <P>Podemos atualizar estes termos. Em caso de mudanças relevantes, notificaremos por e-mail com pelo menos 15 dias de antecedência. O uso continuado após a vigência das alterações implica aceitação.</P>
           </Section>
 
-          <Section title="11. Lei aplicável">
+          <Section title="12. Lei aplicável">
             <P>Estes termos são regidos pelas leis brasileiras. Eventuais disputas serão resolvidas no foro da comarca de São Paulo, SP.</P>
           </Section>
 
@@ -134,7 +147,7 @@ export default function Termos() {
         <div style={{ cursor: 'pointer', display: 'inline-block', marginBottom: 12 }} onClick={() => router.push('/')}>
           <img src="/imagens/logo_kriteria.svg" alt="Kriteria" style={{ height: 28, width: 'auto', filter: 'brightness(0) invert(1)' }} />
         </div>
-        <p style={{ fontSize: 13, color: '#4B5563' }}>© 2025 Kriteria · Todos os direitos reservados</p>
+        <p style={{ fontSize: 13, color: '#4B5563' }}>© 2026 Kriteria · Todos os direitos reservados</p>
       </footer>
 
     </div>
