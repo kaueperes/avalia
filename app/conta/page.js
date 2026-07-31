@@ -214,26 +214,51 @@ function ContaPageInner() {
 
   async function saveInfo() {
     if (!name.trim()) return showMsg(setInfoMsg, 'error', 'O nome não pode estar vazio.');
+    const token = localStorage.getItem('token');
+    if (!token) return;
     setInfoLoading(true);
-    await new Promise(r => setTimeout(r, 600)); // placeholder — connect to API when ready
-    const stored = JSON.parse(localStorage.getItem('user') || '{}');
-    const updated = { ...stored, name: name.trim(), email: email.trim() };
-    localStorage.setItem('user', JSON.stringify(updated));
-    setUserName(name.trim());
-    setUserEmail(email.trim());
-    setInfoLoading(false);
-    showMsg(setInfoMsg, 'success', 'Informações atualizadas com sucesso.');
+    try {
+      const res = await fetch('/api/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) { showMsg(setInfoMsg, 'error', data.error || 'Erro ao salvar informações.'); return; }
+      const stored = JSON.parse(localStorage.getItem('user') || '{}');
+      localStorage.setItem('user', JSON.stringify({ ...stored, name: data.user.name, email: data.user.email }));
+      setUserName(data.user.name);
+      setUserEmail(data.user.email);
+      showMsg(setInfoMsg, 'success', 'Informações atualizadas com sucesso.');
+    } catch {
+      showMsg(setInfoMsg, 'error', 'Erro de conexão.');
+    } finally {
+      setInfoLoading(false);
+    }
   }
 
   async function savePassword() {
     if (!currentPw || !newPw || !confirmPw) return showMsg(setPwMsg, 'error', 'Preencha todos os campos.');
     if (newPw.length < 6) return showMsg(setPwMsg, 'error', 'A nova senha deve ter ao menos 6 caracteres.');
     if (newPw !== confirmPw) return showMsg(setPwMsg, 'error', 'As senhas não coincidem.');
+    const token = localStorage.getItem('token');
+    if (!token) return;
     setPwLoading(true);
-    await new Promise(r => setTimeout(r, 600)); // placeholder — connect to API when ready
-    setPwLoading(false);
-    setCurrentPw(''); setNewPw(''); setConfirmPw('');
-    showMsg(setPwMsg, 'success', 'Senha alterada com sucesso.');
+    try {
+      const res = await fetch('/api/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ currentPassword: currentPw, newPassword: newPw }),
+      });
+      const data = await res.json();
+      if (!res.ok) { showMsg(setPwMsg, 'error', data.error || 'Erro ao alterar senha.'); return; }
+      setCurrentPw(''); setNewPw(''); setConfirmPw('');
+      showMsg(setPwMsg, 'success', 'Senha alterada com sucesso.');
+    } catch {
+      showMsg(setPwMsg, 'error', 'Erro de conexão.');
+    } finally {
+      setPwLoading(false);
+    }
   }
 
   const planLabel = PLANS.find(p => p.id === userPlan)?.label || 'Gratuito';
