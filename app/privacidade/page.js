@@ -42,7 +42,7 @@ export default function Privacidade() {
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
           <p style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 16 }}>Legal</p>
           <h1 style={{ fontSize: 52, fontWeight: 800, color: 'white', lineHeight: 1.1, letterSpacing: '-1.5px', marginBottom: 20 }}>Política de Privacidade</h1>
-          <p style={{ fontSize: 15, color: '#64748B' }}>Última atualização: março de 2025</p>
+          <p style={{ fontSize: 15, color: '#64748B' }}>Última atualização: julho de 2026</p>
         </div>
       </section>
 
@@ -66,15 +66,15 @@ export default function Privacidade() {
             <P>Coletamos apenas os dados necessários para o funcionamento da plataforma:</P>
             <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
               <Li>• <strong>Dados de cadastro:</strong> nome, e-mail e senha (armazenada de forma criptografada)</Li>
-              <Li>• <strong>Dados de uso:</strong> exercícios criados, avaliações realizadas, perfis configurados</Li>
+              <Li>• <strong>Dados de uso:</strong> exercícios criados, avaliações realizadas, perfis configurados, turmas e nomes de alunos cadastrados pelo professor</Li>
               <Li>• <strong>Dados de pagamento:</strong> processados exclusivamente pelo Stripe — não armazenamos dados de cartão</Li>
             </ul>
           </Section>
 
           <Section title="3. Dados dos alunos">
-            <P>Os textos enviados para avaliação são transmitidos à API da Anthropic (Claude) para processamento e <strong>não são armazenados em nossos servidores</strong> após o processamento.</P>
-            <P>O Kriteria não coleta nomes completos, documentos, dados biométricos ou qualquer dado sensível de alunos. Os resultados das avaliações (notas e feedbacks) são salvos associados apenas ao professor responsável.</P>
-            <P>Recomendamos que professores não incluam dados pessoais identificáveis de alunos nos textos enviados para avaliação.</P>
+            <P>Os trabalhos enviados para avaliação (textos, imagens, vídeos, áudios e PDFs) são processados majoritariamente pelo Google (Gemini) e, em caso de indisponibilidade, pela Anthropic (Claude). Arquivos como fotos, vídeos e áudios passam de forma temporária pelo nosso armazenamento (Supabase) antes de serem enviados para o provedor de IA, e são removidos do nosso storage logo após esse envio. A retenção desses arquivos pelos provedores de IA segue a política própria de cada um (Google e Anthropic).</P>
+            <P>O professor pode cadastrar o nome de alunos ao criar turmas, para organizar avaliações e gerar relatórios de turma e individuais. Esses nomes ficam associados apenas à conta do professor responsável e às avaliações realizadas — não são usados para nenhuma outra finalidade, nem compartilhados fora da plataforma.</P>
+            <P>Recomendamos que professores não incluam documentos, dados biométricos ou outras informações sensíveis de alunos nos textos e arquivos enviados para avaliação — apenas o material do trabalho em si.</P>
           </Section>
 
           <Section title="4. Como usamos seus dados">
@@ -89,9 +89,11 @@ export default function Privacidade() {
           <Section title="5. Compartilhamento de dados">
             <P>Não vendemos seus dados. Compartilhamos informações apenas com:</P>
             <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-              <Li>• <strong>Anthropic:</strong> para processamento dos textos via API (sujeito à política de privacidade da Anthropic)</Li>
+              <Li>• <strong>Google (Gemini):</strong> processamento principal dos trabalhos enviados para avaliação — textos, imagens, vídeos e áudios (sujeito à política de privacidade do Google)</Li>
+              <Li>• <strong>Anthropic:</strong> processamento alternativo, usado quando o Google está indisponível (sujeito à política de privacidade da Anthropic)</Li>
               <Li>• <strong>Stripe:</strong> para processamento de pagamentos</Li>
-              <Li>• <strong>Supabase:</strong> para armazenamento seguro dos dados</Li>
+              <Li>• <strong>Supabase:</strong> para armazenamento seguro dos dados e trânsito temporário de arquivos antes do envio para os provedores de IA</Li>
+              <Li>• <strong>Resend:</strong> para envio de e-mails transacionais (cadastro, redefinição de senha, convites de organização)</Li>
             </ul>
           </Section>
 
@@ -126,7 +128,7 @@ export default function Privacidade() {
         <div style={{ cursor: 'pointer', display: 'inline-block', marginBottom: 12 }} onClick={() => router.push('/')}>
           <img src="/imagens/logo_kriteria.svg" alt="Kriteria" style={{ height: 28, width: 'auto', filter: 'brightness(0) invert(1)' }} />
         </div>
-        <p style={{ fontSize: 13, color: '#4B5563' }}>© 2025 Kriteria · Todos os direitos reservados</p>
+        <p style={{ fontSize: 13, color: '#4B5563' }}>© 2026 Kriteria · Todos os direitos reservados</p>
       </footer>
 
     </div>
