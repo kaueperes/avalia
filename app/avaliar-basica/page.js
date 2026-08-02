@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import AppLayout from '../components/AppLayout';
+import { VideoTutorialLink } from '../components/VideoTutorial';
 import mammoth from 'mammoth';
 
 // ── Extração de texto local: .docx (mammoth), .doc/.txt (leitura direta) ─────
@@ -298,6 +299,7 @@ export default function AvaliarBasica() {
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 0 }}>
           Correção rápida por foto ou texto — sem cadastro de aluno, sem PDF. Ideal para provas de matemática, português e outras questões objetivas.
         </p>
+        <VideoTutorialLink slug="avaliar-basica" />
       </div>
 
       <div style={{ maxWidth: 680 }}>

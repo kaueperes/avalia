@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { TONES, scoreToGrade, scoreColor } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
+import { VideoTutorialLink } from '../components/VideoTutorial';
 import mammoth from 'mammoth';
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
@@ -646,6 +647,7 @@ export default function AvaliarV2() {
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 0 }}>
           Selecione o exercício, adicione os trabalhos e gere as avaliações.
         </p>
+        <VideoTutorialLink slug="avaliar-avancado" />
       </div>
 
       <div style={{ maxWidth: 680 }}>

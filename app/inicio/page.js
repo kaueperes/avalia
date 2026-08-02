@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '../components/AppLayout';
+import { VideoTutorialLink } from '../components/VideoTutorial';
 
 // ── Palette for dynamic turma colors ─────────────────────────────────────────
 const PALETTE = [
@@ -292,6 +293,7 @@ export default function InicioPage() {
           <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
             {greeting()}, {firstName} 👋
           </h1>
+          <VideoTutorialLink slug="inicio" />
         </div>
         <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '48px', textAlign: 'center' }}>
           <p style={{ fontSize: 36, marginBottom: 12 }}>🎯</p>
@@ -322,6 +324,7 @@ export default function InicioPage() {
             </span>
           )}
         </p>
+        <VideoTutorialLink slug="inicio" />
       </div>
 
       {/* ── KPIs ── */}

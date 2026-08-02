@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
+import { VideoTutorialLink } from '../components/VideoTutorial';
 
 const TEACHING_LEVELS = [
   { value: 'fundamental', label: 'Fundamental' },
@@ -91,6 +92,7 @@ export default function InstituicaoPage() {
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Cadastro</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Cadastro de Instituição</h1>
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Cadastre sua escola ou faculdade para vincular turmas e gerar relatórios com identidade visual.</p>
+        <VideoTutorialLink slug="instituicao" />
       </div>
 
       {msg.text && (

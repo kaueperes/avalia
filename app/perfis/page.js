@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { TONES } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
+import { VideoTutorialLink } from '../components/VideoTutorial';
 
 const BLANK = { name: '', tone: 'neutro', writingSample: '', isDefault: false };
 
@@ -94,6 +95,7 @@ export default function PerfisPage() {
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Cadastro</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Perfil do Professor</h1>
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Configure seu nome, tom de feedback e amostra de escrita. O perfil padrão é usado automaticamente nas avaliações.</p>
+        <VideoTutorialLink slug="perfis" />
       </div>
 
       {msg.text && (

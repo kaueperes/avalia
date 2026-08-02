@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { TYPES, scoreToGrade, scoreColor, PLANS } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
+import { VideoTutorialLink } from '../components/VideoTutorial';
 
 // ── Chart helpers ─────────────────────────────────────────────────────────────
 function _esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -525,6 +526,7 @@ export default function AvaliacoesPage() {
           <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Histórico</p>
           <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Gerenciar Avaliações</h1>
           <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Consulte, filtre e exporte o histórico completo de avaliações.</p>
+          <VideoTutorialLink slug="avaliacoes" />
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           {/* Dropdown Gerar Relatório */}

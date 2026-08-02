@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { TYPES, scoreColor, scoreToGrade } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
+import { VideoTutorialLink } from '../components/VideoTutorial';
 import mammoth from 'mammoth';
 
 const inputStyle = {
@@ -433,6 +434,7 @@ export default function DisciplinasPage() {
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Cadastro</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Cadastro de Disciplinas/Exercícios</h1>
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Cadastre suas disciplinas e adicione exercícios com critérios personalizados dentro de cada uma.</p>
+        <VideoTutorialLink slug="disciplinas" />
       </div>
 
       {msg.text && (

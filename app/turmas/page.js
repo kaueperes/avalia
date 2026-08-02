@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
+import { VideoTutorialLink } from '../components/VideoTutorial';
 
 const inputStyle = {
   width: '100%', padding: '10px 12px',
@@ -185,6 +186,7 @@ export default function TurmasPage() {
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Cadastro</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Cadastro de Turmas</h1>
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 4 }}>Cadastre suas turmas e adicione os alunos para gerar relatórios individuais e de turma.</p>
+        <VideoTutorialLink slug="turmas" />
       </div>
 
       {msg.text && (

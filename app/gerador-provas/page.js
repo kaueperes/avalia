@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import AppLayout from '../components/AppLayout';
+import { VideoTutorialLink } from '../components/VideoTutorial';
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
@@ -106,6 +107,7 @@ export default function GeradorProvas() {
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 0 }}>
           Descreva a prova e copie o texto gerado para usar onde precisar.
         </p>
+        <VideoTutorialLink slug="gerador-provas" />
       </div>
 
       <div style={{ maxWidth: 680 }}>

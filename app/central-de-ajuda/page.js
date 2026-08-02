@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { VideoTutorialCard } from '../components/VideoTutorial';
+import { TUTORIALS_ORDER } from '@/lib/tutorials';
 
 const faqs = [
   {
@@ -206,8 +208,29 @@ export default function CentralDeAjuda() {
         </div>
       </section>
 
+      {/* Vídeos tutoriais */}
+      <section style={{ padding: '80px 32px', background: 'white' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 12 }}>Playlist</p>
+            <h2 style={{ fontSize: 34, fontWeight: 800, color: '#00173f', letterSpacing: '-0.5px', marginBottom: 12 }}>Vídeos tutoriais</h2>
+            <p style={{ fontSize: 15, color: '#6B7280', maxWidth: 480, margin: '0 auto', lineHeight: 1.65 }}>Um passo a passo em vídeo pra cada parte do Kriteria, na ordem que você vai usar na prática.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
+            {TUTORIALS_ORDER.map((slug, i) => (
+              <div key={slug} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#C7CEDB', marginTop: 14, minWidth: 18, textAlign: 'right' }}>{String(i + 1).padStart(2, '0')}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <VideoTutorialCard slug={slug} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
-      <section style={{ padding: '80px 32px 96px', background: 'white' }}>
+      <section style={{ padding: '80px 32px 96px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 12 }}>FAQ</p>
@@ -239,7 +262,7 @@ export default function CentralDeAjuda() {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '64px 32px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6', textAlign: 'center' }}>
+      <section style={{ padding: '64px 32px', background: 'white', borderTop: '1px solid #F3F4F6', textAlign: 'center' }}>
         <div style={{ maxWidth: 520, margin: '0 auto' }}>
           <h2 style={{ fontSize: 28, fontWeight: 800, color: '#00173f', marginBottom: 12 }}>Ainda com dúvidas?</h2>
           <p style={{ fontSize: 15, color: '#6B7280', marginBottom: 28, lineHeight: 1.65 }}>Nossa equipe responde em até 24 horas úteis.</p>
