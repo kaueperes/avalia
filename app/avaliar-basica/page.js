@@ -246,6 +246,14 @@ export default function AvaliarBasica() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Erro ao corrigir');
         updateSlot(slot.id, { result: data, evaluating: false });
+
+        try {
+          const u = JSON.parse(localStorage.getItem('user') || '{}');
+          if (typeof u.quota_ciclo === 'number' && u.quota_ciclo > 0) u.quota_ciclo -= 1;
+          else if (typeof u.quota_extra === 'number' && u.quota_extra > 0) u.quota_extra -= 1;
+          localStorage.setItem('user', JSON.stringify(u));
+          window.dispatchEvent(new Event('storage'));
+        } catch {}
       } catch (e) {
         updateSlot(slot.id, { error: e.message || 'Erro ao corrigir', evaluating: false });
       }
