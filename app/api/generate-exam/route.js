@@ -120,7 +120,8 @@ Responda APENAS com o texto da prova (e gabarito, se solicitado), sem comentári
         break;
       } catch (err) {
         const isCascadable = err?.message?.includes('503') || err?.message?.includes('UNAVAILABLE')
-          || err?.message?.includes('404') || err?.message?.includes('NOT_FOUND');
+          || err?.message?.includes('404') || err?.message?.includes('NOT_FOUND')
+          || err?.message?.includes('429') || err?.message?.includes('RESOURCE_EXHAUSTED');
         if (!isCascadable) { lastGeminiErr = err; break; }
         lastGeminiErr = err;
       }

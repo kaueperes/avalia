@@ -275,7 +275,8 @@ Este trabalho é visual. Ao escrever o feedback, referencie elementos visuais co
             break;
           } catch (err) {
             const isCascadable = err?.message?.includes('503') || err?.message?.includes('UNAVAILABLE')
-              || err?.message?.includes('404') || err?.message?.includes('NOT_FOUND');
+              || err?.message?.includes('404') || err?.message?.includes('NOT_FOUND')
+              || err?.message?.includes('429') || err?.message?.includes('RESOURCE_EXHAUSTED');
             if (!isCascadable) throw err;
             modelErr = err;
             if (attempt < 2) await new Promise(r => setTimeout(r, 3000));
