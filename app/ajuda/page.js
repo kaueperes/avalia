@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import AppLayout from '../components/AppLayout';
+import { VideoTutorialCard } from '../components/VideoTutorial';
+import { TUTORIALS_ORDER } from '@/lib/tutorials';
 
 const faqs = [
   {
@@ -101,6 +103,13 @@ export default function AjudaPage() {
               <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>{s.desc}</p>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 48 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)', marginBottom: 20 }}>Vídeos tutoriais</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
+          {TUTORIALS_ORDER.map(slug => <VideoTutorialCard key={slug} slug={slug} />)}
         </div>
       </div>
 
