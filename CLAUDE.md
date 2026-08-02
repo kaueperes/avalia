@@ -96,9 +96,9 @@ Cada avaliação gerada (Avançada ou Básica) consome 1 cota, independente da I
 | Plano | Preço | Avaliações | Relatórios | Chatbot | Gerador de Provas |
 |---|---|---|---|---|---|
 | Gratuito | R$ 0 | 5/mês | — | — | — |
-| Essencial | R$ 29 | 120/mês | — | 50 msg | 10/mês |
-| Pro | R$ 59 | 180/mês | 10/mês | 150 msg | 10/mês |
-| Premium | R$ 119 | 240/mês | 30/mês | 300 msg | 10/mês |
+| Essencial | R$ 29 | 300/mês | — | 50 msg | 10/mês |
+| Pro | R$ 59 | 450/mês | 10/mês | 150 msg | 10/mês |
+| Premium | R$ 119 | 600/mês | 30/mês | 300 msg | 10/mês |
 
 A **Nova Avaliação Básica** não tem cota própria — usa a mesma cota de avaliações do plano (`quota_ciclo`/`quota_extra`), disponível inclusive no Gratuito.
 
@@ -288,7 +288,5 @@ Todas têm o mesmo navbar com 5 links: Funcionalidades · Tipos de Trabalho · P
 
 ## Pendências (retomar na próxima sessão)
 
-- **Nova cota de avaliações decidida e validada, falta só aplicar no código:** conversa com a irmã do Kaué (professora) confirmou 300 avaliações/mês como número ideal pro Essencial. Estudo de custo/margem validou que é sustentável com os modelos econômicos atuais (Gemini Flash/Claude Haiku-Sonnet) — margem fica entre 19% e 83% mesmo no pior cenário de custo de IA. Capacidade também confirmada nos consoles: Gemini em Tier 1 (1.000 RPM/1M TPM), Anthropic no tier Scale (10.000 RPM/10M TPM) — folga de sobra pra 100-200 professores simultâneos. Cotas propostas, mantendo a proporção atual (1:1,5:2): Essencial 120→300, Pro 180→450, Premium 240→600. Ainda não aplicado em `lib/types.js` → `PLANS`.
-- **Se um dia migrar pro topo de linha (Gemini Pro/Claude Opus) nas correções:** estudo à parte mostrou que isso NÃO fecha a conta pros planos Essencial e Pro nos preços/cotas atuais — margem vira negativa no pior cenário. Só o Premium aguenta. Se avançar nessa direção, precisa ser diferencial pago (add-on ou exclusivo do Premium), não trocar todo mundo de uma vez.
-- **Lacuna de resiliência ainda não corrigida:** a cascata de retry em `evaluate/route.js` e `evaluate-basica/route.js` só trata erro 503/404 do Gemini, não 429 (rate limit excedido) — deveria cascatear pro `gemini-2.5-flash-lite` (4x mais margem de RPM/TPM) em vez de pular direto pro Claude. Baixa urgência hoje (capacidade confirmada com folga), mas vale corrigir como seguro barato antes de escalar uso.
+- **Se um dia migrar pro topo de linha (Gemini Pro/Claude Opus) nas correções:** estudo mostrou que isso NÃO fecha a conta pros planos Essencial e Pro nos preços/cotas atuais — margem vira negativa no pior cenário. Só o Premium aguenta. Se avançar nessa direção, precisa ser diferencial pago (add-on ou exclusivo do Premium), não trocar todo mundo de uma vez.
 - **Duas badges "IA"** ainda aparecem em `app/avaliacoes/page.js` (nos botões de gerar "Relatório de Turma" e "Parecer Individual do Aluno") — não foram removidas ainda, só as da home e do metadata. Achado durante o pente-fino, não corrigido por estar fora do escopo pedido no momento
