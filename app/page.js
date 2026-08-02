@@ -765,7 +765,7 @@ export default function Home() {
                     Assinar Essencial
                   </button>
                   <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['120 avaliações/mês', '4 perfis de avaliação', 'Exercícios ilimitados', 'Avaliação Individual e em Lote', 'Histórico de avaliações', 'PDF de avaliação', 'Exportação CSV', 'Gerador de Provas (10/mês)', 'Chatbot (50 msg)'].map(item => (
+                    {['300 avaliações/mês', '4 perfis de avaliação', 'Exercícios ilimitados', 'Avaliação Individual e em Lote', 'Histórico de avaliações', 'PDF de avaliação', 'Exportação CSV', 'Gerador de Provas (10/mês)', 'Chatbot (50 msg)'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
                         <CheckMark color="#66b3ff" /> {item}
                       </div>
@@ -785,7 +785,7 @@ export default function Home() {
                     Assinar Pro
                   </button>
                   <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['180 avaliações/mês', '6 perfis de avaliação', 'Exercícios ilimitados', 'Avaliação Individual e em Lote', 'Histórico de avaliações', 'PDF de avaliação', 'Exportação CSV', 'Relatórios avançados (10/mês)', 'Gerenciamento de relatórios', 'PDF de relatórios', 'Gerador de Provas (10/mês)', 'Chatbot (150 msg)'].map(item => (
+                    {['450 avaliações/mês', '6 perfis de avaliação', 'Exercícios ilimitados', 'Avaliação Individual e em Lote', 'Histórico de avaliações', 'PDF de avaliação', 'Exportação CSV', 'Relatórios avançados (10/mês)', 'Gerenciamento de relatórios', 'PDF de relatórios', 'Gerador de Provas (10/mês)', 'Chatbot (150 msg)'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                         <CheckMark /> {item}
                       </div>
@@ -805,7 +805,7 @@ export default function Home() {
                     Assinar Premium
                   </button>
                   <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {['240 avaliações/mês', '10 perfis de avaliação', 'Exercícios ilimitados', 'Avaliação Individual e em Lote', 'Histórico de avaliações', 'PDF de avaliação', 'Exportação CSV', 'Relatórios avançados (30/mês)', 'Gerenciamento de relatórios', 'PDF de relatórios', 'Gerador de Provas (10/mês)', 'Chatbot (300 msg)', 'Suporte prioritário'].map(item => (
+                    {['600 avaliações/mês', '10 perfis de avaliação', 'Exercícios ilimitados', 'Avaliação Individual e em Lote', 'Histórico de avaliações', 'PDF de avaliação', 'Exportação CSV', 'Relatórios avançados (30/mês)', 'Gerenciamento de relatórios', 'PDF de relatórios', 'Gerador de Provas (10/mês)', 'Chatbot (300 msg)', 'Suporte prioritário'].map(item => (
                       <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#374151' }}>
                         <CheckMark color="#d97706" /> {item}
                       </div>
