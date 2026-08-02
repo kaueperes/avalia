@@ -435,6 +435,7 @@ export default function AvaliarV2() {
 
   const [refFiles, setRefFiles] = useState([]);
   const [refFileNames, setRefFileNames] = useState([]);
+  const [refTextContent, setRefTextContent] = useState('');
   const [refWeight, setRefWeight] = useState('livre');
   const [refProcessing, setRefProcessing] = useState(false);
   const refInputRef = useRef(null);
@@ -445,16 +446,27 @@ export default function AvaliarV2() {
 
   async function handleRefFiles(selectedFiles) {
     setRefProcessing(true);
-    const fileUris = [], names = [];
+    const fileUris = [], names = [], textParts = [];
     for (const file of Array.from(selectedFiles)) {
+      const n = file.name.toLowerCase(); const t = file.type;
+      const isText = t === 'text/plain' || n.endsWith('.txt')
+        || t.includes('wordprocessingml') || n.endsWith('.docx') || n.endsWith('.doc')
+        || n.endsWith('.obj');
       try {
-        const result = await uploadFileToGemini(file, `Referência para Correção: ${file.name}`);
-        names.push(file.name);
-        fileUris.push(result);
+        if (isText) {
+          const r = await processAnyFile(file);
+          names.push(file.name);
+          if (r.kind === 'text') textParts.push(r.content);
+        } else {
+          const result = await uploadFileToGemini(file, `Referência para Correção: ${file.name}`);
+          names.push(file.name);
+          fileUris.push(result);
+        }
       } catch (e) { console.error('handleRefFiles error:', e.message); }
     }
-    setRefFiles(fileUris);
-    setRefFileNames(names);
+    setRefFiles(prev => [...prev, ...fileUris]);
+    setRefFileNames(prev => [...prev, ...names]);
+    if (textParts.length) setRefTextContent(prev => [prev, ...textParts].filter(Boolean).join('\n\n'));
     setRefProcessing(false);
   }
 
@@ -557,7 +569,8 @@ export default function AvaliarV2() {
             writingSample: profile?.writingSample || undefined,
             fileUris: (slot.fileUris?.length > 0 || refFiles.length > 0) ? [...(slot.fileUris || []), ...refFiles] : undefined,
             linkUrl: slot.linkUrl || undefined,
-            referenceWeight: refFiles.length > 0 ? refWeight : undefined,
+            referenceText: refTextContent || undefined,
+            referenceWeight: (refFiles.length > 0 || refTextContent) ? refWeight : undefined,
           }),
         });
         let evalData;
@@ -605,7 +618,7 @@ export default function AvaliarV2() {
     setStep(1); setExerciseName(''); setExerciseContext(''); setCriteria([]);
     setSelectedExerciseId(''); setSelectedDisciplineId(''); setDisciplineExercises([]);
     setSelectedClassId(''); setStudents([]); setSlots([newSlot()]); setShowResults(false);
-    setRefFiles([]); setRefFileNames([]); setRefWeight('livre');
+    setRefFiles([]); setRefFileNames([]); setRefTextContent(''); setRefWeight('livre');
   }
 
   const canGoToStep2 = !!selectedExerciseId;
@@ -789,17 +802,17 @@ export default function AvaliarV2() {
                 onClick={() => !refProcessing && refInputRef.current?.click()}
                 onDragOver={e => e.preventDefault()}
                 onDrop={e => { e.preventDefault(); handleRefFiles(e.dataTransfer.files); }}
-                style={{ border: `1.5px dashed ${refFiles.length > 0 ? '#810cfa' : 'var(--border)'}`, borderRadius: 10, padding: refFiles.length > 0 ? '10px 14px' : '16px', cursor: refProcessing ? 'wait' : 'pointer', background: refFiles.length > 0 ? 'var(--bg-card)' : 'transparent' }}>
+                style={{ border: `1.5px dashed ${refFileNames.length > 0 ? '#810cfa' : 'var(--border)'}`, borderRadius: 10, padding: refFileNames.length > 0 ? '10px 14px' : '16px', cursor: refProcessing ? 'wait' : 'pointer', background: refFileNames.length > 0 ? 'var(--bg-card)' : 'transparent' }}>
                 {refProcessing ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-sub)', fontSize: 13 }}><IconSpinner /> Processando...</div>
-                ) : refFiles.length > 0 ? (
+                ) : refFileNames.length > 0 ? (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
                     {refFileNames.map((name, i) => (
                       <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 8px', fontSize: 12, color: 'var(--text-main)' }}>
                         {fileIcon(name)} {name}
                       </span>
                     ))}
-                    <button onClick={e => { e.stopPropagation(); setRefFiles([]); setRefFileNames([]); }}
+                    <button onClick={e => { e.stopPropagation(); setRefFiles([]); setRefFileNames([]); setRefTextContent(''); }}
                       style={{ fontSize: 11, color: '#ef4444', background: 'transparent', border: 'none', cursor: 'pointer', marginLeft: 4, fontFamily: 'inherit' }}>
                       Remover
                     </button>
@@ -809,15 +822,15 @@ export default function AvaliarV2() {
                     <IconUpload />
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-main)' }}>Gabarito, concept ou referências visuais</div>
-                      <div style={{ fontSize: 11, marginTop: 2 }}>Imagem, PDF — usado como contexto de correção para toda a turma</div>
+                      <div style={{ fontSize: 11, marginTop: 2 }}>Imagem, vídeo, áudio, PDF, DOCX, TXT — usado como contexto de correção para toda a turma</div>
                     </div>
                   </div>
                 )}
               </div>
               <input ref={refInputRef} type="file" style={{ display: 'none' }} multiple
-                accept="image/*,.pdf"
+                accept="image/*,video/*,audio/*,.pdf,.docx,.doc,.txt"
                 onChange={e => handleRefFiles(e.target.files)} />
-              {refFiles.length > 0 && (
+              {refFileNames.length > 0 && (
                 <div style={{ marginTop: 10 }}>
                   <label style={{ ...lbl, marginBottom: 6 }}>Peso na correção</label>
                   <select style={inp} value={refWeight} onChange={e => setRefWeight(e.target.value)}>

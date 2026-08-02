@@ -91,7 +91,7 @@ export async function POST(request) {
     }
   }
 
-  const { type, exerciseName, exerciseContext, criteria, studentName, studentWork, tone, profName, profDisc, writingSample, images, fileUris, linkUrl, youtubeUrl, referenceWeight } = await request.json();
+  const { type, exerciseName, exerciseContext, criteria, studentName, studentWork, tone, profName, profDisc, writingSample, images, fileUris, linkUrl, youtubeUrl, referenceWeight, referenceText } = await request.json();
 
   if (!exerciseName || !criteria?.length) {
     return NextResponse.json({ error: 'Exercício e critérios são obrigatórios.' }, { status: 400 });
@@ -125,6 +125,13 @@ export async function POST(request) {
     || images?.some(img => img.mediaType?.startsWith('image/'))
     || (websiteContent?.images?.length > 0)
   );
+
+  // Reference/gabarito can arrive as a labeled file (fileUris) or as extracted text
+  // (referenceText, from .txt/.docx uploads processed client-side). Either one means
+  // the "peso do gabarito" instruction actually applies.
+  const hasLabeledFiles = (fileUris?.length > 0) || (images?.length > 0);
+  const hasReferenceMaterial = fileUris?.some(f => f.label?.startsWith('Referência para Correção')) || !!referenceText;
+  const referenceWeightDesc = { livre: 'REFERÊNCIA LIVRE — use o gabarito apenas como orientação geral; valorize criatividade e interpretações pessoais', parcial: 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes', estrito: 'ESTRITO — o aluno deve seguir o gabarito de perto; penalize desvios significativos' }[referenceWeight] || 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes';
 
   const prompt = `Você é ${profName ? `o professor ${profName}` : 'um professor experiente'}${profDisc ? ` de ${profDisc}` : ''}, avaliando o trabalho de um aluno.
 
@@ -186,11 +193,16 @@ CONTEXTO DE TRABALHO — SITE/PORTFÓLIO ONLINE:
 O trabalho do aluno é um site ou portfólio online (${effectiveUrl}). Analise o conteúdo extraído abaixo — textos, estrutura e imagens dos projetos apresentados. Avalie qualidade dos trabalhos, organização, apresentação visual e domínio da técnica demonstrado. Cite elementos concretos que você conseguiu observar no portfólio.` : ''}${promptHasImageOnly ? `
 
 CONTEXTO DE MÍDIA — IMAGEM:
-Este trabalho é visual. Ao escrever o feedback, referencie elementos visuais concretos: composição, proporções, uso de cor e luz, detalhes técnicos, acabamento, escolhas estilísticas. Nunca avalie "a imagem" de forma genérica — cite o que foi concretamente observado.` : ''}${images?.length > 0 ? `
+Este trabalho é visual. Ao escrever o feedback, referencie elementos visuais concretos: composição, proporções, uso de cor e luz, detalhes técnicos, acabamento, escolhas estilísticas. Nunca avalie "a imagem" de forma genérica — cite o que foi concretamente observado.` : ''}${hasLabeledFiles ? `
 
-Os arquivos enviados estão identificados com rótulos: "Trabalho do aluno" = produção do aluno a ser avaliada; "Referência do aluno" = material consultado pelo aluno como inspiração/fonte (use como contexto, mas NÃO avalie como produção dele); "Referência para Correção" = gabarito interno do professor (use apenas para calibrar a avaliação — NUNCA mencione, cite ou faça referência ao gabarito no feedback); "Arquivo adicional" = contexto extra
-Peso do gabarito na correção: ${{ livre: 'REFERÊNCIA LIVRE — use o gabarito apenas como orientação geral; valorize criatividade e interpretações pessoais', parcial: 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes', estrito: 'ESTRITO — o aluno deve seguir o gabarito de perto; penalize desvios significativos' }[referenceWeight] || 'PARCIAL — considere o gabarito como base, mas aceite variações e soluções alternativas coerentes'}
-O gabarito é uma ferramenta interna do professor. Jamais mencione sua existência no feedback ao aluno` : ''}`;
+Os arquivos enviados estão identificados com rótulos: "Trabalho do aluno" = produção do aluno a ser avaliada; "Referência do aluno" = material consultado pelo aluno como inspiração/fonte (use como contexto, mas NÃO avalie como produção dele); "Referência para Correção" = gabarito interno do professor (use apenas para calibrar a avaliação — NUNCA mencione, cite ou faça referência ao gabarito no feedback); "Arquivo adicional" = contexto extra` : ''}${hasReferenceMaterial ? `
+Peso do gabarito na correção: ${referenceWeightDesc}
+O gabarito é uma ferramenta interna do professor. Jamais mencione sua existência no feedback ao aluno` : ''}${referenceText ? `
+
+Referência para Correção (gabarito em texto, fornecido pelo professor) — use apenas para calibrar a avaliação, NUNCA mencione ou cite no feedback ao aluno:
+"""
+${referenceText}
+"""` : ''}`;
 
   // Helper: parse JSON from model response text.
   // Walks char-by-char to collect every top-level {...} candidate, then tries

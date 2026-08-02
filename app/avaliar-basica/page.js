@@ -1,6 +1,18 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import AppLayout from '../components/AppLayout';
+import mammoth from 'mammoth';
+
+// ── Extração de texto local: .docx (mammoth), .doc/.txt (leitura direta) ─────
+// Evita subir esses formatos como arquivo binário pro Gemini, que não os lê corretamente.
+async function extractTextFromFile(file) {
+  const name = file.name.toLowerCase();
+  if (name.endsWith('.docx') || file.type.includes('wordprocessingml')) {
+    const { value } = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+    return value;
+  }
+  return file.text();
+}
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
@@ -197,18 +209,27 @@ export default function AvaliarBasica() {
 
   async function handleContextFiles(selectedFiles) {
     setContextProcessing(true);
-    const uris = [], names = [];
+    const uris = [], names = [], textParts = [];
     for (const file of Array.from(selectedFiles)) {
+      const n = file.name.toLowerCase(); const t = file.type;
+      const isText = t === 'text/plain' || n.endsWith('.txt')
+        || t.includes('wordprocessingml') || n.endsWith('.docx') || n.endsWith('.doc');
       try {
-        const r = await uploadFileToGemini(file, 'Gabarito/Referência do professor');
-        uris.push(r);
-        names.push(file.name);
+        if (isText) {
+          const content = await extractTextFromFile(file);
+          textParts.push(content);
+        } else {
+          const r = await uploadFileToGemini(file, 'Gabarito/Referência do professor');
+          uris.push(r);
+          names.push(file.name);
+        }
       } catch (e) {
         console.error('handleContextFiles error:', e.message);
       }
     }
     setContextFileUris(prev => [...prev, ...uris]);
     setContextFileNames(prev => [...prev, ...names]);
+    if (textParts.length) setContext(prev => [prev, ...textParts].filter(Boolean).join('\n\n'));
     setContextProcessing(false);
   }
 
@@ -287,7 +308,7 @@ export default function AvaliarBasica() {
               placeholder="Ex: 7 questões sobre equação de 2º grau. Ou cole o gabarito, se tiver."
               style={{ ...inp, marginBottom: 10 }} />
 
-            <input ref={contextFileRef} type="file" accept="image/*" multiple style={{ display: 'none' }}
+            <input ref={contextFileRef} type="file" accept="image/*,.pdf,.docx,.doc,.txt" multiple style={{ display: 'none' }}
               onChange={e => { if (e.target.files.length) handleContextFiles(e.target.files); e.target.value = ''; }} />
             {contextFileNames.length > 0 ? (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
@@ -298,12 +319,12 @@ export default function AvaliarBasica() {
                   </span>
                 ))}
                 <button onClick={() => contextFileRef.current?.click()} disabled={contextProcessing} style={{ ...btnSecondary, padding: '4px 10px', fontSize: 12 }}>
-                  {contextProcessing ? <><IconSpinner /> Processando...</> : '+ adicionar foto'}
+                  {contextProcessing ? <><IconSpinner /> Processando...</> : '+ adicionar arquivo'}
                 </button>
               </div>
             ) : (
               <button onClick={() => contextFileRef.current?.click()} disabled={contextProcessing} style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}>
-                {contextProcessing ? <><IconSpinner /> Processando...</> : <><IconUpload /> Anexar foto do gabarito</>}
+                {contextProcessing ? <><IconSpinner /> Processando...</> : <><IconUpload /> Anexar foto ou arquivo do gabarito</>}
               </button>
             )}
           </div>
