@@ -580,7 +580,6 @@ export default function AvaliacoesPage() {
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                       <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>Análise Pedagógica da Turma</span>
-                      <span style={{ fontSize: 10, fontWeight: 700, background: '#f5f3ff', color: '#7c3aed', borderRadius: 5, padding: '1px 7px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>IA</span>
                     </div>
                     <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
                       {canClassReport ? `${selectedEvals.length} avaliações de ${selectedStudents.length} alunos selecionadas.` : 'Selecione avaliações de 2+ alunos diferentes.'}
@@ -603,7 +602,6 @@ export default function AvaliacoesPage() {
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                       <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>Parecer Individual do Aluno</span>
-                      <span style={{ fontSize: 10, fontWeight: 700, background: '#fff7ed', color: '#ea580c', borderRadius: 5, padding: '1px 7px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>IA</span>
                     </div>
                     <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
                       {canStudentReport ? `${selectedEvals.length} avaliações de ${selectedStudents[0]} selecionadas.` : 'Selecione 2+ avaliações do mesmo aluno.'}
