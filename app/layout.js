@@ -8,6 +8,7 @@ export const metadata = {
   title: 'Kriteria — Avaliação Inteligente para Educadores',
   description: 'O Kriteria corrige trabalhos de alunos com os critérios e o estilo do professor — mais rápido, com qualidade e consistência.',
   icons: { icon: '/imagens/favicon.svg' },
+  other: { 'facebook-domain-verification': 'xo4x1lto534zhpwi0klj6ekn9l092r' },
 };
 
 export default function RootLayout({ children }) {
