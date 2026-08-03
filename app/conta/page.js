@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AppLayout from '../components/AppLayout';
+import { fbTrack } from '@/lib/pixel';
 
 // ── Plan config ──────────────────────────────────────────────────────────────
 
@@ -163,6 +164,7 @@ function ContaPageInner() {
 
     if (searchParams.get('success')) {
       showMsg(setPlanMsg, 'success', 'Pagamento confirmado! Seu plano será atualizado ao fazer login novamente.');
+      fbTrack('Purchase');
     }
     if (searchParams.get('canceled')) showMsg(setPlanMsg, 'error', 'Pagamento cancelado. Nenhuma cobrança foi feita.');
   }, [router, searchParams]);
