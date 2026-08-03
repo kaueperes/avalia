@@ -175,6 +175,32 @@ Plano institucional para coordenadores administrarem uma equipe de professores c
 
 ---
 
+## Vídeos tutoriais (`lib/tutorials.js`, `app/components/VideoTutorial.js`)
+
+Canal do YouTube do Kriteria com 10 vídeos curtos, um por página/fluxo principal. Config centralizada em `lib/tutorials.js` (`TUTORIALS` — mapa `slug → {videoId, title, duration}` — e `TUTORIALS_ORDER`, a ordem de exibição na galeria). **Pra trocar um vídeo, só editar essa entrada — nenhuma página precisa mudar.**
+
+Dois componentes em `app/components/VideoTutorial.js`, ambos abrindo o mesmo player em modal (`youtube-nocookie.com/embed`, sem autoplay indevido):
+- `VideoTutorialLink` — link compacto (thumbnail pequena + "Ver tutorial (duração)"), usado no topo das 10 páginas de ferramenta (`/inicio`, `/avaliar-basica`, `/avaliar-avancado`, `/gerador-provas`, `/perfis`, `/instituicao`, `/disciplinas`, `/turmas`, `/avaliacoes`, `/relatorios`)
+- `VideoTutorialCard` — card maior estilo galeria, usado em `/ajuda` (dentro do app) e `/central-de-ajuda` (pública) — as duas páginas de ajuda têm a galeria completa dos 10 vídeos, cada uma com seu próprio layout adaptado ao estilo da página (tokens `var(--...)` no app autenticado, hex fixo na pública)
+
+Thumbnails puxam direto do YouTube (`i.ytimg.com/vi/{id}/mqdefault.jpg`) — decisão consciente de não hospedar imagem própria, simplicidade > controle total da imagem.
+
+---
+
+## Meta Pixel / Marketing (`lib/pixel.js`, `app/components/MetaPixel.js`)
+
+Pixel do Meta (Facebook/Instagram Ads) instalado em `app/layout.js` pra otimizar campanhas pagas. Dataset "Kriteria - Pixel Site" no Business Manager, ID em `lib/pixel.js` (`PIXEL_ID`).
+
+- Script base (`fbq('init', ...)`) carrega via `next/script` em todas as páginas
+- `MetaPixelRouteTracker` (client component, `usePathname`/`useSearchParams`) dispara `PageView` a cada navegação — necessário porque o App Router é SPA e o script base sozinho só pega o primeiro load
+- `fbTrack('CompleteRegistration')` disparado em `app/signup/page.js` no cadastro bem-sucedido
+- `fbTrack('Purchase')` disparado em `app/conta/page.js` quando a URL tem `?success=1` (retorno do Stripe checkout) — cobre tanto upgrade de plano quanto compra de addon avulso, sem diferenciar os dois
+- `app/layout.js` também tem a meta tag `facebook-domain-verification` (via `metadata.other`) — domínio `kriteria.education` já verificado no Business Manager, necessário pra priorização de eventos de conversão em iOS
+
+**Presença institucional:** Página do Facebook e Instagram profissional "Kriteria" criados e conectados entre si, dentro do mesmo Business Manager do Pixel. Ainda sem posts publicados (ver Pendências).
+
+---
+
 ## API Routes (`app/api/`)
 
 | Rota | Função |
@@ -234,7 +260,7 @@ Plano institucional para coordenadores administrarem uma equipe de professores c
 Páginas sem autenticação (landing + suporte):
 - `/` — landing page (app/page.js). Se já houver token válido no `localStorage`, redireciona automaticamente para `/inicio` (ou `/onboarding`)
 - `/login` — mesmo redirecionamento automático se já houver sessão válida
-- `/central-de-ajuda` — FAQ e guia de uso
+- `/central-de-ajuda` — FAQ, guia de uso e galeria dos 10 vídeos tutoriais (ver seção "Vídeos tutoriais")
 - `/contato` — formulário envia via Resend (`api/contact`) para `contato@kriteria.education`
 - `/privacidade` — política de privacidade
 - `/termos` — termos de uso
@@ -283,6 +309,7 @@ Todas têm o mesmo navbar com 5 links: Funcionalidades · Tipos de Trabalho · P
 - Sem TypeScript — projeto em JavaScript puro
 - Sem testes automatizados atualmente
 - HTML gerado dinamicamente (PDFs via `document.write`, emails) deve sempre escapar valores de usuário/IA (`esc()`/`_esc()`) antes de interpolar — evita XSS que poderia expor o token JWT do `localStorage`
+- **Grid inline sem `className` não é responsivo**: `app/page.js` (home) tem um bloco `<style>` com `@media (max-width: 900px)` que empilha os grids por classe (`.grid-4`, `.grid-plans` etc.), mas um `gridTemplateColumns` inline sem classe correspondente não é pego por essa media query. Já aconteceu no mockup do hero (coluna direita cortada no mobile, texto ilegível) — corrigido dando `className="hero-mockup-grid"` ao grid e adicionando a regra no bloco de media query. Ao criar um grid novo na home, sempre checar se existe contraparte mobile
 
 ---
 
@@ -290,3 +317,7 @@ Todas têm o mesmo navbar com 5 links: Funcionalidades · Tipos de Trabalho · P
 
 - **Se um dia migrar pro topo de linha (Gemini Pro/Claude Opus) nas correções:** estudo mostrou que isso NÃO fecha a conta pros planos Essencial e Pro nos preços/cotas atuais — margem vira negativa no pior cenário. Só o Premium aguenta. Se avançar nessa direção, precisa ser diferencial pago (add-on ou exclusivo do Premium), não trocar todo mundo de uma vez.
 - **Duas badges "IA"** ainda aparecem em `app/avaliacoes/page.js` (nos botões de gerar "Relatório de Turma" e "Parecer Individual do Aluno") — não foram removidas ainda, só as da home e do metadata. Achado durante o pente-fino, não corrigido por estar fora do escopo pedido no momento
+- **Campanha paga no Meta Ads (Facebook/Instagram) ainda não foi criada.** Infra pronta: Business Manager, Pixel instalado e testado, domínio verificado, Página do Facebook e Instagram profissional criados e conectados. Falta: publicar pelo menos 1 post em cada rede (hoje estão com 0 seguidores/0 posts — não convém mandar tráfego pago pra um perfil vazio), e então montar a campanha em si (público de professores, orçamento de teste, otimização pro evento `CompleteRegistration` ou `Purchase`). Destino do anúncio: a home (`/`), que já foi auditada pra mobile.
+- **Erro no campo "nome da empresa" da conta profissional do Instagram** ficou pendente de resolver (o campo não aceitava o texto digitado, sem mensagem de erro clara) — não bloqueia o uso básico da conta, mas vale investigar antes de rodar campanha por lá.
+- **Página do Kriteria no LinkedIn** — decidido que vale a pena (alcança coordenador/diretor de escola, público que o Facebook/Instagram não pega), ainda não criada.
+- **Ideia (não implementada, só registrada):** automatizar geração de posts pra redes sociais via IA (ex: Make.com), mas sempre com aprovação humana antes de publicar (ex: rascunho enviado pro WhatsApp) — nunca publicação 100% automática, por coerência com o posicionamento "Kriteria sugere, você decide".
