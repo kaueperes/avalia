@@ -149,6 +149,7 @@ export default function Home() {
 
         @media (max-width: 900px) {
           .hero-h1 { font-size: 44px !important; letter-spacing: -1px !important; }
+          .hero-mockup-grid { grid-template-columns: 1fr !important; }
           .grid-4  { grid-template-columns: repeat(2,1fr) !important; }
           .grid-3  { grid-template-columns: 1fr !important; }
           .grid-2  { grid-template-columns: 1fr !important; }
@@ -241,7 +242,7 @@ export default function Home() {
               </div>
             </div>
             {/* App interface */}
-            <div style={{ padding: '28px', background: '#FAFAFA', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="hero-mockup-grid" style={{ padding: '28px', background: '#FAFAFA', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               {/* Left panel */}
               <div style={{ background: 'white', borderRadius: 12, padding: 24, border: '1px solid #F0F0F0' }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 16 }}>Trabalho do aluno</div>
