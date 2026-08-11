@@ -16,6 +16,7 @@ export default function AdminOrganizacoesPage() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ name: '', quotaPool: '' });
   const [editing, setEditing] = useState(null); // { id, name, quotaPool, active }
+  const [settingAdmin, setSettingAdmin] = useState(null); // { id, email }
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState({ text: '', ok: true });
 
@@ -64,6 +65,21 @@ export default function AdminOrganizacoesPage() {
       });
       if (r.ok) { flash('Atualizado!'); setEditing(null); load(); }
       else flash('Erro ao atualizar', false);
+    } finally { setSaving(false); }
+  }
+
+  async function submitSetAdmin() {
+    if (!settingAdmin?.email?.trim()) return;
+    setSaving(true);
+    try {
+      const r = await fetch(`/api/admin/organizations/${settingAdmin.id}/set-admin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+        body: JSON.stringify({ email: settingAdmin.email.trim() }),
+      });
+      const d = await r.json();
+      if (r.ok) { flash(`${d.email} agora é admin da organização!`); setSettingAdmin(null); load(); }
+      else flash(d.error || 'Erro ao definir admin', false);
     } finally { setSaving(false); }
   }
 
@@ -146,6 +162,10 @@ export default function AdminOrganizacoesPage() {
                       </p>
                     </div>
                     <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      <button onClick={() => setSettingAdmin(settingAdmin?.id === org.id ? null : { id: org.id, email: '' })}
+                        style={{ padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
+                        Definir admin
+                      </button>
                       <button onClick={() => setEditing({ id: org.id, name: org.name, quotaPool: org.quota_pool, active: org.active })}
                         style={{ padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
                         Editar
@@ -155,6 +175,19 @@ export default function AdminOrganizacoesPage() {
                         <TrashIcon />
                       </button>
                     </div>
+                  </div>
+                )}
+                {settingAdmin?.id === org.id && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 10, alignItems: 'center', marginTop: 14, paddingTop: 14, borderTop: '1px dashed var(--border)' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>Email do professor (já com conta no Kriteria)</label>
+                      <input style={{ ...inputStyle, marginBottom: 0 }} value={settingAdmin.email} onChange={e => setSettingAdmin(v => ({ ...v, email: e.target.value }))} placeholder="professor@exemplo.com" autoFocus />
+                    </div>
+                    <button onClick={submitSetAdmin} disabled={saving || !settingAdmin.email.trim()}
+                      style={{ padding: '10px 16px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', height: 42, opacity: !settingAdmin.email.trim() ? 0.5 : 1 }}>
+                      Confirmar
+                    </button>
+                    <button onClick={() => setSettingAdmin(null)} style={{ padding: '10px 12px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, cursor: 'pointer', color: 'var(--text-muted)', height: 42 }}>×</button>
                   </div>
                 )}
               </div>
