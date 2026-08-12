@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import { getUserFromRequest } from '@/lib/auth';
+import { canAccessOrgMember } from '@/lib/orgAuth';
 import { supabase } from '@/lib/supabase';
 import { PLANS, TYPES } from '@/lib/types';
 import Anthropic from '@anthropic-ai/sdk';
@@ -13,7 +14,8 @@ export async function POST(request) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada. Adicione sua chave no arquivo .env.local.' }, { status: 503 });
   }
 
-  const { data: dbUser } = await supabase.from('users').select('plan, org_id, org_quota_relatorios_limit, org_quota_relatorios_used, quota_relatorios_ciclo, quota_relatorios_extra').eq('id', user.userId).single();
+  const { data: dbUser } = await supabase.from('users').select('plan, org_id, org_role, org_quota_relatorios_limit, org_quota_relatorios_used, quota_relatorios_ciclo, quota_relatorios_extra').eq('id', user.userId).single();
+  const ctx = { userId: user.userId, orgId: dbUser?.org_id || null, orgRole: dbUser?.org_role || null };
 
   let orgReport = null;
   if (dbUser?.org_id) {
@@ -49,10 +51,17 @@ export async function POST(request) {
 
   // Se student_id foi passado, busca avaliações direto do BD — histórico confiável
   if (student_id) {
+    // O aluno pode ser de outro professor (admin/coordenador da org vendo o time) —
+    // busca o dono real do aluno antes de confiar em user.userId.
+    const { data: ownerCheck } = await supabase.from('students').select('user_id, name').eq('id', student_id).single();
+    if (!ownerCheck || !(await canAccessOrgMember(ctx, ownerCheck.user_id))) {
+      return NextResponse.json({ error: 'Aluno não encontrado' }, { status: 404 });
+    }
+
     const { data: dbEvals } = await supabase
       .from('evaluations')
       .select('*')
-      .eq('user_id', user.userId)
+      .eq('user_id', ownerCheck.user_id)
       .eq('student_id', student_id)
       .order('created_at', { ascending: true });
     if (dbEvals?.length) {
@@ -64,9 +73,7 @@ export async function POST(request) {
       }));
       studentName = evaluations[0]?.studentName || studentName;
     }
-    // Busca nome do aluno na tabela students se disponível
-    const { data: studentRow } = await supabase.from('students').select('name').eq('id', student_id).single();
-    if (studentRow?.name) studentName = studentRow.name;
+    if (ownerCheck.name) studentName = ownerCheck.name;
   }
 
   const institution = evaluations[0]?.institution || '';

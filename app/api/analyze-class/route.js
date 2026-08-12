@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import { getUserFromRequest } from '@/lib/auth';
+import { canAccessOrgMember } from '@/lib/orgAuth';
 import { supabase } from '@/lib/supabase';
 import { PLANS, TYPES } from '@/lib/types';
 import Anthropic from '@anthropic-ai/sdk';
@@ -13,7 +14,8 @@ export async function POST(request) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada. Adicione sua chave no arquivo .env.local.' }, { status: 503 });
   }
 
-  const { data: dbUser } = await supabase.from('users').select('plan, org_id, org_quota_relatorios_limit, org_quota_relatorios_used, quota_relatorios_ciclo, quota_relatorios_extra').eq('id', user.userId).single();
+  const { data: dbUser } = await supabase.from('users').select('plan, org_id, org_role, org_quota_relatorios_limit, org_quota_relatorios_used, quota_relatorios_ciclo, quota_relatorios_extra').eq('id', user.userId).single();
+  const ctx = { userId: user.userId, orgId: dbUser?.org_id || null, orgRole: dbUser?.org_role || null };
 
   let orgReport = null;
   if (dbUser?.org_id) {
@@ -48,10 +50,17 @@ export async function POST(request) {
 
   // Se class_id foi passado, busca avaliações direto do BD por class_id
   if (class_id) {
+    // A turma pode ser de outro professor (admin/coordenador da org vendo o time) —
+    // busca o dono real da turma antes de confiar em user.userId.
+    const { data: classOwner } = await supabase.from('classes').select('user_id').eq('id', class_id).single();
+    if (!classOwner || !(await canAccessOrgMember(ctx, classOwner.user_id))) {
+      return NextResponse.json({ error: 'Turma não encontrada' }, { status: 404 });
+    }
+
     const { data: dbEvals } = await supabase
       .from('evaluations')
       .select('*')
-      .eq('user_id', user.userId)
+      .eq('user_id', classOwner.user_id)
       .eq('class_id', class_id)
       .order('created_at', { ascending: true });
     if (dbEvals?.length) {
