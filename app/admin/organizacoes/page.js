@@ -14,9 +14,10 @@ export default function AdminOrganizacoesPage() {
   const [userName, setUserName] = useState('');
   const [orgs, setOrgs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ name: '', quotaPool: '' });
+  const [form, setForm] = useState({ name: '', quotaPool: '', quotaRelatoriosPool: '' });
   const [editing, setEditing] = useState(null); // { id, name, quotaPool, active }
   const [settingAdmin, setSettingAdmin] = useState(null); // { id, email }
+  const [addingQuota, setAddingQuota] = useState(null); // { id, type, amount }
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState({ text: '', ok: true });
 
@@ -46,10 +47,10 @@ export default function AdminOrganizacoesPage() {
       const r = await fetch('/api/admin/organizations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
-        body: JSON.stringify({ name: form.name.trim(), quotaPool: Number(form.quotaPool) || 0 }),
+        body: JSON.stringify({ name: form.name.trim(), quotaPool: Number(form.quotaPool) || 0, quotaRelatoriosPool: Number(form.quotaRelatoriosPool) || 0 }),
       });
       const d = await r.json();
-      if (r.ok) { flash('Organização criada!'); setForm({ name: '', quotaPool: '' }); load(); }
+      if (r.ok) { flash('Organização criada!'); setForm({ name: '', quotaPool: '', quotaRelatoriosPool: '' }); load(); }
       else flash(d.error || 'Erro ao criar', false);
     } finally { setSaving(false); }
   }
@@ -61,10 +62,32 @@ export default function AdminOrganizacoesPage() {
       const r = await fetch(`/api/admin/organizations/${editing.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
-        body: JSON.stringify({ name: editing.name.trim(), quotaPool: Number(editing.quotaPool) || 0, active: editing.active }),
+        body: JSON.stringify({
+          name: editing.name.trim(),
+          quotaPool: Number(editing.quotaPool) || 0,
+          quotaRelatoriosPool: Number(editing.quotaRelatoriosPool) || 0,
+          active: editing.active,
+          stripeCustomerId: editing.stripeCustomerId || '',
+          stripeSubscriptionId: editing.stripeSubscriptionId || '',
+        }),
       });
       if (r.ok) { flash('Atualizado!'); setEditing(null); load(); }
       else flash('Erro ao atualizar', false);
+    } finally { setSaving(false); }
+  }
+
+  async function submitAddQuota() {
+    if (!addingQuota?.amount || Number(addingQuota.amount) <= 0) return;
+    setSaving(true);
+    try {
+      const r = await fetch(`/api/admin/organizations/${addingQuota.id}/add-quota`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+        body: JSON.stringify({ type: addingQuota.type, amount: Number(addingQuota.amount) }),
+      });
+      const d = await r.json();
+      if (r.ok) { flash('Cota extra adicionada!'); setAddingQuota(null); load(); }
+      else flash(d.error || 'Erro ao adicionar cota', false);
     } finally { setSaving(false); }
   }
 
@@ -109,7 +132,7 @@ export default function AdminOrganizacoesPage() {
       {/* Criar nova org */}
       <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '24px 28px', marginBottom: 28 }}>
         <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 16 }}>Nova organização</p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 10, alignItems: 'end' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: 10, alignItems: 'end' }}>
           <div>
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>Nome da organização *</label>
             <input style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ex: Universidade Federal..." />
@@ -117,6 +140,10 @@ export default function AdminOrganizacoesPage() {
           <div>
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>Pool de avaliações</label>
             <input type="number" min="0" style={{ ...inputStyle, width: 140 }} value={form.quotaPool} onChange={e => setForm(f => ({ ...f, quotaPool: e.target.value }))} placeholder="Ex: 500" />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>Pool de relatórios</label>
+            <input type="number" min="0" style={{ ...inputStyle, width: 140 }} value={form.quotaRelatoriosPool} onChange={e => setForm(f => ({ ...f, quotaRelatoriosPool: e.target.value }))} placeholder="Ex: 30" />
           </div>
           <button onClick={create} disabled={saving || !form.name.trim()}
             style={{ padding: '10px 22px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: !form.name.trim() ? 0.5 : 1, height: 42 }}>
@@ -138,17 +165,39 @@ export default function AdminOrganizacoesPage() {
             orgs.map(org => (
               <div key={org.id} style={{ borderTop: '1px solid var(--border)', padding: '16px 24px' }}>
                 {editing?.id === org.id ? (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: 10, alignItems: 'center' }}>
-                    <input style={{ ...inputStyle, marginBottom: 0 }} value={editing.name} onChange={e => setEditing(v => ({ ...v, name: e.target.value }))} autoFocus />
-                    <input type="number" min="0" style={{ ...inputStyle, width: 120, marginBottom: 0 }} value={editing.quotaPool} onChange={e => setEditing(v => ({ ...v, quotaPool: e.target.value }))} />
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                      <input type="checkbox" checked={editing.active} onChange={e => setEditing(v => ({ ...v, active: e.target.checked }))} style={{ width: 14, height: 14 }} />
-                      Ativa
-                    </label>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <button onClick={saveEdit} disabled={saving} style={{ padding: '7px 16px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Salvar</button>
-                      <button onClick={() => setEditing(null)} style={{ padding: '7px 12px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
+                  <div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 10, alignItems: 'center', marginBottom: 10 }}>
+                      <input style={{ ...inputStyle, marginBottom: 0 }} value={editing.name} onChange={e => setEditing(v => ({ ...v, name: e.target.value }))} placeholder="Nome" autoFocus />
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                        <input type="checkbox" checked={editing.active} onChange={e => setEditing(v => ({ ...v, active: e.target.checked }))} style={{ width: 14, height: 14 }} />
+                        Ativa
+                      </label>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button onClick={saveEdit} disabled={saving} style={{ padding: '7px 16px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Salvar</button>
+                        <button onClick={() => setEditing(null)} style={{ padding: '7px 12px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
+                      </div>
                     </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>Pool de avaliações (contratado)</label>
+                        <input type="number" min="0" style={{ ...inputStyle, marginBottom: 0 }} value={editing.quotaPool} onChange={e => setEditing(v => ({ ...v, quotaPool: e.target.value }))} />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>Pool de relatórios (contratado)</label>
+                        <input type="number" min="0" style={{ ...inputStyle, marginBottom: 0 }} value={editing.quotaRelatoriosPool} onChange={e => setEditing(v => ({ ...v, quotaRelatoriosPool: e.target.value }))} />
+                      </div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>Stripe Customer ID</label>
+                        <input style={{ ...inputStyle, marginBottom: 0 }} value={editing.stripeCustomerId} onChange={e => setEditing(v => ({ ...v, stripeCustomerId: e.target.value }))} placeholder="cus_..." />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 5 }}>Stripe Subscription ID</label>
+                        <input style={{ ...inputStyle, marginBottom: 0 }} value={editing.stripeSubscriptionId} onChange={e => setEditing(v => ({ ...v, stripeSubscriptionId: e.target.value }))} placeholder="sub_..." />
+                      </div>
+                    </div>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>Os pools acima resetam sozinhos a cada renovação da assinatura no Stripe (uso volta a zero). Editar aqui muda o valor contratado — pra dar cota avulsa sem afetar o reset automático, use "Cota extra".</p>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -158,15 +207,22 @@ export default function AdminOrganizacoesPage() {
                         {!org.active && <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5' }}>Inativa</span>}
                       </div>
                       <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                        {org.memberCount} professor{org.memberCount !== 1 ? 'es' : ''} · Pool: {org.quota_used}/{org.quota_pool} usadas
+                        {org.memberCount} professor{org.memberCount !== 1 ? 'es' : ''} · Avaliações: {org.quota_used}/{org.quota_pool}{org.quota_pool_extra > 0 ? ` (+${org.quota_pool_extra} extra)` : ''} · Relatórios: {org.quota_relatorios_used || 0}/{org.quota_relatorios_pool || 0}{org.quota_relatorios_pool_extra > 0 ? ` (+${org.quota_relatorios_pool_extra} extra)` : ''}
+                      </p>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                        {org.stripe_subscription_id ? `Stripe: ${org.stripe_subscription_id}` : 'Sem assinatura Stripe vinculada'}
                       </p>
                     </div>
                     <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      <button onClick={() => setAddingQuota(addingQuota?.id === org.id ? null : { id: org.id, type: 'avaliacoes', amount: '' })}
+                        style={{ padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
+                        Cota extra
+                      </button>
                       <button onClick={() => setSettingAdmin(settingAdmin?.id === org.id ? null : { id: org.id, email: '' })}
                         style={{ padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
                         Definir admin
                       </button>
-                      <button onClick={() => setEditing({ id: org.id, name: org.name, quotaPool: org.quota_pool, active: org.active })}
+                      <button onClick={() => setEditing({ id: org.id, name: org.name, quotaPool: org.quota_pool, quotaRelatoriosPool: org.quota_relatorios_pool || 0, active: org.active, stripeCustomerId: org.stripe_customer_id || '', stripeSubscriptionId: org.stripe_subscription_id || '' })}
                         style={{ padding: '6px 14px', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
                         Editar
                       </button>
@@ -175,6 +231,21 @@ export default function AdminOrganizacoesPage() {
                         <TrashIcon />
                       </button>
                     </div>
+                  </div>
+                )}
+                {addingQuota?.id === org.id && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto auto', gap: 10, alignItems: 'center', marginTop: 14, paddingTop: 14, borderTop: '1px dashed var(--border)' }}>
+                    <select value={addingQuota.type} onChange={e => setAddingQuota(v => ({ ...v, type: e.target.value }))}
+                      style={{ ...inputStyle, marginBottom: 0, width: 150 }}>
+                      <option value="avaliacoes">Avaliações</option>
+                      <option value="relatorios">Relatórios</option>
+                    </select>
+                    <input type="number" min="1" style={{ ...inputStyle, marginBottom: 0 }} value={addingQuota.amount} onChange={e => setAddingQuota(v => ({ ...v, amount: e.target.value }))} placeholder="Quantidade" autoFocus />
+                    <button onClick={submitAddQuota} disabled={saving || !addingQuota.amount}
+                      style={{ padding: '10px 16px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', height: 42, opacity: !addingQuota.amount ? 0.5 : 1 }}>
+                      Adicionar
+                    </button>
+                    <button onClick={() => setAddingQuota(null)} style={{ padding: '10px 12px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, cursor: 'pointer', color: 'var(--text-muted)', height: 42 }}>×</button>
                   </div>
                 )}
                 {settingAdmin?.id === org.id && (

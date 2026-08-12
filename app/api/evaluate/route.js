@@ -69,13 +69,13 @@ export async function POST(request) {
 
   if (!dbErr && dbUser) {
     if (dbUser.org_id) {
-      // Usuário de organização: verifica pool da org
-      const { data: org } = await supabase.from('organizations').select('quota_pool, quota_used, active').eq('id', dbUser.org_id).single();
+      // Usuário de organização: verifica pool da org (cota contratada + cota extra avulsa)
+      const { data: org } = await supabase.from('organizations').select('quota_pool, quota_used, quota_pool_extra, active').eq('id', dbUser.org_id).single();
       orgData = org;
       if (org && !org.active) {
         return NextResponse.json({ error: 'Sua organização está inativa. Entre em contato com o administrador.' }, { status: 402 });
       }
-      if (org && (org.quota_pool - org.quota_used) <= 0) {
+      if (org && (org.quota_pool - org.quota_used) <= 0 && (org.quota_pool_extra || 0) <= 0) {
         return NextResponse.json({ error: 'Sua instituição não tem avaliações disponíveis. Fale com o administrador.' }, { status: 402 });
       }
       if (dbUser.org_quota_limit != null && (dbUser.org_quota_used || 0) >= dbUser.org_quota_limit) {
@@ -409,9 +409,12 @@ ${referenceText}
     // Decrement quota in Supabase
     if (!dbErr && dbUser) {
       if (dbUser.org_id && orgData) {
-        // Usuário de org: decrementa pool da org e contador individual
+        // Usuário de org: consome o ciclo contratado primeiro, cota extra só depois de zerar
+        const orgUpdate = (orgData.quota_pool - orgData.quota_used) > 0
+          ? { quota_used: (orgData.quota_used || 0) + 1 }
+          : { quota_pool_extra: Math.max((orgData.quota_pool_extra || 0) - 1, 0) };
         await Promise.all([
-          supabase.from('organizations').update({ quota_used: (orgData.quota_used || 0) + 1 }).eq('id', dbUser.org_id),
+          supabase.from('organizations').update(orgUpdate).eq('id', dbUser.org_id),
           supabase.from('users').update({ org_quota_used: (dbUser.org_quota_used || 0) + 1 }).eq('id', user.userId),
         ]);
       } else {

@@ -62,6 +62,26 @@ export async function POST(request) {
 
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;
+
+    // Organização institucional: criada manualmente no Stripe (fora do checkout do app),
+    // então um stripe_subscription_id nunca corresponde a um user E a uma org ao mesmo tempo.
+    // Roda em QUALQUER pagamento bem-sucedido (não só renovação) — é o que ativa a org
+    // automaticamente no primeiro pagamento, já que ela nasce com active=false no admin.
+    const { data: org } = await supabase.from('organizations').select('id, active').eq('stripe_subscription_id', invoice.subscription).single();
+    if (org) {
+      const orgUpdates = {};
+      if (!org.active) orgUpdates.active = true;
+      // Só reseta uso na renovação (não no primeiro pagamento, onde used já começa em 0),
+      // sem tocar na cota extra avulsa (quota_*_extra nunca reseta).
+      if (invoice.billing_reason === 'subscription_cycle') {
+        orgUpdates.quota_used = 0;
+        orgUpdates.quota_relatorios_used = 0;
+      }
+      if (Object.keys(orgUpdates).length > 0) {
+        await supabase.from('organizations').update(orgUpdates).eq('id', org.id);
+      }
+    }
+
     // Only reset quota on renewal (not on first payment, which is handled by checkout.session.completed)
     if (invoice.billing_reason === 'subscription_cycle') {
       const { data: user } = await supabase.from('users').select('id, plan').eq('stripe_subscription_id', invoice.subscription).single();
@@ -90,6 +110,14 @@ export async function POST(request) {
 
   if (event.type === 'customer.subscription.deleted') {
     const subscription = event.data.object;
+
+    // Instituição cancelou/deixou de pagar: desativa a org (bloqueia novas avaliações
+    // e relatórios pro pool, sem apagar dados nem desvincular professores).
+    const { data: org } = await supabase.from('organizations').select('id').eq('stripe_subscription_id', subscription.id).single();
+    if (org) {
+      await supabase.from('organizations').update({ active: false }).eq('id', org.id);
+    }
+
     const { data: user } = await supabase.from('users').select('id').eq('stripe_subscription_id', subscription.id).single();
     if (user) {
       const gratuito = PLANS.gratuito;

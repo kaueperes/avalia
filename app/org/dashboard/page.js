@@ -25,8 +25,10 @@ export default function OrgDashboardPage() {
       .catch(() => setLoading(false));
   }, [router]);
 
-  const quotaLeft = data ? (data.org?.quota_pool || 0) - (data.org?.quota_used || 0) : 0;
+  const quotaLeft = data ? (data.org?.quota_pool || 0) - (data.org?.quota_used || 0) + (data.org?.quota_pool_extra || 0) : 0;
   const pct = data?.org?.quota_pool > 0 ? Math.round((data.org.quota_used / data.org.quota_pool) * 100) : 0;
+  const relLeft = data ? (data.org?.quota_relatorios_pool || 0) - (data.org?.quota_relatorios_used || 0) + (data.org?.quota_relatorios_pool_extra || 0) : 0;
+  const relPct = data?.org?.quota_relatorios_pool > 0 ? Math.round((data.org.quota_relatorios_used / data.org.quota_relatorios_pool) * 100) : 0;
 
   return (
     <AppLayout userName={userName}>
@@ -50,6 +52,11 @@ export default function OrgDashboardPage() {
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>de {data.org?.quota_pool || 0} no pool</p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '24px 28px', border: '1px solid var(--border-card)' }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Relatórios disponíveis</p>
+              <p style={{ fontSize: 36, fontWeight: 800, color: relLeft <= 5 ? '#ef4444' : '#0081f0', letterSpacing: '-1px', lineHeight: 1 }}>{relLeft}</p>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>de {data.org?.quota_relatorios_pool || 0} no pool</p>
+            </div>
+            <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '24px 28px', border: '1px solid var(--border-card)' }}>
               <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Professores</p>
               <p style={{ fontSize: 36, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1 }}>{data.memberCount}</p>
               {data.pendingInvites > 0 && <p style={{ fontSize: 13, color: '#d97706', marginTop: 4 }}>{data.pendingInvites} convite{data.pendingInvites > 1 ? 's' : ''} pendente{data.pendingInvites > 1 ? 's' : ''}</p>}
@@ -70,6 +77,18 @@ export default function OrgDashboardPage() {
               <div style={{ height: '100%', width: `${Math.min(pct, 100)}%`, background: pct >= 90 ? '#ef4444' : pct >= 70 ? '#d97706' : '#0081f0', borderRadius: 99, transition: 'width .3s' }} />
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>{pct}% utilizado</p>
+          </div>
+
+          {/* Barra de uso do pool de relatórios */}
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '24px 28px', border: '1px solid var(--border-card)', marginBottom: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>Uso do pool de relatórios</p>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{data.org?.quota_relatorios_used || 0} / {data.org?.quota_relatorios_pool || 0} usados</p>
+            </div>
+            <div style={{ height: 10, background: 'var(--bg-content)', borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${Math.min(relPct, 100)}%`, background: relPct >= 90 ? '#ef4444' : relPct >= 70 ? '#d97706' : '#0081f0', borderRadius: 99, transition: 'width .3s' }} />
+            </div>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>{relPct}% utilizado</p>
           </div>
 
           {/* Ações rápidas */}

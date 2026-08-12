@@ -13,16 +13,30 @@ export async function POST(request) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada. Adicione sua chave no arquivo .env.local.' }, { status: 503 });
   }
 
-  const { data: dbUser } = await supabase.from('users').select('plan, quota_relatorios_ciclo, quota_relatorios_extra').eq('id', user.userId).single();
-  const plan = PLANS[dbUser?.plan] || PLANS.gratuito;
-  if (!plan.features.relatorioAluno) {
-    return NextResponse.json({ error: 'Relatórios individuais de aluno não estão disponíveis no seu plano. Faça upgrade para acessar.' }, { status: 402 });
+  const { data: dbUser } = await supabase.from('users').select('plan, org_id, quota_relatorios_ciclo, quota_relatorios_extra').eq('id', user.userId).single();
+
+  let orgReport = null;
+  if (dbUser?.org_id) {
+    // Usuário de organização: cota de relatório vem do pool da org, não do plano individual
+    const { data: org } = await supabase.from('organizations').select('quota_relatorios_pool, quota_relatorios_used, quota_relatorios_pool_extra, active').eq('id', dbUser.org_id).single();
+    orgReport = org;
+    if (org && !org.active) {
+      return NextResponse.json({ error: 'Sua organização está inativa. Entre em contato com o administrador.' }, { status: 402 });
+    }
+    if (org && (org.quota_relatorios_pool - org.quota_relatorios_used) <= 0 && (org.quota_relatorios_pool_extra || 0) <= 0) {
+      return NextResponse.json({ error: 'Sua instituição não tem relatórios disponíveis. Fale com o administrador.' }, { status: 402 });
+    }
+  } else {
+    const plan = PLANS[dbUser?.plan] || PLANS.gratuito;
+    if (!plan.features.relatorioAluno) {
+      return NextResponse.json({ error: 'Relatórios individuais de aluno não estão disponíveis no seu plano. Faça upgrade para acessar.' }, { status: 402 });
+    }
   }
 
-  // Quota check
+  // Quota check (usuário individual — org já foi checada acima)
   const relCiclo = typeof dbUser?.quota_relatorios_ciclo === 'number' ? dbUser.quota_relatorios_ciclo : null;
   const relExtra = typeof dbUser?.quota_relatorios_extra === 'number' ? dbUser.quota_relatorios_extra : null;
-  if (relCiclo !== null && relCiclo <= 0 && (relExtra === null || relExtra <= 0)) {
+  if (!dbUser?.org_id && relCiclo !== null && relCiclo <= 0 && (relExtra === null || relExtra <= 0)) {
     return NextResponse.json({ error: 'Você não tem relatórios disponíveis. Adquira mais para continuar.' }, { status: 402 });
   }
 
@@ -144,7 +158,12 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
     const analysis = JSON.parse(jsonMatch[0]);
 
     // Decrement quota
-    if (relCiclo !== null && relCiclo > 0) {
+    if (dbUser?.org_id && orgReport) {
+      const orgUpdate = (orgReport.quota_relatorios_pool - orgReport.quota_relatorios_used) > 0
+        ? { quota_relatorios_used: (orgReport.quota_relatorios_used || 0) + 1 }
+        : { quota_relatorios_pool_extra: Math.max((orgReport.quota_relatorios_pool_extra || 0) - 1, 0) };
+      await supabase.from('organizations').update(orgUpdate).eq('id', dbUser.org_id);
+    } else if (relCiclo !== null && relCiclo > 0) {
       await supabase.from('users').update({ quota_relatorios_ciclo: relCiclo - 1 }).eq('id', user.userId);
     } else if (relExtra !== null && relExtra > 0) {
       await supabase.from('users').update({ quota_relatorios_extra: relExtra - 1 }).eq('id', user.userId);

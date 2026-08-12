@@ -13,12 +13,15 @@ export async function PUT(request, { params }) {
   if (!await checkAdmin(request)) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
 
   const { id } = await params;
-  const { name, quotaPool, active } = await request.json();
+  const { name, quotaPool, quotaRelatoriosPool, active, stripeCustomerId, stripeSubscriptionId } = await request.json();
 
   const updates = {};
   if (name !== undefined) updates.name = name.trim();
   if (quotaPool !== undefined) updates.quota_pool = quotaPool;
+  if (quotaRelatoriosPool !== undefined) updates.quota_relatorios_pool = quotaRelatoriosPool;
   if (active !== undefined) updates.active = active;
+  if (stripeCustomerId !== undefined) updates.stripe_customer_id = stripeCustomerId.trim() || null;
+  if (stripeSubscriptionId !== undefined) updates.stripe_subscription_id = stripeSubscriptionId.trim() || null;
 
   const { data, error } = await supabase.from('organizations').update(updates).eq('id', id).select().single();
   if (error) return NextResponse.json({ error: 'Erro ao atualizar' }, { status: 500 });
