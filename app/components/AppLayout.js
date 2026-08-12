@@ -196,6 +196,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
   const [authChecked, setAuthChecked] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [orgRole, setOrgRole] = useState(null);
+  const [orgQuota, setOrgQuota] = useState(null);
   const [darkMode, setDarkMode] = useState(() => typeof window !== 'undefined' && localStorage.getItem('darkMode') === 'true');
 
   useEffect(() => {
@@ -211,6 +212,15 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
       } catch {}
     }
   }, [router]);
+
+  useEffect(() => {
+    if (!orgRole) return;
+    const token = localStorage.getItem('token');
+    fetch('/api/org/quota', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => data && setOrgQuota(data))
+      .catch(() => {});
+  }, [orgRole]);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -310,7 +320,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
           {/* Right side */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
 
-            {/* Quota combinada (oculta para usuários de org) */}
+            {/* Quota combinada (individual) */}
             {quotaCiclo !== null && !orgRole && (
               <>
                 <div
@@ -344,6 +354,31 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
                   </span>
                 </div>
               </>
+            )}
+
+            {/* Quota combinada (pool da organização) */}
+            {orgRole && orgQuota && (
+              <div
+                className="quota-display"
+                onClick={orgRole === 'admin' ? () => router.push('/org/dashboard') : undefined}
+                title={orgRole === 'admin' ? 'Ver detalhes do pool da instituição' : undefined}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '5px 12px', borderRadius: 8, cursor: orgRole === 'admin' ? 'pointer' : 'default',
+                  border: `1px solid ${border}`,
+                }}
+                onMouseEnter={e => { if (orgRole === 'admin') e.currentTarget.style.background = navHover; }}
+                onMouseLeave={e => e.currentTarget.style.background = 'none'}
+              >
+                <span style={{ fontSize: 12, fontWeight: 600, color: (orgQuota.quota_pool - orgQuota.quota_used) <= 0 && (orgQuota.quota_pool_extra || 0) <= 0 ? '#EF4444' : textMain }}>
+                  {Math.max(orgQuota.quota_pool - orgQuota.quota_used, 0)}{(orgQuota.quota_pool_extra || 0) > 0 ? ` +${orgQuota.quota_pool_extra}` : ''} avaliações
+                </span>
+                <span style={{ fontSize: 12, color: textSub }}>·</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: (orgQuota.quota_relatorios_pool - orgQuota.quota_relatorios_used) <= 0 && (orgQuota.quota_relatorios_pool_extra || 0) <= 0 ? '#EF4444' : textMain }}>
+                  {Math.max(orgQuota.quota_relatorios_pool - orgQuota.quota_relatorios_used, 0)}{(orgQuota.quota_relatorios_pool_extra || 0) > 0 ? ` +${orgQuota.quota_relatorios_pool_extra}` : ''} relatórios
+                </span>
+                <span style={{ fontSize: 11, color: textSub, marginLeft: 2 }}>da instituição</span>
+              </div>
             )}
 
             {/* User + Profile Dropdown */}
@@ -382,7 +417,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
                       background: userPlan === 'pro' ? 'linear-gradient(135deg, #0081f0, #810cfa)' : (darkMode ? '#1e2330' : '#EBF4FF'),
                       color: userPlan === 'pro' ? 'white' : '#0081f0',
                     }}>
-                      {(() => { const p = planFromStorage || userPlan; return p === 'pro' ? '★ Plano Pro' : p === 'premium' ? 'Plano Premium' : p === 'essencial' ? 'Plano Essencial' : 'Plano Gratuito'; })()}
+                      {(() => { const p = planFromStorage || userPlan; return p === 'pro' ? '★ Plano Pro' : p === 'premium' ? 'Plano Premium' : p === 'essencial' ? 'Plano Essencial' : p === 'org' ? 'Plano Institucional' : 'Plano Gratuito'; })()}
 
                     </div>
                   </div>
@@ -456,8 +491,8 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
               {[
                 ...navItems,
                 ...(orgRole === 'admin' ? [
-                  { Icon: BuildingIcon, label: 'Painel da Instituição', href: '/org/dashboard' },
-                  { Icon: PeopleIcon, label: 'Professores',           href: '/org/professores' },
+                  { Icon: BuildingIcon, label: 'Painel da Instituição', href: '/org/dashboard', divider: true },
+                  { Icon: PeopleIcon, label: 'Convidar/Gerenciar Professores', href: '/org/professores' },
                   { Icon: ClipboardIcon, label: 'Avaliações da Instituição', href: '/org/avaliacoes' },
                 ] : []),
                 ...(isAdmin ? [{ Icon: ShieldIcon, label: 'Administração', href: '/admin' }] : []),

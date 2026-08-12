@@ -127,6 +127,7 @@ function ContaPageInner() {
   const [quotaResetDate, setQuotaResetDate] = useState(null);
   const [quotaRelCiclo, setQuotaRelCiclo] = useState(null);
   const [quotaRelExtra, setQuotaRelExtra] = useState(null);
+  const [orgQuota, setOrgQuota] = useState(null);
 
   // UI states
   const [infoMsg, setInfoMsg] = useState(null);
@@ -161,6 +162,13 @@ function ContaPageInner() {
         if (u.quota_relatorios_extra !== undefined) setQuotaRelExtra(u.quota_relatorios_extra);
       }
     } catch {}
+
+    if (JSON.parse(localStorage.getItem('user') || '{}').plan === 'org') {
+      fetch('/api/org/quota', { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => data && setOrgQuota(data))
+        .catch(() => {});
+    }
 
     if (searchParams.get('success')) {
       showMsg(setPlanMsg, 'success', 'Pagamento confirmado! Seu plano será atualizado ao fazer login novamente.');
@@ -263,8 +271,9 @@ function ContaPageInner() {
     }
   }
 
-  const planLabel = PLANS.find(p => p.id === userPlan)?.label || 'Gratuito';
-  const planColor = PLANS.find(p => p.id === userPlan)?.color || '#6B7280';
+  const isOrgUser = userPlan === 'org';
+  const planLabel = isOrgUser ? 'Institucional' : PLANS.find(p => p.id === userPlan)?.label || 'Gratuito';
+  const planColor = isOrgUser ? '#0081f0' : PLANS.find(p => p.id === userPlan)?.color || '#6B7280';
 
   return (
     <AppLayout userName={userName} userEmail={userEmail} userPlan={userPlan}>
@@ -318,7 +327,9 @@ function ContaPageInner() {
             {planLabel}
           </div>
           <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-            {userPlan === 'gratuito' ? 'Você está no plano gratuito.' : `Você está no Plano ${planLabel}.`}
+            {isOrgUser
+              ? 'Sua cota vem do pool da sua instituição — fale com o administrador da organização para ajustes.'
+              : userPlan === 'gratuito' ? 'Você está no plano gratuito.' : `Você está no Plano ${planLabel}.`}
           </span>
         </div>
 
@@ -328,6 +339,7 @@ function ContaPageInner() {
         )}
 
         {/* Plan cards */}
+        {!isOrgUser && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>
           {PLANS.map(plan => {
             const isCurrent = plan.id === userPlan;
@@ -369,9 +381,47 @@ function ContaPageInner() {
             );
           })}
         </div>
+        )}
+
+        {/* Cota da instituição (usuário de org) */}
+        {isOrgUser && orgQuota && (
+          <>
+            <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Cota da instituição</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 28 }}>
+              <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Avaliações do pool</p>
+                <p style={{ fontSize: 28, fontWeight: 800, color: (orgQuota.quota_pool - orgQuota.quota_used) <= 0 ? '#EF4444' : 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
+                  {Math.max(orgQuota.quota_pool - orgQuota.quota_used, 0)}
+                </p>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>de {orgQuota.quota_pool} no pool</p>
+              </div>
+              <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Avaliações extras</p>
+                <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
+                  {orgQuota.quota_pool_extra ?? 0}
+                </p>
+                <p style={{ fontSize: 12, color: '#10B981', fontWeight: 500 }}>Não expiram</p>
+              </div>
+              <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Relatórios do pool</p>
+                <p style={{ fontSize: 28, fontWeight: 800, color: (orgQuota.quota_relatorios_pool - orgQuota.quota_relatorios_used) <= 0 ? '#EF4444' : 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
+                  {Math.max(orgQuota.quota_relatorios_pool - orgQuota.quota_relatorios_used, 0)}
+                </p>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>de {orgQuota.quota_relatorios_pool} no pool</p>
+              </div>
+              <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Relatórios extras</p>
+                <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
+                  {orgQuota.quota_relatorios_pool_extra ?? 0}
+                </p>
+                <p style={{ fontSize: 12, color: '#10B981', fontWeight: 500 }}>Não expiram</p>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Todas as cotas juntas */}
-        {quotaCiclo !== null && (
+        {quotaCiclo !== null && !isOrgUser && (
           <>
             <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Suas cotas</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 28 }}>
@@ -418,7 +468,7 @@ function ContaPageInner() {
         )}
 
         {/* Comprar extras */}
-        {userPlan !== 'gratuito' && (
+        {userPlan !== 'gratuito' && !isOrgUser && (
           <>
             <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Comprar extras</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
@@ -458,7 +508,7 @@ function ContaPageInner() {
       </Section>
 
       {/* ── Cancelar assinatura ── */}
-      {userPlan !== 'gratuito' && (
+      {userPlan !== 'gratuito' && !isOrgUser && (
         <Section title="Assinatura" subtitle="Cancele sua assinatura quando quiser, sem multa.">
           {cancelDate ? (
             <p style={{ fontSize: 14, color: '#10B981', fontWeight: 500 }}>
