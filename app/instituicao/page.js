@@ -37,6 +37,8 @@ const Field = ({ label, hint, tooltip, children }) => (
 export default function InstituicaoPage() {
   const router = useRouter();
   const [userName, setUserName] = useState('Professor');
+  const [userId, setUserId] = useState(null);
+  const [orgRole, setOrgRole] = useState(null);
   const [institutions, setInstitutions] = useState([]);
   const [form, setForm] = useState(BLANK);
   const [editingId, setEditingId] = useState(null);
@@ -47,9 +49,16 @@ export default function InstituicaoPage() {
 
   useEffect(() => {
     if (!token()) { router.push('/login'); return; }
-    try { const u = JSON.parse(localStorage.getItem('user') || '{}'); if (u.name) setUserName(u.name); } catch {}
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      if (u.name) setUserName(u.name);
+      if (u.id) setUserId(u.id);
+      if (u.org_role) setOrgRole(u.org_role);
+    } catch {}
     load();
   }, [router]);
+
+  const canManageInstitutions = !orgRole || orgRole === 'admin';
 
   async function load() {
     const r = await fetch('/api/institutions', { headers: { Authorization: `Bearer ${token()}` } });
@@ -108,7 +117,9 @@ export default function InstituicaoPage() {
           <div>
             <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 14 }}>Instituições cadastradas</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {institutions.map(inst => (
+              {institutions.map(inst => {
+                const canEditThis = inst.userId === userId || orgRole === 'admin';
+                return (
                 <div key={inst.id} style={{ background: 'var(--bg-card)', border: `1px solid ${editingId === inst.id ? '#0081f0' : 'var(--border-card)'}`, borderRadius: 12, padding: '16px 20px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
@@ -116,26 +127,33 @@ export default function InstituicaoPage() {
                         <img src={inst.logoUrl} alt="Logo" style={{ height: 36, width: 36, objectFit: 'contain', borderRadius: 6, flexShrink: 0 }} />
                       )}
                       <div style={{ minWidth: 0 }}>
-                        <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inst.name}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inst.name}</p>
+                          {inst.orgId && <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: '#eff6ff', color: '#0081f0', border: '1px solid #bfdbfe', flexShrink: 0 }}>Instituição</span>}
+                        </div>
                         {inst.educationLevel && (
                           <p style={{ fontSize: 12, color: 'var(--text-sub)' }}>{TEACHING_LEVELS.find(l => l.value === inst.educationLevel)?.label || inst.educationLevel}</p>
                         )}
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 12 }}>
-                      <button onClick={() => startEdit(inst)} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>Editar</button>
-                      <button onClick={() => del(inst.id)} style={{ padding: '5px 9px', border: '1px solid #EF444433', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center' }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-                      </button>
-                    </div>
+                    {canEditThis && (
+                      <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 12 }}>
+                        <button onClick={() => startEdit(inst)} style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>Editar</button>
+                        <button onClick={() => del(inst.id)} style={{ padding: '5px 9px', border: '1px solid #EF444433', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center' }}>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
 
         {/* Formulário */}
+        {canManageInstitutions ? (
         <div>
           <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 14 }}>
             {editingId ? 'Editar instituição' : 'Nova instituição'}
@@ -206,6 +224,14 @@ export default function InstituicaoPage() {
           </div>
         </div>
         </div>
+        ) : (
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '24px 24px' }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>Gerenciado pela sua instituição</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+              O cadastro da instituição é feito pelo administrador da sua organização e já aparece automaticamente nos seus relatórios e PDFs.
+            </p>
+          </div>
+        )}
       </div>
     </AppLayout>
   );
