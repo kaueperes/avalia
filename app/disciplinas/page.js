@@ -137,6 +137,8 @@ const BLANK_EXERCISE = { name: '', type: 'redacao', context: '', criteria: [] };
 export default function DisciplinasPage() {
   const router = useRouter();
   const [userName, setUserName] = useState('Professor');
+  const [userId, setUserId] = useState(null);
+  const [orgRole, setOrgRole] = useState(null);
   const [disciplines, setDisciplines] = useState([]);
   const [exercisesByDisc, setExercisesByDisc] = useState({});
   const [expandedDisc, setExpandedDisc] = useState(null);
@@ -180,9 +182,17 @@ export default function DisciplinasPage() {
 
   useEffect(() => {
     if (!token()) { router.push('/login'); return; }
-    try { const u = JSON.parse(localStorage.getItem('user') || '{}'); if (u.name) setUserName(u.name); } catch {}
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      if (u.name) setUserName(u.name);
+      if (u.id) setUserId(u.id);
+      if (u.org_role) setOrgRole(u.org_role);
+    } catch {}
     loadDisciplines();
   }, [router]);
+
+  // Dentro de uma org, só o admin cria/edita disciplina — professor comum só escolhe
+  const canManageDisciplines = !orgRole || orgRole === 'admin';
 
   async function loadDisciplines() {
     const r = await fetch('/api/disciplines', { headers: { Authorization: `Bearer ${token()}` } });
@@ -453,6 +463,7 @@ export default function DisciplinasPage() {
               {disciplines.map(disc => {
                 const isExpanded = expandedDisc === disc.id;
                 const exercises = exercisesByDisc[disc.id] || [];
+                const canEditThis = disc.userId === userId || orgRole === 'admin';
 
                 return (
                   <div key={disc.id} style={{ background: 'var(--bg-card)', border: `1px solid ${editingDiscId === disc.id ? '#0081f0' : 'var(--border-card)'}`, borderRadius: 12, overflow: 'hidden' }}>
@@ -460,7 +471,10 @@ export default function DisciplinasPage() {
                     {/* Cabeçalho da disciplina */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{disc.subject}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{disc.subject}</p>
+                          {disc.orgId && <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: '#eff6ff', color: '#0081f0', border: '1px solid #bfdbfe', flexShrink: 0 }}>Instituição</span>}
+                        </div>
                         <p style={{ fontSize: 12, color: 'var(--text-sub)' }}>
                           {exercisesByDisc[disc.id] ? `${exercises.length} exercício${exercises.length !== 1 ? 's' : ''}` : 'Clique para ver exercícios'}
                         </p>
@@ -470,14 +484,18 @@ export default function DisciplinasPage() {
                           style={{ padding: '5px 12px', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: isExpanded ? 'rgba(0,129,240,0.12)' : 'linear-gradient(135deg, #0081f0, #0033ad)', color: isExpanded ? '#0081f0' : 'white' }}>
                           {isExpanded ? 'Fechar' : 'Exercícios'}
                         </button>
-                        <button onClick={() => startEditDisc(disc)}
-                          style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
-                          Editar
-                        </button>
-                        <button onClick={() => deleteDisc(disc.id)}
-                          style={{ padding: '5px 9px', border: '1px solid #EF444433', borderRadius: 7, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center' }}>
-                          <TrashIcon />
-                        </button>
+                        {canEditThis && (
+                          <>
+                            <button onClick={() => startEditDisc(disc)}
+                              style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
+                              Editar
+                            </button>
+                            <button onClick={() => deleteDisc(disc.id)}
+                              style={{ padding: '5px 9px', border: '1px solid #EF444433', borderRadius: 7, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center' }}>
+                              <TrashIcon />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -601,6 +619,7 @@ export default function DisciplinasPage() {
         )}
 
         {/* Formulário de disciplina */}
+        {canManageDisciplines ? (
         <div>
           <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', marginBottom: 14 }}>
             {editingDiscId ? 'Editar disciplina' : 'Nova disciplina'}
@@ -614,7 +633,9 @@ export default function DisciplinasPage() {
 
           <div style={{ padding: '12px 14px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 10, marginBottom: 24 }}>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
-              Após criar a disciplina, clique em <strong>Exercícios</strong> para adicionar atividades com critérios e enunciados.
+              {orgRole === 'admin'
+                ? 'Disciplinas criadas aqui ficam disponíveis para todos os professores da instituição escolherem.'
+                : <>Após criar a disciplina, clique em <strong>Exercícios</strong> para adicionar atividades com critérios e enunciados.</>}
             </p>
           </div>
 
@@ -632,6 +653,14 @@ export default function DisciplinasPage() {
           </div>
         </div>
         </div>
+        ) : (
+          <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '24px 24px' }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 6 }}>Gerenciado pela sua instituição</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+              As disciplinas são cadastradas pelo administrador da sua organização. Você pode escolher entre elas ao criar um exercício — se precisar de uma disciplina nova, fale com o administrador.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* ── Lightbox: Modo Teste ──────────────────────────────────────────────── */}
