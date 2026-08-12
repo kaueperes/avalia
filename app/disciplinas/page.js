@@ -506,24 +506,29 @@ export default function DisciplinasPage() {
                         {/* Lista de exercícios */}
                         {exercises.length > 0 && (
                           <div style={{ padding: '12px 20px 0' }}>
-                            {exercises.map(ex => (
+                            {exercises.map(ex => {
+                              const isOwn = ex.userId === userId;
+                              return (
                               <div key={ex.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 9, border: '1px solid var(--border)', background: 'var(--bg-card)', marginBottom: 8 }}>
                                 <div style={{ minWidth: 0, flex: 1 }}>
                                   <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ex.name}</p>
-                                  <p style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ex.criteria?.length || 0} critérios</p>
+                                  <p style={{ fontSize: 11, color: 'var(--text-sub)' }}>{ex.criteria?.length || 0} critérios{!isOwn && ex.authorName ? ` · por ${ex.authorName}` : ''}</p>
                                 </div>
-                                <div style={{ display: 'flex', gap: 6, flexShrink: 0, marginLeft: 10 }}>
-                                  <button onClick={() => startEditExercise(ex)}
-                                    style={{ padding: '4px 10px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
-                                    Editar
-                                  </button>
-                                  <button onClick={() => deleteExercise(ex.id, disc.id)}
-                                    style={{ padding: '4px 7px', border: '1px solid #EF444433', borderRadius: 6, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center' }}>
-                                    <TrashIcon />
-                                  </button>
-                                </div>
+                                {isOwn && (
+                                  <div style={{ display: 'flex', gap: 6, flexShrink: 0, marginLeft: 10 }}>
+                                    <button onClick={() => startEditExercise(ex)}
+                                      style={{ padding: '4px 10px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)' }}>
+                                      Editar
+                                    </button>
+                                    <button onClick={() => deleteExercise(ex.id, disc.id)}
+                                      style={{ padding: '4px 7px', border: '1px solid #EF444433', borderRadius: 6, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center' }}>
+                                      <TrashIcon />
+                                    </button>
+                                  </div>
+                                )}
                               </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         )}
 
