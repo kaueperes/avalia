@@ -19,14 +19,15 @@ export async function GET(request) {
 
   if (!orgs?.length) return NextResponse.json([]);
 
-  // Adicionar contagem de membros para cada org
-  const counts = await Promise.all(
-    orgs.map(org =>
-      supabase.from('users').select('id', { count: 'exact', head: true }).eq('org_id', org.id)
-    )
-  );
+  // Uma query só pra todos os membros de todas as orgs — usada tanto pra contar quanto pra achar o admin
+  const orgIds = orgs.map(o => o.id);
+  const { data: members } = await supabase.from('users').select('org_id, org_role, name, email').in('org_id', orgIds);
 
-  const result = orgs.map((org, i) => ({ ...org, memberCount: counts[i].count || 0 }));
+  const result = orgs.map(org => {
+    const orgMembers = (members || []).filter(m => m.org_id === org.id);
+    const admin = orgMembers.find(m => m.org_role === 'admin');
+    return { ...org, memberCount: orgMembers.length, adminName: admin?.name || null, adminEmail: admin?.email || null };
+  });
   return NextResponse.json(result);
 }
 

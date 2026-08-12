@@ -212,6 +212,9 @@ export default function AdminOrganizacoesPage() {
                       <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
                         {org.stripe_subscription_id ? `Stripe: ${org.stripe_subscription_id}` : 'Sem assinatura Stripe vinculada'}
                       </p>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                        {org.adminEmail ? `Admin: ${org.adminName || ''} (${org.adminEmail})` : 'Nenhum admin definido ainda'}
+                      </p>
                     </div>
                     <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                       <button onClick={() => setAddingQuota(addingQuota?.id === org.id ? null : { id: org.id, type: 'avaliacoes', amount: '' })}
