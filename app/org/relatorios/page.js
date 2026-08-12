@@ -15,7 +15,6 @@ export default function OrgRelatoriosPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterTeacher, setFilterTeacher] = useState('');
-  const [expanded, setExpanded] = useState(null);
 
   function token() { return localStorage.getItem('token'); }
 
@@ -40,6 +39,14 @@ export default function OrgRelatoriosPage() {
     const matchTeacher = !filterTeacher || r.teacherName === filterTeacher;
     return matchSearch && matchTeacher;
   });
+
+  // Mesmo mapeamento de rota usado em /relatorios — reaproveita as páginas
+  // de visualização completa (gráficos, PDF) já existentes.
+  function reportRoute(r) {
+    if (r.type === 'aluno') return `/relatorio-aluno-evolucao?id=${r.id}`;
+    if (r.reportTemplate === 'turma-evolucao') return `/relatorio-turma-evolucao?id=${r.id}`;
+    return `/relatorio-turma?id=${r.id}`;
+  }
 
   return (
     <AppLayout userName={userName}>
@@ -75,29 +82,26 @@ export default function OrgRelatoriosPage() {
             <div style={{ padding: '32px 24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>Nenhum relatório encontrado.</div>
           ) : (
             filtered.map(r => (
-              <div key={r.id} style={{ borderTop: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', cursor: 'pointer' }}
-                  onClick={() => setExpanded(expanded === r.id ? null : r.id)}>
-                  <div style={{ minWidth: 0, flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: r.type === 'turma' ? '#faf5ff' : '#eff6ff', color: r.type === 'turma' ? '#810cfa' : '#0081f0', border: `1px solid ${r.type === 'turma' ? '#e9d5ff' : '#bfdbfe'}` }}>
-                        {r.type === 'turma' ? 'Turma' : 'Aluno'}
-                      </span>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>
-                        {r.type === 'turma' ? (r.turma || 'Turma') : r.subject}
-                      </p>
-                    </div>
-                    <p style={{ fontSize: 12, color: 'var(--text-sub)', marginTop: 2 }}>
-                      {r.teacherName} · {r.disciplina || 'sem disciplina'} · {fmt(r.created_at)}
+              <div key={r.id} style={{ borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px' }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: r.type === 'turma' ? '#faf5ff' : '#eff6ff', color: r.type === 'turma' ? '#810cfa' : '#0081f0', border: `1px solid ${r.type === 'turma' ? '#e9d5ff' : '#bfdbfe'}` }}>
+                      {r.type === 'turma' ? 'Turma' : 'Aluno'}
+                    </span>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>
+                      {r.type === 'turma' ? (r.turma || 'Turma') : r.subject}
                     </p>
                   </div>
-                  <span style={{ color: 'var(--text-muted)', flexShrink: 0, transform: expanded === r.id ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}>▾</span>
+                  <p style={{ fontSize: 12, color: 'var(--text-sub)', marginTop: 2 }}>
+                    {r.teacherName} · {r.disciplina || 'sem disciplina'} · {fmt(r.created_at)}
+                  </p>
                 </div>
-                {expanded === r.id && (
-                  <div style={{ padding: '0 24px 20px', fontSize: 13, color: 'var(--text-main)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-                    {r.resumo || 'Sem resumo disponível.'}
-                  </div>
-                )}
+                <button
+                  onClick={() => router.push(reportRoute(r))}
+                  style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
+                >
+                  Ver relatório
+                </button>
               </div>
             ))
           )}

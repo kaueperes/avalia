@@ -62,7 +62,12 @@ export async function GET(request) {
     all = all.filter(r => allowedDisciplines[r.user_id]?.has(r.content?.disciplina));
   }
 
-  all = all.map(({ user_id, content, ...rest }) => ({ ...rest, disciplina: content?.disciplina || '', resumo: content?.resumo || content?.parecer || '' }));
+  all = all.map(({ user_id, content, ...rest }) => ({
+    ...rest,
+    disciplina: content?.disciplina || '',
+    resumo: content?.resumo || content?.parecer || '',
+    reportTemplate: content?.stats?.reportTemplate || null,
+  }));
 
   return NextResponse.json(all);
 }
