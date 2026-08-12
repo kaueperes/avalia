@@ -19,8 +19,15 @@ export default function OrgAvaliacoesPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterTeacher, setFilterTeacher] = useState('');
+  const [selected, setSelected] = useState(new Set());
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState('');
 
   function token() { return localStorage.getItem('token'); }
+
+  function toggleSelect(id) {
+    setSelected(prev => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
+  }
 
   useEffect(() => {
     if (!token()) { router.push('/login'); return; }
@@ -45,6 +52,42 @@ export default function OrgAvaliacoesPage() {
     const matchTeacher = !filterTeacher || e.teacherName === filterTeacher;
     return matchSearch && matchTeacher;
   });
+
+  const selectedItems = filtered.filter(e => selected.has(e.id));
+  const studentIds = [...new Set(selectedItems.map(e => e.student_id).filter(Boolean))];
+  const classIds = [...new Set(selectedItems.map(e => e.class_id).filter(Boolean))];
+  const canGenerateStudent = selectedItems.length > 0 && studentIds.length === 1;
+  const canGenerateClass = selectedItems.length > 0 && classIds.length === 1;
+
+  async function generateStudentReport() {
+    setGenerating(true);
+    setGenError('');
+    try {
+      const r = await fetch('/api/analyze-student', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id: studentIds[0], studentName: selectedItems[0]?.student_name }),
+      });
+      const d = await r.json();
+      if (!r.ok) { setGenError(d.error || 'Erro ao gerar parecer.'); return; }
+      router.push('/org/relatorios');
+    } finally { setGenerating(false); }
+  }
+
+  async function generateClassReport() {
+    setGenerating(true);
+    setGenError('');
+    try {
+      const r = await fetch('/api/analyze-class', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token()}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ class_id: classIds[0], turma: selectedItems[0]?.turma }),
+      });
+      const d = await r.json();
+      if (!r.ok) { setGenError(d.error || 'Erro ao gerar relatório.'); return; }
+      router.push('/org/relatorios');
+    } finally { setGenerating(false); }
+  }
 
   return (
     <AppLayout userName={userName}>
@@ -76,9 +119,27 @@ export default function OrgAvaliacoesPage() {
 
       {!loading && (
         <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', overflow: 'hidden' }}>
-          <div style={{ padding: '14px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '14px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{filtered.length} avaliação{filtered.length !== 1 ? 'ões' : ''}</p>
+            {selectedItems.length > 0 && (
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{selectedItems.length} selecionada{selectedItems.length !== 1 ? 's' : ''}</span>
+                <button onClick={generateStudentReport} disabled={!canGenerateStudent || generating}
+                  title={!canGenerateStudent ? 'Selecione avaliações do mesmo aluno' : ''}
+                  style={{ padding: '6px 14px', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: canGenerateStudent ? 'pointer' : 'not-allowed', background: canGenerateStudent ? '#0081f0' : 'var(--border)', color: canGenerateStudent ? 'white' : 'var(--text-muted)' }}>
+                  {generating ? 'Gerando...' : 'Gerar parecer do aluno'}
+                </button>
+                <button onClick={generateClassReport} disabled={!canGenerateClass || generating}
+                  title={!canGenerateClass ? 'Selecione avaliações da mesma turma' : ''}
+                  style={{ padding: '6px 14px', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: canGenerateClass ? 'pointer' : 'not-allowed', background: canGenerateClass ? '#810cfa' : 'var(--border)', color: canGenerateClass ? 'white' : 'var(--text-muted)' }}>
+                  {generating ? 'Gerando...' : 'Gerar relatório de turma'}
+                </button>
+              </div>
+            )}
           </div>
+          {genError && (
+            <div style={{ padding: '10px 24px', background: '#fef2f2', borderBottom: '1px solid #fca5a5', color: '#dc2626', fontSize: 13 }}>{genError}</div>
+          )}
 
           {filtered.length === 0 ? (
             <div style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
@@ -88,14 +149,17 @@ export default function OrgAvaliacoesPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'var(--bg-content)' }}>
-                  {['Data', 'Aluno', 'Exercício', 'Turma', 'Professor', 'Nota', ''].map(h => (
-                    <th key={h} style={{ padding: '10px 18px', fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, textAlign: 'left', whiteSpace: 'nowrap' }}>{h}</th>
+                  {['', 'Data', 'Aluno', 'Exercício', 'Turma', 'Professor', 'Nota', ''].map((h, i) => (
+                    <th key={i} style={{ padding: '10px 18px', fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, textAlign: 'left', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(e => (
                   <tr key={e.id} style={{ borderTop: '1px solid var(--border)' }}>
+                    <td style={{ padding: '13px 18px' }}>
+                      <input type="checkbox" checked={selected.has(e.id)} onChange={() => toggleSelect(e.id)} style={{ cursor: 'pointer', accentColor: '#0081f0' }} />
+                    </td>
                     <td style={{ padding: '13px 18px', fontSize: 13, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{fmt(e.created_at)}</td>
                     <td style={{ padding: '13px 18px', fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{e.student_name || '—'}</td>
                     <td style={{ padding: '13px 18px', fontSize: 13, color: 'var(--text-muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.exercise_name || '—'}</td>

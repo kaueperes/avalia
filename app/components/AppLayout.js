@@ -494,8 +494,10 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
                   { Icon: BuildingIcon, label: 'Painel da Instituição', href: '/org/dashboard', divider: true },
                   { Icon: PeopleIcon, label: 'Convidar/Gerenciar Professores', href: '/org/professores' },
                   { Icon: ClipboardIcon, label: 'Avaliações da Instituição', href: '/org/avaliacoes' },
+                  { Icon: BarChartIcon, label: 'Relatórios da Instituição', href: '/org/relatorios' },
                 ] : orgQuota?.isCoordinator ? [
                   { Icon: ClipboardIcon, label: 'Avaliações da Instituição', href: '/org/avaliacoes', divider: true },
+                  { Icon: BarChartIcon, label: 'Relatórios da Instituição', href: '/org/relatorios' },
                 ] : []),
                 ...(isAdmin ? [{ Icon: ShieldIcon, label: 'Administração', href: '/admin' }] : []),
               ].map(({ Icon, label, href, highlight, divider }) => {

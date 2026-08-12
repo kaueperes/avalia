@@ -3,6 +3,9 @@ import { getUserFromRequest } from '@/lib/auth';
 import { coordinatedTeamIds } from '@/lib/orgAuth';
 import { supabase } from '@/lib/supabase';
 
+// GET: relatórios (parecer de aluno / relatório de turma) gerados por qualquer
+// professor da organização — mesma lógica de escopo de /api/org/evaluations,
+// só que a disciplina fica dentro de content.disciplina (JSONB), não numa coluna.
 export async function GET(request) {
   const user = getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
@@ -13,14 +16,12 @@ export async function GET(request) {
   const ctx = { userId: user.userId, orgId: dbUser.org_id, orgRole: dbUser.org_role };
   const isAdmin = dbUser.org_role === 'admin';
 
-  // allowedDisciplines[userId] = null (sem filtro, vê tudo) ou Set de nomes de disciplina
-  let allowedDisciplines = null; // null = não é admin nem coordenador, acesso negado
+  let allowedDisciplines = {};
   let memberIds = [];
 
   if (isAdmin) {
     const { data: members } = await supabase.from('users').select('id').eq('org_id', dbUser.org_id);
     memberIds = (members || []).map(m => m.id);
-    allowedDisciplines = {}; // admin não filtra por disciplina
   } else {
     const teamIds = await coordinatedTeamIds(ctx);
     if (!teamIds.length) return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
@@ -32,7 +33,6 @@ export async function GET(request) {
     const { data: disciplines } = await supabase.from('disciplines').select('id, subject').in('id', disciplineIds);
     const disciplineNameById = Object.fromEntries((disciplines || []).map(d => [d.id, d.subject]));
 
-    allowedDisciplines = {};
     for (const m of memberships) {
       const name = disciplineNameById[m.discipline_id];
       if (!name) continue;
@@ -44,33 +44,25 @@ export async function GET(request) {
 
   if (!memberIds.length) return NextResponse.json([]);
 
-  const { data: members } = await supabase.from('users').select('id, name, org_joined_at').in('id', memberIds);
+  const { data: members } = await supabase.from('users').select('id, name').in('id', memberIds);
   if (!members?.length) return NextResponse.json([]);
-
-  const queries = members.map(m =>
-    supabase.from('evaluations')
-      .select('id, user_id, student_id, class_id, student_name, exercise_name, score, created_at, type, turma, disciplina')
-      .eq('user_id', m.id)
-      .gte('created_at', m.org_joined_at || '1970-01-01')
-      .order('created_at', { ascending: false })
-      .limit(100)
-  );
-
-  const results = await Promise.all(queries);
   const memberMap = Object.fromEntries(members.map(m => [m.id, m.name]));
 
-  let all = results.flatMap((r, i) =>
-    (r.data || []).map(e => ({ ...e, teacherName: memberMap[members[i].id] }))
-  );
+  const { data: reports } = await supabase
+    .from('reports')
+    .select('id, user_id, type, subject, turma, exercise_name, institution, profile_name, content, created_at')
+    .in('user_id', memberIds)
+    .order('created_at', { ascending: false })
+    .limit(200);
+
+  let all = (reports || []).map(r => ({ ...r, teacherName: memberMap[r.user_id] }));
 
   // Coordenador só vê a disciplina vinculada de cada professor na equipe dele
   if (!isAdmin) {
-    all = all.filter(e => allowedDisciplines[e.user_id]?.has(e.disciplina));
+    all = all.filter(r => allowedDisciplines[r.user_id]?.has(r.content?.disciplina));
   }
 
-  all = all.map(({ user_id, ...rest }) => rest);
-
-  all.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  all = all.map(({ user_id, content, ...rest }) => ({ ...rest, disciplina: content?.disciplina || '', resumo: content?.resumo || content?.parecer || '' }));
 
   return NextResponse.json(all);
 }
