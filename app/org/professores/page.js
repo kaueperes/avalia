@@ -23,7 +23,7 @@ export default function OrgProfessoresPage() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
   const [msg, setMsg] = useState({ text: '', ok: true });
-  const [editingLimit, setEditingLimit] = useState(null); // { memberId, value }
+  const [editingLimit, setEditingLimit] = useState(null); // { memberId, type: 'avaliacoes' | 'relatorios', value }
 
   function token() { return localStorage.getItem('token'); }
   function flash(text, ok = true) { setMsg({ text, ok }); setTimeout(() => setMsg({ text: '', ok: true }), 3500); }
@@ -76,12 +76,15 @@ export default function OrgProfessoresPage() {
     else { const d = await r.json(); flash(d.error || 'Erro ao remover', false); }
   }
 
-  async function saveLimit(memberId, value) {
+  async function saveLimit(memberId, type, value) {
     const limit = value === '' ? null : Number(value);
+    const body = type === 'relatorios'
+      ? { memberId, orgQuotaRelatoriosLimit: limit }
+      : { memberId, orgQuotaLimit: limit };
     const r = await fetch('/api/org/members', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
-      body: JSON.stringify({ memberId, orgQuotaLimit: limit }),
+      body: JSON.stringify(body),
     });
     if (r.ok) { flash('Limite atualizado!'); setEditingLimit(null); load(); }
     else flash('Erro ao atualizar limite', false);
@@ -140,8 +143,8 @@ export default function OrgProfessoresPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ background: 'var(--bg-content)' }}>
-                    {['Professor', 'Email', 'Membro desde', 'Avaliações', 'Limite', ''].map(h => (
-                      <th key={h} style={{ padding: '10px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, textAlign: 'left' }}>{h}</th>
+                    {['Professor', 'Email', 'Membro desde', 'Avaliações', 'Limite', 'Relatórios', 'Limite', ''].map((h, i) => (
+                      <th key={i} style={{ padding: '10px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, textAlign: 'left' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -156,7 +159,7 @@ export default function OrgProfessoresPage() {
                       <td style={{ padding: '14px 20px', fontSize: 13, color: 'var(--text-muted)' }}>{fmt(m.org_joined_at)}</td>
                       <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{m.org_quota_used || 0}</td>
                       <td style={{ padding: '14px 20px' }}>
-                        {editingLimit?.memberId === m.id ? (
+                        {editingLimit?.memberId === m.id && editingLimit.type === 'avaliacoes' ? (
                           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                             <input
                               type="number"
@@ -166,13 +169,35 @@ export default function OrgProfessoresPage() {
                               style={{ width: 70, padding: '4px 8px', border: '1px solid var(--border-input)', borderRadius: 6, fontSize: 13, background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: 'inherit', outline: 'none' }}
                               autoFocus
                             />
-                            <button onClick={() => saveLimit(m.id, editingLimit.value)} style={{ padding: '4px 10px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>OK</button>
+                            <button onClick={() => saveLimit(m.id, 'avaliacoes', editingLimit.value)} style={{ padding: '4px 10px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>OK</button>
                             <button onClick={() => setEditingLimit(null)} style={{ padding: '4px 8px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
                           </div>
                         ) : (
-                          <button onClick={() => setEditingLimit({ memberId: m.id, value: m.org_quota_limit ?? '' })}
+                          <button onClick={() => setEditingLimit({ memberId: m.id, type: 'avaliacoes', value: m.org_quota_limit ?? '' })}
                             style={{ padding: '4px 10px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: 'var(--text-muted)' }}>
                             {m.org_quota_limit != null ? `${m.org_quota_limit} máx` : 'Sem limite'}
+                          </button>
+                        )}
+                      </td>
+                      <td style={{ padding: '14px 20px', fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{m.org_quota_relatorios_used || 0}</td>
+                      <td style={{ padding: '14px 20px' }}>
+                        {editingLimit?.memberId === m.id && editingLimit.type === 'relatorios' ? (
+                          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                            <input
+                              type="number"
+                              min="0"
+                              value={editingLimit.value}
+                              onChange={e => setEditingLimit(l => ({ ...l, value: e.target.value }))}
+                              style={{ width: 70, padding: '4px 8px', border: '1px solid var(--border-input)', borderRadius: 6, fontSize: 13, background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: 'inherit', outline: 'none' }}
+                              autoFocus
+                            />
+                            <button onClick={() => saveLimit(m.id, 'relatorios', editingLimit.value)} style={{ padding: '4px 10px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>OK</button>
+                            <button onClick={() => setEditingLimit(null)} style={{ padding: '4px 8px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
+                          </div>
+                        ) : (
+                          <button onClick={() => setEditingLimit({ memberId: m.id, type: 'relatorios', value: m.org_quota_relatorios_limit ?? '' })}
+                            style={{ padding: '4px 10px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: 'var(--text-muted)' }}>
+                            {m.org_quota_relatorios_limit != null ? `${m.org_quota_relatorios_limit} máx` : 'Sem limite'}
                           </button>
                         )}
                       </td>

@@ -13,7 +13,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY não configurada. Adicione sua chave no arquivo .env.local.' }, { status: 503 });
   }
 
-  const { data: dbUser } = await supabase.from('users').select('plan, org_id, quota_relatorios_ciclo, quota_relatorios_extra').eq('id', user.userId).single();
+  const { data: dbUser } = await supabase.from('users').select('plan, org_id, org_quota_relatorios_limit, org_quota_relatorios_used, quota_relatorios_ciclo, quota_relatorios_extra').eq('id', user.userId).single();
 
   let orgReport = null;
   if (dbUser?.org_id) {
@@ -25,6 +25,9 @@ export async function POST(request) {
     }
     if (org && (org.quota_relatorios_pool - org.quota_relatorios_used) <= 0 && (org.quota_relatorios_pool_extra || 0) <= 0) {
       return NextResponse.json({ error: 'Sua instituição não tem relatórios disponíveis. Fale com o administrador.' }, { status: 402 });
+    }
+    if (dbUser.org_quota_relatorios_limit != null && (dbUser.org_quota_relatorios_used || 0) >= dbUser.org_quota_relatorios_limit) {
+      return NextResponse.json({ error: 'Você atingiu seu limite de relatórios nesta organização. Fale com o administrador.' }, { status: 402 });
     }
   } else {
     const plan = PLANS[dbUser?.plan] || PLANS.gratuito;
@@ -162,7 +165,10 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
       const orgUpdate = (orgReport.quota_relatorios_pool - orgReport.quota_relatorios_used) > 0
         ? { quota_relatorios_used: (orgReport.quota_relatorios_used || 0) + 1 }
         : { quota_relatorios_pool_extra: Math.max((orgReport.quota_relatorios_pool_extra || 0) - 1, 0) };
-      await supabase.from('organizations').update(orgUpdate).eq('id', dbUser.org_id);
+      await Promise.all([
+        supabase.from('organizations').update(orgUpdate).eq('id', dbUser.org_id),
+        supabase.from('users').update({ org_quota_relatorios_used: (dbUser.org_quota_relatorios_used || 0) + 1 }).eq('id', user.userId),
+      ]);
     } else if (relCiclo !== null && relCiclo > 0) {
       await supabase.from('users').update({ quota_relatorios_ciclo: relCiclo - 1 }).eq('id', user.userId);
     } else if (relExtra !== null && relExtra > 0) {

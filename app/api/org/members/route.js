@@ -16,7 +16,7 @@ export async function GET(request) {
 
   const { data: members } = await supabase
     .from('users')
-    .select('id, name, email, org_role, org_quota_limit, org_quota_used, org_joined_at')
+    .select('id, name, email, org_role, org_quota_limit, org_quota_used, org_quota_relatorios_limit, org_quota_relatorios_used, org_joined_at')
     .eq('org_id', admin.orgId)
     .order('org_joined_at', { ascending: true });
 
@@ -28,14 +28,18 @@ export async function PUT(request) {
   const admin = await getOrgAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
 
-  const { memberId, orgQuotaLimit } = await request.json();
+  const { memberId, orgQuotaLimit, orgQuotaRelatoriosLimit } = await request.json();
   if (!memberId) return NextResponse.json({ error: 'memberId obrigatório' }, { status: 400 });
 
   // Verificar que o membro pertence à mesma org
   const { data: member } = await supabase.from('users').select('org_id').eq('id', memberId).single();
   if (member?.org_id !== admin.orgId) return NextResponse.json({ error: 'Membro não encontrado' }, { status: 404 });
 
-  await supabase.from('users').update({ org_quota_limit: orgQuotaLimit ?? null }).eq('id', memberId);
+  const updates = {};
+  if (orgQuotaLimit !== undefined) updates.org_quota_limit = orgQuotaLimit ?? null;
+  if (orgQuotaRelatoriosLimit !== undefined) updates.org_quota_relatorios_limit = orgQuotaRelatoriosLimit ?? null;
+
+  await supabase.from('users').update(updates).eq('id', memberId);
   return NextResponse.json({ ok: true });
 }
 
@@ -62,6 +66,8 @@ export async function DELETE(request) {
     org_joined_at: null,
     org_quota_limit: null,
     org_quota_used: 0,
+    org_quota_relatorios_limit: null,
+    org_quota_relatorios_used: 0,
     plan: 'gratuito',
     quota_ciclo: 5,
     quota_extra: 0,
