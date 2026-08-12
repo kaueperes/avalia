@@ -213,7 +213,7 @@ export default function ExerciciosPage() {
                   style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', border: '1px solid #0081f033', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'var(--selected-bg)', color: '#0081f0' }}
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><path d="M18 2v4h4"/></svg>
-                  Criar com IA
+                  Gerar automaticamente
                 </button>
               </div>
               {showAiPrompt && (

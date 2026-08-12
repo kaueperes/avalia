@@ -64,7 +64,7 @@ export async function POST(request) {
         <p style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 32px; letter-spacing: -0.5px;">Kriteria</p>
         <h2 style="font-size: 22px; font-weight: 800; color: #111827; margin-bottom: 12px;">Você foi convidado!</h2>
         <p style="font-size: 15px; color: #4B5563; line-height: 1.6; margin-bottom: 28px;">
-          ${admin.name} convidou você para fazer parte de <strong>${org?.name || 'sua instituição'}</strong> no Kriteria — a plataforma de avaliação educacional com IA.
+          ${admin.name} convidou você para fazer parte de <strong>${org?.name || 'sua instituição'}</strong> no Kriteria — avaliação inteligente para educadores.
         </p>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 28px;">
           <tr>
@@ -78,7 +78,7 @@ export async function POST(request) {
         <p style="font-size: 13px; color: #9CA3AF; margin-bottom: 4px;">Ou copie e cole este link no navegador:</p>
         <p style="font-size: 13px; color: #0081f0; word-break: break-all; margin-bottom: 28px;">${inviteUrl}</p>
         <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 28px 0;" />
-        <p style="font-size: 12px; color: #D1D5DB;">Kriteria · Plataforma de avaliação educacional com IA</p>
+        <p style="font-size: 12px; color: #D1D5DB;">Kriteria · Avaliação inteligente para educadores</p>
       </div>
     `,
   }).catch(() => {});

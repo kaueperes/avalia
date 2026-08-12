@@ -15,8 +15,8 @@ const faqs = [
     a: 'Vá em "Perfil do Professor" no menu lateral. Preencha seu nome, disciplina e escolha o tom de feedback. Opcionalmente, adicione uma amostra do seu estilo de escrita — a IA vai imitar seu jeito de escrever.',
   },
   {
-    q: 'Como funciona a avaliação com IA?',
-    a: 'Em "Nova Avaliação Avançada", você escolhe o tipo de trabalho (3D, Design, Redação etc.), seleciona um perfil de professor e envia o arquivo do aluno. A IA analisa o trabalho com base nos critérios da disciplina e gera um feedback detalhado com notas por critério, nota final e comentários personalizados no seu estilo.',
+    q: 'Como funciona a avaliação inteligente?',
+    a: 'Em "Nova Avaliação Avançada", você escolhe o tipo de trabalho (3D, Design, Redação etc.), seleciona um perfil de professor e envia o arquivo do aluno. O Kriteria analisa o trabalho com base nos critérios da disciplina e gera um feedback detalhado com notas por critério, nota final e comentários personalizados no seu estilo.',
   },
   {
     q: 'O que são exercícios?',

@@ -51,7 +51,7 @@ export async function POST(request) {
             Se você não solicitou isso, pode ignorar este email — sua senha permanece a mesma.
           </p>
           <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 28px 0;" />
-          <p style="font-size: 12px; color: #D1D5DB;">Kriteria · Plataforma de avaliação educacional com IA</p>
+          <p style="font-size: 12px; color: #D1D5DB;">Kriteria · Avaliação inteligente para educadores</p>
         </div>
       `,
     });

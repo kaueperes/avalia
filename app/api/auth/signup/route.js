@@ -41,7 +41,7 @@ export async function POST(request) {
           <p style="font-size: 20px; font-weight: 900; color: #111827; margin-bottom: 32px; letter-spacing: -0.5px;">Kriteria</p>
           <h2 style="font-size: 22px; font-weight: 800; color: #111827; margin-bottom: 12px;">Olá, ${firstName}! Seja bem-vindo 👋</h2>
           <p style="font-size: 15px; color: #4B5563; line-height: 1.6; margin-bottom: 28px;">
-            Sua conta no Kriteria foi criada com sucesso. Agora você pode avaliar trabalhos de alunos com inteligência artificial — economizando horas de correção.
+            Sua conta no Kriteria foi criada com sucesso. Agora você já pode começar a avaliar trabalhos de alunos — economizando horas de correção.
           </p>
           <p style="font-size: 14px; color: #4B5563; line-height: 1.6; margin-bottom: 8px;">Com o plano gratuito você pode:</p>
           <ul style="font-size: 14px; color: #4B5563; line-height: 1.8; padding-left: 20px; margin-bottom: 28px;">
@@ -59,7 +59,7 @@ export async function POST(request) {
             </tr>
           </table>
           <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 28px 0;" />
-          <p style="font-size: 12px; color: #D1D5DB;">Kriteria · Plataforma de avaliação educacional com IA</p>
+          <p style="font-size: 12px; color: #D1D5DB;">Kriteria · Avaliação inteligente para educadores</p>
         </div>
       `,
     }).catch(() => {}); // não bloqueia o signup se o email falhar

@@ -660,7 +660,7 @@ export default function RelatoriosPage() {
           <div style={{ fontSize: 48, marginBottom: 16 }}>📄</div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-main)', marginBottom: 8 }}>Relatórios disponíveis nos planos Pro e Premium</h2>
           <p style={{ fontSize: 15, color: 'var(--text-muted)', maxWidth: 460, margin: '0 auto 24px' }}>
-            Gere pareceres pedagógicos individuais por aluno e análises completas de turma com inteligência artificial.
+            Gere pareceres pedagógicos individuais por aluno e análises completas de turma automaticamente.
           </p>
           <button
             onClick={() => router.push('/conta')}

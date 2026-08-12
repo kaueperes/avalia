@@ -26,8 +26,8 @@ const faqs = [
     cat: 'Avaliações',
     items: [
       {
-        q: 'Como funciona a avaliação com IA?',
-        a: 'Vá em "Nova Avaliação Avançada", selecione o perfil de professor, o exercício correspondente e cole o texto ou envie o trabalho do aluno. Em segundos a IA gera nota por critério, nota final e feedback personalizado no seu estilo.',
+        q: 'Como funciona a avaliação inteligente?',
+        a: 'Vá em "Nova Avaliação Avançada", selecione o perfil de professor, o exercício correspondente e cole o texto ou envie o trabalho do aluno. Em segundos o Kriteria gera nota por critério, nota final e feedback personalizado no seu estilo.',
       },
       {
         q: 'Quantos tipos de trabalho são suportados?',
