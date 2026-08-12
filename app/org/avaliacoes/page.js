@@ -26,12 +26,14 @@ export default function OrgAvaliacoesPage() {
     if (!token()) { router.push('/login'); return; }
     try {
       const u = JSON.parse(localStorage.getItem('user') || '{}');
-      if (!u.org_id || u.org_role !== 'admin') { router.push('/inicio'); return; }
+      // Admin vê tudo; coordenador vê a própria equipe — ambos passam daqui,
+      // a autorização real (e o filtro por equipe) acontece na API.
+      if (!u.org_id) { router.push('/inicio'); return; }
       if (u.name) setUserName(u.name);
     } catch { router.push('/inicio'); return; }
 
     fetch('/api/org/evaluations', { headers: { Authorization: `Bearer ${token()}` } })
-      .then(r => r.json())
+      .then(r => { if (r.status === 403) { router.push('/inicio'); return []; } return r.json(); })
       .then(d => { setEvals(Array.isArray(d) ? d : []); setLoading(false); })
       .catch(() => setLoading(false));
   }, [router]);

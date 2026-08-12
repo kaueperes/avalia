@@ -25,6 +25,14 @@ export default function OrgProfessoresPage() {
   const [msg, setMsg] = useState({ text: '', ok: true });
   const [editingLimit, setEditingLimit] = useState(null); // { memberId, type: 'avaliacoes' | 'relatorios', value }
 
+  // Equipes
+  const [teams, setTeams] = useState([]);
+  const [orgDisciplines, setOrgDisciplines] = useState([]);
+  const [newTeamName, setNewTeamName] = useState('');
+  const [creatingTeam, setCreatingTeam] = useState(false);
+  const [addingMember, setAddingMember] = useState(null); // { teamId, userId, disciplineId }
+  const [savingTeamMember, setSavingTeamMember] = useState(false);
+
   function token() { return localStorage.getItem('token'); }
   function flash(text, ok = true) { setMsg({ text, ok }); setTimeout(() => setMsg({ text: '', ok: true }), 3500); }
 
@@ -39,13 +47,68 @@ export default function OrgProfessoresPage() {
   }, [router]);
 
   async function load() {
-    const [mRes, iRes] = await Promise.all([
+    const [mRes, iRes, tRes, dRes] = await Promise.all([
       fetch('/api/org/members', { headers: { Authorization: `Bearer ${token()}` } }),
       fetch('/api/org/invites', { headers: { Authorization: `Bearer ${token()}` } }),
+      fetch('/api/org/teams', { headers: { Authorization: `Bearer ${token()}` } }),
+      fetch('/api/disciplines', { headers: { Authorization: `Bearer ${token()}` } }),
     ]);
     if (mRes.ok) setMembers(await mRes.json());
     if (iRes.ok) setInvites(await iRes.json());
+    if (tRes.ok) setTeams(await tRes.json());
+    if (dRes.ok) setOrgDisciplines((await dRes.json()).filter(d => d.orgId));
     setLoading(false);
+  }
+
+  async function createTeam() {
+    if (!newTeamName.trim()) return;
+    setCreatingTeam(true);
+    try {
+      const r = await fetch('/api/org/teams', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+        body: JSON.stringify({ name: newTeamName.trim() }),
+      });
+      if (r.ok) { flash('Equipe criada!'); setNewTeamName(''); load(); }
+      else { const d = await r.json(); flash(d.error || 'Erro ao criar equipe', false); }
+    } finally { setCreatingTeam(false); }
+  }
+
+  async function deleteTeam(id, name) {
+    if (!confirm(`Excluir a equipe "${name}"? Os vínculos de professores com ela serão removidos.`)) return;
+    await fetch(`/api/org/teams/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token()}` } });
+    flash('Equipe excluída');
+    load();
+  }
+
+  async function addTeamMember(teamId) {
+    if (!addingMember?.userId || !addingMember?.disciplineId) return;
+    setSavingTeamMember(true);
+    try {
+      const r = await fetch(`/api/org/teams/${teamId}/members`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+        body: JSON.stringify({ userId: addingMember.userId, disciplineId: addingMember.disciplineId }),
+      });
+      const d = await r.json();
+      if (r.ok) { setAddingMember(null); load(); }
+      else flash(d.error || 'Erro ao adicionar à equipe', false);
+    } finally { setSavingTeamMember(false); }
+  }
+
+  async function removeTeamMember(teamId, memberId) {
+    await fetch(`/api/org/teams/${teamId}/members?memberId=${memberId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token()}` } });
+    load();
+  }
+
+  async function setCoordinator(teamId, coordinatorId) {
+    const r = await fetch(`/api/org/teams/${teamId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+      body: JSON.stringify({ coordinatorId: coordinatorId || null }),
+    });
+    if (r.ok) load();
+    else { const d = await r.json(); flash(d.error || 'Erro ao definir coordenador', false); }
   }
 
   async function sendInvite() {
@@ -236,6 +299,100 @@ export default function OrgProfessoresPage() {
               ))}
             </div>
           )}
+
+          {/* Equipes */}
+          <div style={{ marginTop: 24 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Equipes</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14 }}>
+              Uma equipe representa um curso — um professor pode estar em várias, cada uma com sua própria disciplina e coordenador.
+            </p>
+
+            <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '20px 24px', marginBottom: 20 }}>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <input
+                  placeholder="Nome da equipe (ex: Curso de Engenharia)"
+                  value={newTeamName}
+                  onChange={e => setNewTeamName(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && createTeam()}
+                  style={{ flex: 1, padding: '10px 14px', border: '1px solid var(--border-input)', borderRadius: 10, fontSize: 14, background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: 'inherit', outline: 'none' }}
+                />
+                <button onClick={createTeam} disabled={creatingTeam || !newTeamName.trim()}
+                  style={{ padding: '10px 22px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: !newTeamName.trim() ? 0.5 : 1, flexShrink: 0 }}>
+                  {creatingTeam ? 'Criando...' : 'Criar equipe'}
+                </button>
+              </div>
+            </div>
+
+            {teams.length === 0 ? (
+              <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '32px 24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
+                Nenhuma equipe criada ainda.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {teams.map(team => (
+                  <div key={team.id} style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '18px 24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                      <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>{team.name}</p>
+                      <button onClick={() => deleteTeam(team.id, team.name)}
+                        style={{ padding: '5px 8px', border: '1px solid #EF444433', borderRadius: 6, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center' }}>
+                        <TrashIcon />
+                      </button>
+                    </div>
+
+                    {team.members.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
+                        {team.members.map(m => (
+                          <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 8 }}>
+                            <span style={{ fontSize: 13, color: 'var(--text-main)' }}>
+                              {m.userName} — {m.disciplineName}
+                              {team.coordinatorId === m.userId && <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: '#eff6ff', color: '#0081f0', border: '1px solid #bfdbfe' }}>★ Coordenador</span>}
+                            </span>
+                            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                              {team.coordinatorId !== m.userId && (
+                                <button onClick={() => setCoordinator(team.id, m.userId)}
+                                  style={{ padding: '3px 8px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 11, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
+                                  Definir coordenador
+                                </button>
+                              )}
+                              <button onClick={() => removeTeamMember(team.id, m.id)}
+                                style={{ padding: '3px 6px', border: '1px solid #EF444433', borderRadius: 6, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center' }}>
+                                <TrashIcon />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {addingMember?.teamId === team.id ? (
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
+                        <select value={addingMember.userId} onChange={e => setAddingMember(v => ({ ...v, userId: e.target.value }))}
+                          style={{ flex: 1, padding: '8px 10px', border: '1px solid var(--border-input)', borderRadius: 8, fontSize: 13, background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: 'inherit' }}>
+                          <option value="">Selecione o professor</option>
+                          {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                        </select>
+                        <select value={addingMember.disciplineId} onChange={e => setAddingMember(v => ({ ...v, disciplineId: e.target.value }))}
+                          style={{ flex: 1, padding: '8px 10px', border: '1px solid var(--border-input)', borderRadius: 8, fontSize: 13, background: 'var(--bg-card)', color: 'var(--text-main)', fontFamily: 'inherit' }}>
+                          <option value="">Selecione a disciplina</option>
+                          {orgDisciplines.map(d => <option key={d.id} value={d.id}>{d.subject}</option>)}
+                        </select>
+                        <button onClick={() => addTeamMember(team.id)} disabled={savingTeamMember || !addingMember.userId || !addingMember.disciplineId}
+                          style={{ padding: '8px 16px', background: '#0081f0', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+                          Adicionar
+                        </button>
+                        <button onClick={() => setAddingMember(null)} style={{ padding: '8px 10px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, cursor: 'pointer', color: 'var(--text-muted)', flexShrink: 0 }}>×</button>
+                      </div>
+                    ) : (
+                      <button onClick={() => setAddingMember({ teamId: team.id, userId: '', disciplineId: '' })}
+                        style={{ padding: '6px 14px', border: '1px dashed var(--border)', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
+                        + Adicionar professor
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </>
       )}
     </AppLayout>

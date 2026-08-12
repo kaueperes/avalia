@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/auth';
+import { managedDisciplineIds } from '@/lib/orgAuth';
 import { PLANS } from '@/lib/types';
 
 function fmt(e, authorName) {
@@ -18,12 +19,12 @@ export async function GET(request) {
   const disciplineId = searchParams.get('disciplineId');
 
   let query = supabase.from('exercises').select('*').order('created_at', { ascending: false });
-  if (dbUser?.org_id && dbUser.org_role === 'admin') {
-    // Admin vê também os exercícios de outros professores nas disciplinas compartilhadas da org
-    const { data: orgDisciplines } = await supabase.from('disciplines').select('id').eq('org_id', dbUser.org_id);
-    const orgDisciplineIds = (orgDisciplines || []).map(d => d.id);
-    query = orgDisciplineIds.length
-      ? query.or(`user_id.eq.${user.userId},discipline_id.in.(${orgDisciplineIds.join(',')})`)
+  if (dbUser?.org_id) {
+    // Admin vê disciplinas de toda a org; coordenador só das equipes que coordena
+    const ctx = { userId: user.userId, orgId: dbUser.org_id, orgRole: dbUser.org_role };
+    const visibleDisciplineIds = await managedDisciplineIds(ctx);
+    query = visibleDisciplineIds.length
+      ? query.or(`user_id.eq.${user.userId},discipline_id.in.(${visibleDisciplineIds.join(',')})`)
       : query.eq('user_id', user.userId);
   } else {
     query = query.eq('user_id', user.userId);

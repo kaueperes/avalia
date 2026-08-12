@@ -17,5 +17,7 @@ export async function GET(request) {
     .eq('id', dbUser.org_id)
     .single();
 
-  return NextResponse.json(org || {});
+  const { count } = await supabase.from('org_teams').select('id', { count: 'exact', head: true }).eq('coordinator_id', user.userId);
+
+  return NextResponse.json({ ...(org || {}), isCoordinator: !!count });
 }

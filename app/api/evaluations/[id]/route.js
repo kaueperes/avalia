@@ -11,7 +11,7 @@ export async function GET(request, { params }) {
   if (!ctx) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
   const { data, error } = await supabase.from('evaluations').select('*').eq('id', params.id).single();
-  if (error || !data || !(await canAccessOrgMember(ctx, data.user_id))) {
+  if (error || !data || !(await canAccessOrgMember(ctx, data.user_id, data.disciplina))) {
     return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
   }
   return NextResponse.json(fmt(data));
@@ -21,8 +21,8 @@ export async function PUT(request, { params }) {
   const ctx = await getOrgContext(request);
   if (!ctx) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  const { data: existing } = await supabase.from('evaluations').select('user_id').eq('id', params.id).single();
-  if (!existing || !(await canAccessOrgMember(ctx, existing.user_id))) {
+  const { data: existing } = await supabase.from('evaluations').select('user_id, disciplina').eq('id', params.id).single();
+  if (!existing || !(await canAccessOrgMember(ctx, existing.user_id, existing.disciplina))) {
     return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
   }
 
@@ -39,8 +39,8 @@ export async function DELETE(request, { params }) {
   const ctx = await getOrgContext(request);
   if (!ctx) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-  const { data: existing } = await supabase.from('evaluations').select('user_id').eq('id', params.id).single();
-  if (!existing || !(await canAccessOrgMember(ctx, existing.user_id))) {
+  const { data: existing } = await supabase.from('evaluations').select('user_id, disciplina').eq('id', params.id).single();
+  if (!existing || !(await canAccessOrgMember(ctx, existing.user_id, existing.disciplina))) {
     return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
   }
 

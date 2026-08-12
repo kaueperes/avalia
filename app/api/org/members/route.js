@@ -59,6 +59,12 @@ export async function DELETE(request) {
   const { data: member } = await supabase.from('users').select('org_id, org_quota_used').eq('id', memberId).single();
   if (member?.org_id !== admin.orgId) return NextResponse.json({ error: 'Membro não encontrado' }, { status: 404 });
 
+  // Limpa vínculos de equipe: sai de qualquer equipe que estivesse, e perde
+  // a coordenação de qualquer equipe que coordenava (não fica "coordenador
+  // fantasma" de uma equipe numa org da qual ele nem faz mais parte)
+  await supabase.from('org_team_members').delete().eq('user_id', memberId);
+  await supabase.from('org_teams').update({ coordinator_id: null }).eq('coordinator_id', memberId);
+
   // Reverter o membro para plano gratuito e desvinculá-lo da org
   await supabase.from('users').update({
     org_id: null,
