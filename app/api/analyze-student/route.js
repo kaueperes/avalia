@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { getUserFromRequest } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { PLANS, TYPES } from '@/lib/types';
@@ -163,6 +164,7 @@ Responda APENAS com um JSON válido neste formato exato (sem markdown, sem texto
 
     return NextResponse.json({ ...analysis, disciplina, tipoTrabalho, stats });
   } catch (err) {
+    Sentry.captureException(err);
     console.error('analyze-student error:', err);
     return NextResponse.json({ error: 'Erro ao chamar a IA. Verifique sua chave ANTHROPIC_API_KEY.' }, { status: 500 });
   }

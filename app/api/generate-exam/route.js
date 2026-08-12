@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { getUserFromRequest } from '@/lib/auth';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenAI } from '@google/genai';
@@ -141,6 +142,7 @@ Responda APENAS com o texto da prova (e gabarito, se solicitado), sem comentári
 
     return NextResponse.json({ examText, quotaProvasRestante: quotaRestante });
   } catch (err) {
+    Sentry.captureException(err);
     console.error('generate-exam error:', err?.message || err);
     if (err?.status === 529 || err?.error?.type === 'overloaded_error') {
       return NextResponse.json({ error: 'Os servidores estão sobrecarregados no momento. Aguarde alguns segundos e tente novamente.' }, { status: 503 });

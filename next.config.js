@@ -1,3 +1,5 @@
+const { withSentryConfig } = require('@sentry/nextjs');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
@@ -6,4 +8,9 @@ const nextConfig = {
     ];
   },
 };
-module.exports = nextConfig;
+
+module.exports = withSentryConfig(nextConfig, {
+  org: 'kriteria-na',
+  project: 'javascript-nextjs',
+  silent: true,
+});

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { getUserFromRequest } from '@/lib/auth';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenAI } from '@google/genai';
@@ -356,6 +357,7 @@ Este trabalho é visual. Ao escrever o feedback, referencie elementos visuais co
       quota_testes_restante: quotaRestante,
     });
   } catch (err) {
+    Sentry.captureException(err);
     console.error('evaluate-test error:', err?.message || err);
     if (err?.status === 529 || err?.error?.type === 'overloaded_error') {
       return NextResponse.json({ error: 'Os servidores estão sobrecarregados. Aguarde alguns segundos e tente novamente.' }, { status: 503 });

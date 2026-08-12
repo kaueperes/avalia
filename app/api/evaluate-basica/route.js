@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { getUserFromRequest } from '@/lib/auth';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenAI } from '@google/genai';
@@ -191,6 +192,7 @@ Regras importantes:
 
     return NextResponse.json({ items: parsed.items || [], summary: parsed.summary || '', suggestedScore: parsed.suggestedScore || null });
   } catch (err) {
+    Sentry.captureException(err);
     console.error('evaluate-basica error:', err?.message || err);
     if (err?.status === 529 || err?.error?.type === 'overloaded_error') {
       return NextResponse.json({ error: 'Os servidores estão sobrecarregados no momento. Aguarde alguns segundos e tente novamente.' }, { status: 503 });

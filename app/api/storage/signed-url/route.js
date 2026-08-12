@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { getUserFromRequest } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 
@@ -34,6 +35,7 @@ export async function POST(request) {
 
     return NextResponse.json({ signedUrl: data.signedUrl, path });
   } catch (err) {
+    Sentry.captureException(err);
     console.error('signed-url error:', err?.message || err);
     return NextResponse.json({ error: 'Erro ao criar URL de upload.' }, { status: 500 });
   }

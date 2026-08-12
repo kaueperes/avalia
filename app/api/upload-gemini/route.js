@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { getUserFromRequest } from '@/lib/auth';
 import { GoogleGenAI } from '@google/genai';
 import { supabase } from '@/lib/supabase';
@@ -57,6 +58,7 @@ export async function POST(request) {
       label: label || 'Trabalho do aluno',
     });
   } catch (err) {
+    Sentry.captureException(err);
     console.error('upload-gemini error:', err?.message || err);
     return NextResponse.json(
       { error: 'Erro ao enviar arquivo para o servidor de IA. Tente novamente.' },

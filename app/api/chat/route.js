@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { getUserFromRequest } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { PLANS } from '@/lib/types';
@@ -72,6 +73,7 @@ export async function POST(request) {
 
     return NextResponse.json({ reply: text });
   } catch (err) {
+    Sentry.captureException(err);
     console.error('chat error:', err);
     return NextResponse.json({ error: 'Erro ao chamar a IA.' }, { status: 500 });
   }
