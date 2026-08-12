@@ -1,10 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LoginPage() {
+function LoginPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -12,13 +14,14 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!localStorage.getItem('token')) return;
+    if (redirect) { router.replace(redirect); return; }
     try {
       const u = JSON.parse(localStorage.getItem('user') || '{}');
       router.replace(u.onboarding_done ? '/inicio' : '/onboarding');
     } catch {
       router.replace('/inicio');
     }
-  }, [router]);
+  }, [router, redirect]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -34,7 +37,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.error);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      router.push(data.user.onboarding_done ? '/inicio' : '/onboarding');
+      router.push(redirect || (data.user.onboarding_done ? '/inicio' : '/onboarding'));
     } catch (err) {
       setError(err.message || 'Erro ao fazer login');
     } finally {
@@ -115,10 +118,18 @@ export default function LoginPage() {
 
           <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#9CA3AF' }}>
             Não tem conta?{' '}
-            <Link href="/signup" style={{ color: '#0081f0', fontWeight: 600, textDecoration: 'none' }}>Criar conta grátis</Link>
+            <Link href={redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : '/signup'} style={{ color: '#0081f0', fontWeight: 600, textDecoration: 'none' }}>Criar conta grátis</Link>
           </p>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageInner />
+    </Suspense>
   );
 }

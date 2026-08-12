@@ -1,11 +1,13 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { fbTrack } from '@/lib/pixel';
 
-export default function SignupPage() {
+function SignupPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +29,7 @@ export default function SignupPage() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       fbTrack('CompleteRegistration');
-      router.push('/onboarding');
+      router.push(redirect || '/onboarding');
     } catch (err) {
       setError(err.message || 'Erro ao criar conta');
     } finally {
@@ -114,10 +116,18 @@ export default function SignupPage() {
 
           <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#9CA3AF' }}>
             Já tem conta?{' '}
-            <Link href="/login" style={{ color: '#0081f0', fontWeight: 600, textDecoration: 'none' }}>Entrar</Link>
+            <Link href={redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : '/login'} style={{ color: '#0081f0', fontWeight: 600, textDecoration: 'none' }}>Entrar</Link>
           </p>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignupPageInner />
+    </Suspense>
   );
 }
