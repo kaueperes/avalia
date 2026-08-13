@@ -8,6 +8,12 @@ function fmt(dt) {
   return new Date(dt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+const TrashIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+  </svg>
+);
+
 export default function OrgRelatoriosPage() {
   const router = useRouter();
   const [userName, setUserName] = useState('');
@@ -46,6 +52,12 @@ export default function OrgRelatoriosPage() {
     if (r.type === 'aluno') return `/relatorio-aluno-evolucao?id=${r.id}`;
     if (r.reportTemplate === 'turma-evolucao') return `/relatorio-turma-evolucao?id=${r.id}`;
     return `/relatorio-turma?id=${r.id}`;
+  }
+
+  async function del(id) {
+    if (!confirm('Excluir este relatório?')) return;
+    await fetch(`/api/reports/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token()}` } });
+    setReports(prev => prev.filter(r => r.id !== id));
   }
 
   return (
@@ -96,12 +108,22 @@ export default function OrgRelatoriosPage() {
                     {r.teacherName} · {r.disciplina || 'sem disciplina'} · {fmt(r.created_at)}
                   </p>
                 </div>
-                <button
-                  onClick={() => router.push(reportRoute(r))}
-                  style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}
-                >
-                  Ver relatório
-                </button>
+                <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                  <button onClick={() => window.open(reportRoute(r), '_blank')}
+                    style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: '#0081f0', fontFamily: 'inherit' }}>
+                    Ver
+                  </button>
+                  <button onClick={() => window.open(`${reportRoute(r)}&print=1`, '_blank')}
+                    style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit' }}>
+                    Baixar PDF
+                  </button>
+                  {r.isOwner && (
+                    <button onClick={() => del(r.id)}
+                      style={{ padding: '5px 9px', border: '1px solid #EF444433', borderRadius: 7, cursor: 'pointer', background: 'transparent', color: '#EF4444', display: 'flex', alignItems: 'center', fontFamily: 'inherit' }}>
+                      <TrashIcon />
+                    </button>
+                  )}
+                </div>
               </div>
             ))
           )}

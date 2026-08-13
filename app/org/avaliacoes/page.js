@@ -169,12 +169,16 @@ export default function OrgAvaliacoesPage() {
                       <span style={{ fontSize: 14, fontWeight: 800, color: scoreColor(e.score) }}>{e.score?.toFixed(1)}</span>
                     </td>
                     <td style={{ padding: '13px 18px' }}>
-                      <button
-                        onClick={() => router.push(`/relatorio-individual?id=${e.id}`)}
-                        style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', whiteSpace: 'nowrap' }}
-                      >
-                        Ver PDF
-                      </button>
+                      <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                        <button onClick={() => window.open(`/relatorio-individual?id=${e.id}`, '_blank')}
+                          style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: '#0081f0', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                          Ver
+                        </button>
+                        <button onClick={() => window.open(`/relatorio-individual?id=${e.id}&print=1`, '_blank')}
+                          style={{ padding: '5px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+                          Baixar PDF
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -67,6 +67,9 @@ export async function GET(request) {
     disciplina: content?.disciplina || '',
     resumo: content?.resumo || content?.parecer || '',
     reportTemplate: content?.stats?.reportTemplate || null,
+    // Só quem gerou o relatório (o próprio admin/coordenador) pode excluí-lo —
+    // relatório gerado pelo professor na própria página dele continua intacto.
+    isOwner: user_id === user.userId,
   }));
 
   return NextResponse.json(all);
