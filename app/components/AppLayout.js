@@ -360,14 +360,14 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
             {orgRole && orgQuota && (
               <div
                 className="quota-display"
-                onClick={orgRole === 'admin' ? () => router.push('/org/dashboard') : undefined}
-                title={orgRole === 'admin' ? 'Ver detalhes do pool da instituição' : undefined}
+                onClick={(orgRole === 'admin' || orgQuota?.isCoordinator) ? () => router.push('/org/dashboard') : undefined}
+                title={(orgRole === 'admin' || orgQuota?.isCoordinator) ? 'Ver detalhes do pool da instituição' : undefined}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '5px 12px', borderRadius: 8, cursor: orgRole === 'admin' ? 'pointer' : 'default',
+                  padding: '5px 12px', borderRadius: 8, cursor: (orgRole === 'admin' || orgQuota?.isCoordinator) ? 'pointer' : 'default',
                   border: `1px solid ${border}`,
                 }}
-                onMouseEnter={e => { if (orgRole === 'admin') e.currentTarget.style.background = navHover; }}
+                onMouseEnter={e => { if (orgRole === 'admin' || orgQuota?.isCoordinator) e.currentTarget.style.background = navHover; }}
                 onMouseLeave={e => e.currentTarget.style.background = 'none'}
               >
                 <span style={{ fontSize: 12, fontWeight: 600, color: (orgQuota.quota_pool - orgQuota.quota_used) <= 0 && (orgQuota.quota_pool_extra || 0) <= 0 ? '#EF4444' : textMain }}>
@@ -496,7 +496,8 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
                   { Icon: ClipboardIcon, label: 'Avaliações da Instituição', href: '/org/avaliacoes' },
                   { Icon: BarChartIcon, label: 'Relatórios da Instituição', href: '/org/relatorios' },
                 ] : orgQuota?.isCoordinator ? [
-                  { Icon: ClipboardIcon, label: 'Avaliações da Instituição', href: '/org/avaliacoes', divider: true },
+                  { Icon: BuildingIcon, label: 'Painel da Instituição', href: '/org/dashboard', divider: true },
+                  { Icon: ClipboardIcon, label: 'Avaliações da Instituição', href: '/org/avaliacoes' },
                   { Icon: BarChartIcon, label: 'Relatórios da Instituição', href: '/org/relatorios' },
                 ] : []),
                 ...(isAdmin ? [{ Icon: ShieldIcon, label: 'Administração', href: '/admin' }] : []),
