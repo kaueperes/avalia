@@ -217,6 +217,10 @@ export default function TurmasPage() {
                 const isExpanded = expandedClass === cls.id;
                 const students = studentsByClass[cls.id] || [];
                 const canEditThis = cls.userId === userId || orgRole === 'admin';
+                // Adicionar aluno é liberado pra qualquer professor com acesso à turma;
+                // editar/excluir só quem criou aquele aluno específico, ou dono/admin.
+                const canManageStudent = s => canEditThis || s.userId === userId;
+                const manageableStudents = students.filter(canManageStudent);
 
                 return (
                   <div key={cls.id} style={{ background: 'var(--bg-card)', border: `1px solid ${editingClassId === cls.id ? '#0081f0' : 'var(--border-card)'}`, borderRadius: 12, overflow: 'hidden' }}>
@@ -257,12 +261,12 @@ export default function TurmasPage() {
                         {/* Lista de alunos */}
                         {students.length > 0 ? (
                           <div style={{ marginBottom: 12 }}>
-                            {canEditThis && (
+                            {manageableStudents.length > 0 && (
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, padding: '0 10px' }}>
                                 <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer', userSelect: 'none' }}>
                                   <input type="checkbox"
-                                    checked={students.length > 0 && selectedStudents.size === students.length}
-                                    onChange={e => setSelectedStudents(e.target.checked ? new Set(students.map(s => s.id)) : new Set())}
+                                    checked={manageableStudents.length > 0 && selectedStudents.size === manageableStudents.length}
+                                    onChange={e => setSelectedStudents(e.target.checked ? new Set(manageableStudents.map(s => s.id)) : new Set())}
                                     style={{ cursor: 'pointer', accentColor: '#0081f0' }}
                                   />
                                   Selecionar todos
@@ -277,7 +281,7 @@ export default function TurmasPage() {
                             )}
                             {students.map((s, idx) => (
                               <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', borderRadius: 8, background: idx % 2 === 0 ? 'var(--bg-card)' : 'transparent' }}>
-                                {canEditThis && (
+                                {canManageStudent(s) && (
                                   <input type="checkbox"
                                     checked={selectedStudents.has(s.id)}
                                     onChange={() => toggleSelect(s.id)}
@@ -305,7 +309,7 @@ export default function TurmasPage() {
                                 ) : (
                                   <>
                                     <span style={{ fontSize: 14, color: 'var(--text-main)', flex: 1 }}>{s.name}</span>
-                                    {canEditThis && (
+                                    {canManageStudent(s) && (
                                       <>
                                         <button onClick={() => { setEditingStudentId(s.id); setEditingStudentName(s.name); }}
                                           style={{ padding: '3px 9px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)', flexShrink: 0 }}>
@@ -326,31 +330,29 @@ export default function TurmasPage() {
                           <p style={{ fontSize: 13, color: 'var(--text-sub)', marginBottom: 12, fontStyle: 'italic' }}>Nenhum aluno cadastrado ainda.</p>
                         )}
 
-                        {/* Adicionar alunos */}
-                        {canEditThis ? (
-                          <>
-                            <p style={{ fontSize: 12, color: 'var(--text-sub)', marginBottom: 6 }}>
-                              Cole os nomes — um por linha, ou separados por vírgula/ponto-e-vírgula. Também aceita colunas copiadas de planilha.
-                            </p>
-                            <textarea
-                              style={{ ...inputStyle, minHeight: 110, resize: 'vertical', fontSize: 13, lineHeight: 1.6, marginBottom: 8 }}
-                              value={importText}
-                              onChange={e => setImportText(e.target.value)}
-                              placeholder={"João Silva\nMaria Oliveira\nPedro Santos"}
-                            />
-                            <div style={{ display: 'flex', gap: 8 }}>
-                              <button onClick={() => importStudents(cls.id)} disabled={loadingImport || !importText.trim()}
-                                style={{ padding: '8px 18px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: loadingImport ? 'wait' : 'pointer', opacity: !importText.trim() ? 0.5 : 1 }}>
-                                {loadingImport ? 'Adicionando...' : `Adicionar${parseNames(importText).length > 0 ? ` (${parseNames(importText).length})` : ''}`}
-                              </button>
-                              <button onClick={() => setImportText('')}
-                                style={{ padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
-                                Cancelar
-                              </button>
-                            </div>
-                          </>
-                        ) : (
-                          <p style={{ fontSize: 12, color: 'var(--text-sub)', fontStyle: 'italic' }}>Os alunos dessa turma são gerenciados pela sua instituição.</p>
+                        {/* Adicionar alunos — liberado pra qualquer professor com acesso à turma */}
+                        <p style={{ fontSize: 12, color: 'var(--text-sub)', marginBottom: 6 }}>
+                          Cole os nomes — um por linha, ou separados por vírgula/ponto-e-vírgula. Também aceita colunas copiadas de planilha.
+                        </p>
+                        <textarea
+                          style={{ ...inputStyle, minHeight: 110, resize: 'vertical', fontSize: 13, lineHeight: 1.6, marginBottom: 8 }}
+                          value={importText}
+                          onChange={e => setImportText(e.target.value)}
+                          placeholder={"João Silva\nMaria Oliveira\nPedro Santos"}
+                        />
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button onClick={() => importStudents(cls.id)} disabled={loadingImport || !importText.trim()}
+                            style={{ padding: '8px 18px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: loadingImport ? 'wait' : 'pointer', opacity: !importText.trim() ? 0.5 : 1 }}>
+                            {loadingImport ? 'Adicionando...' : `Adicionar${parseNames(importText).length > 0 ? ` (${parseNames(importText).length})` : ''}`}
+                          </button>
+                          <button onClick={() => setImportText('')}
+                            style={{ padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 9, fontSize: 13, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
+                            Cancelar
+                          </button>
+                        </div>
+                        {!canEditThis && (
+                          <p style={{ fontSize: 12, color: 'var(--text-sub)', fontStyle: 'italic', marginTop: 8 }}>Você só pode editar ou excluir os alunos que você mesmo adicionou.</p>
+                        )}
                         )}
                       </div>
                     )}
@@ -388,7 +390,9 @@ export default function TurmasPage() {
 
           <div style={{ padding: '12px 14px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 10, marginBottom: 24 }}>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
-              Após criar a turma, clique em <strong>Alunos</strong> para adicionar os alunos à turma.
+              {orgRole === 'admin'
+                ? 'Turmas criadas aqui ficam disponíveis para todos os professores da instituição escolherem.'
+                : <>Após criar a turma, clique em <strong>Alunos</strong> para adicionar os alunos à turma.</>}
             </p>
           </div>
 

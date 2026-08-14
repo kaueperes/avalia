@@ -47,9 +47,9 @@ export async function POST(request) {
   if (!cls) return NextResponse.json({ error: 'Turma não encontrada' }, { status: 404 });
   if (cls.user_id !== user.userId) {
     if (!cls.org_id) return NextResponse.json({ error: 'Turma não encontrada' }, { status: 404 });
-    const { data: dbUser } = await supabase.from('users').select('org_id, org_role').eq('id', user.userId).single();
-    if (dbUser?.org_id !== cls.org_id || dbUser.org_role !== 'admin') {
-      return NextResponse.json({ error: 'Alunos são gerenciados pela sua instituição. Fale com o administrador.' }, { status: 403 });
+    const { data: dbUser } = await supabase.from('users').select('org_id').eq('id', user.userId).single();
+    if (dbUser?.org_id !== cls.org_id) {
+      return NextResponse.json({ error: 'Turma não encontrada' }, { status: 404 });
     }
   }
 

@@ -12,16 +12,19 @@ function fmt(s) {
   };
 }
 
-// Aluno herda permissão da turma (própria ou compartilhada da org, só admin mexe)
+// Aluno herda permissão da turma (própria, ou compartilhada da org — aí só quem
+// criou aquele aluno ou o admin pode editar/excluir, pra evitar um professor
+// mexer no que outro colega cadastrou por engano).
 async function canManage(request, studentId) {
   const user = getUserFromRequest(request);
   if (!user) return null;
-  const { data: student } = await supabase.from('students').select('class_id').eq('id', studentId).single();
+  const { data: student } = await supabase.from('students').select('user_id, class_id').eq('id', studentId).single();
   if (!student) return null;
   const { data: cls } = await supabase.from('classes').select('user_id, org_id').eq('id', student.class_id).single();
   if (!cls) return null;
   if (cls.user_id === user.userId) return user;
   if (!cls.org_id) return null;
+  if (student.user_id === user.userId) return user;
   const { data: dbUser } = await supabase.from('users').select('org_id, org_role').eq('id', user.userId).single();
   return (dbUser?.org_id === cls.org_id && dbUser.org_role === 'admin') ? user : null;
 }
