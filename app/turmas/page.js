@@ -353,7 +353,6 @@ export default function TurmasPage() {
                         {!canEditThis && (
                           <p style={{ fontSize: 12, color: 'var(--text-sub)', fontStyle: 'italic', marginTop: 8 }}>Você só pode editar ou excluir os alunos que você mesmo adicionou.</p>
                         )}
-                        )}
                       </div>
                     )}
                   </div>
