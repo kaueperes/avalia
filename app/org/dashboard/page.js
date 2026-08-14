@@ -252,6 +252,8 @@ export default function OrgDashboardPage() {
 
   const quotaLeft = orgInfo ? (orgInfo.org?.quota_pool || 0) - (orgInfo.org?.quota_used || 0) + (orgInfo.org?.quota_pool_extra || 0) : 0;
   const pct = orgInfo?.org?.quota_pool > 0 ? Math.round((orgInfo.org.quota_used / orgInfo.org.quota_pool) * 100) : 0;
+  const relLeft = orgInfo ? (orgInfo.org?.quota_relatorios_pool || 0) - (orgInfo.org?.quota_relatorios_used || 0) + (orgInfo.org?.quota_relatorios_pool_extra || 0) : 0;
+  const relPct = orgInfo?.org?.quota_relatorios_pool > 0 ? Math.round((orgInfo.org.quota_relatorios_used / orgInfo.org.quota_relatorios_pool) * 100) : 0;
 
   const inpStyle = {
     padding: '8px 14px', border: '1px solid var(--border)', borderRadius: 9,
@@ -289,35 +291,35 @@ export default function OrgDashboardPage() {
       {!loading && (
         <>
           {isAdmin && orgInfo && (
-            <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 20 }}>
-                <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '20px 24px', border: '1px solid var(--border-card)' }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Avaliações disponíveis</p>
-                  <p style={{ fontSize: 32, fontWeight: 800, color: quotaLeft <= 20 ? '#ef4444' : '#0081f0', letterSpacing: '-1px', lineHeight: 1 }}>{quotaLeft}</p>
-                  <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>de {orgInfo.org?.quota_pool || 0} no pool</p>
-                </div>
-                <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '20px 24px', border: '1px solid var(--border-card)' }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Professores cadastrados</p>
-                  <p style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1 }}>{orgInfo.memberCount}</p>
-                  {orgInfo.pendingInvites > 0 && <p style={{ fontSize: 13, color: '#d97706', marginTop: 4 }}>{orgInfo.pendingInvites} convite{orgInfo.pendingInvites > 1 ? 's' : ''} pendente{orgInfo.pendingInvites > 1 ? 's' : ''}</p>}
-                </div>
-                <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '20px 24px', border: '1px solid var(--border-card)' }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Avaliações este mês</p>
-                  <p style={{ fontSize: 32, fontWeight: 800, color: '#810cfa', letterSpacing: '-1px', lineHeight: 1 }}>{orgInfo.evalThisMonth}</p>
-                </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1fr 1fr', gap: 14, marginBottom: 24 }}>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 20px', border: '1px solid var(--border-card)' }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Professores cadastrados</p>
+                <p style={{ fontSize: 26, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1 }}>{orgInfo.memberCount}</p>
+                {orgInfo.pendingInvites > 0 && <p style={{ fontSize: 12, color: '#d97706', marginTop: 4 }}>{orgInfo.pendingInvites} convite{orgInfo.pendingInvites > 1 ? 's' : ''} pendente{orgInfo.pendingInvites > 1 ? 's' : ''}</p>}
               </div>
 
-              <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '20px 24px', border: '1px solid var(--border-card)', marginBottom: 24 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>Uso do pool de avaliações</p>
-                  <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{orgInfo.org?.quota_used || 0} / {orgInfo.org?.quota_pool || 0} usadas</p>
+              <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 20px', border: '1px solid var(--border-card)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Avaliações disponíveis</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{orgInfo.org?.quota_used || 0}/{orgInfo.org?.quota_pool || 0}</p>
                 </div>
-                <div style={{ height: 10, background: 'var(--bg-content)', borderRadius: 99, overflow: 'hidden' }}>
+                <div style={{ height: 8, background: 'var(--bg-content)', borderRadius: 99, overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${Math.min(pct, 100)}%`, background: pct >= 90 ? '#ef4444' : pct >= 70 ? '#d97706' : '#0081f0', borderRadius: 99, transition: 'width .3s' }} />
                 </div>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>{pct}% utilizado</p>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>{quotaLeft} disponíveis · {pct}% utilizado</p>
               </div>
-            </>
+
+              <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 20px', border: '1px solid var(--border-card)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-main)' }}>Relatórios disponíveis</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{orgInfo.org?.quota_relatorios_used || 0}/{orgInfo.org?.quota_relatorios_pool || 0}</p>
+                </div>
+                <div style={{ height: 8, background: 'var(--bg-content)', borderRadius: 99, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${Math.min(relPct, 100)}%`, background: relPct >= 90 ? '#ef4444' : relPct >= 70 ? '#d97706' : '#0081f0', borderRadius: 99, transition: 'width .3s' }} />
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>{relLeft} disponíveis · {relPct}% utilizado</p>
+              </div>
+            </div>
           )}
 
           {evaluations.length === 0 ? (
