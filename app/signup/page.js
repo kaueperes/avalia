@@ -28,7 +28,7 @@ function SignupPageInner() {
       if (!res.ok) throw new Error(data.error);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      fbTrack('CompleteRegistration');
+      fbTrack('CompleteRegistration', undefined, data.fbEventId);
       router.push(redirect || '/onboarding');
     } catch (err) {
       setError(err.message || 'Erro ao criar conta');

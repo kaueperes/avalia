@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { Resend } from 'resend';
 import { supabase } from '@/lib/supabase';
 import { signToken } from '@/lib/auth';
+import { sendMetaCapiEvent } from '@/lib/metaConversionsApi';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -30,8 +32,19 @@ export async function POST(request) {
 
     const token = signToken({ userId: user.id, email: user.email });
 
-    const firstName = name.split(' ')[0];
+    // event_id compartilhado com o fbq() do cliente — Meta deduplica em vez de
+    // contar o mesmo cadastro duas vezes (pixel do navegador + CAPI do servidor).
+    const fbEventId = crypto.randomUUID();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    sendMetaCapiEvent({
+      eventName: 'CompleteRegistration',
+      eventId: fbEventId,
+      eventSourceUrl: `${appUrl}/signup`,
+      email: user.email,
+      request,
+    }).catch(() => {});
+
+    const firstName = name.split(' ')[0];
     resend.emails.send({
       from: 'Kriteria <noreply@kriteria.education>',
       to: email,
@@ -66,7 +79,8 @@ export async function POST(request) {
 
     return NextResponse.json({
       token,
-      user: { id: user.id, name: user.name, email: user.email, plan: user.plan, onboarding_done: false }
+      user: { id: user.id, name: user.name, email: user.email, plan: user.plan, onboarding_done: false },
+      fbEventId,
     }, { status: 201 });
   } catch {
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
