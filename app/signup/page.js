@@ -63,7 +63,7 @@ function SignupPageInner() {
             </span>
           </h2>
           <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.6, marginBottom: 40, maxWidth: 360 }}>
-            Crie sua conta grátis e comece a usar o poder da IA para corrigir trabalhos em segundos.
+            Crie sua conta grátis e comece a usar o poder do Kriteria para corrigir trabalhos em segundos.
           </p>
           {['5 avaliações gratuitas por mês', 'Sem cartão de crédito necessário', 'Cancele quando quiser'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>

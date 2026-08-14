@@ -18,7 +18,7 @@ const faqs = [
       },
       {
         q: 'O que são exercícios?',
-        a: 'Exercícios são os enunciados ou briefings das atividades que você passa para os alunos. Você cria uma vez em "Exercícios" e reutiliza em várias avaliações. A IA leva o enunciado em conta na análise do trabalho.',
+        a: 'Exercícios são os enunciados ou briefings das atividades que você passa para os alunos. Você cria uma vez em "Exercícios" e reutiliza em várias avaliações. O Kriteria leva o enunciado em conta na análise do trabalho.',
       },
     ],
   },
@@ -35,10 +35,10 @@ const faqs = [
       },
       {
         q: 'O que é a Nova Avaliação Básica?',
-        a: 'É um modo de correção rápida por foto ou texto, sem precisar cadastrar exercício, critérios ou aluno antes. Ideal para provas objetivas (matemática, português etc). A IA analisa questão por questão e diz o que está certo, errado ou incerto, com nota sugerida. Não gera histórico nem PDF — é pra você ler na tela e escrever direto na prova do aluno. Está disponível em todos os planos, inclusive o Gratuito.',
+        a: 'É um modo de correção rápida por foto ou texto, sem precisar cadastrar exercício, critérios ou aluno antes. Ideal para provas objetivas (matemática, português etc). O Kriteria analisa questão por questão e diz o que está certo, errado ou incerto, com nota sugerida. Não gera histórico nem PDF — é pra você ler na tela e escrever direto na prova do aluno. Está disponível em todos os planos, inclusive o Gratuito.',
       },
       {
-        q: 'O feedback da IA pode ser editado?',
+        q: 'O feedback do Kriteria pode ser editado?',
         a: 'Sim. Após a avaliação ser gerada, você pode editar qualquer parte do feedback antes de exportar ou compartilhar com o aluno.',
       },
       {
@@ -52,7 +52,7 @@ const faqs = [
     items: [
       {
         q: 'Como funciona o Gerador de Provas?',
-        a: 'Você informa a matéria, o tema, o nível/série, a quantidade de questões e o tipo (múltipla escolha, dissertativa, verdadeiro/falso ou mista). A IA gera o texto completo da prova, com gabarito opcional ao final, para você copiar e colar onde precisar.',
+        a: 'Você informa a matéria, o tema, o nível/série, a quantidade de questões e o tipo (múltipla escolha, dissertativa, verdadeiro/falso ou mista). O Kriteria gera o texto completo da prova, com gabarito opcional ao final, para você copiar e colar onde precisar.',
       },
       {
         q: 'Em quais planos o Gerador de Provas está disponível?',
@@ -86,7 +86,7 @@ const faqs = [
     items: [
       {
         q: 'O que são os relatórios de turma?',
-        a: 'Disponíveis nos planos Pro e Premium, os relatórios de turma mostram médias, taxas de aprovação, desempenho por critério e alertas sobre pontos onde a turma toda está com dificuldade — gerados por IA.',
+        a: 'Disponíveis nos planos Pro e Premium, os relatórios de turma mostram médias, taxas de aprovação, desempenho por critério e alertas sobre pontos onde a turma toda está com dificuldade — gerados pelo Kriteria.',
       },
       {
         q: 'O que são os relatórios individuais de aluno?',
