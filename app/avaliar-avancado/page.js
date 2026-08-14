@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { TONES, scoreToGrade, scoreColor } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
+import Tooltip from '../components/Tooltip';
 import { VideoTutorialLink } from '../components/VideoTutorial';
 import { findSimilarPairs } from '@/lib/textSimilarity';
 import { hashFile, findDuplicateFiles } from '@/lib/fileHash';
@@ -739,7 +740,7 @@ export default function AvaliarV2() {
 
             {/* Tom */}
             <div style={section}>
-              <div style={secLabel}>Tom do Feedback</div>
+              <div style={secLabel}><Tooltip text="Define o estilo do texto nos feedbacks — do mais técnico ao mais encorajador.">Tom do Feedback</Tooltip></div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {TONES.map(t => (
                   <button key={t.id} onClick={() => setTone(t.id)} title={t.desc}
@@ -782,7 +783,7 @@ export default function AvaliarV2() {
 
             <div style={section}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                <div style={secLabel}>Critérios de Avaliação</div>
+                <div style={secLabel}><Tooltip text="Cada critério recebe nota de 0 a 10. O peso (×) define a importância do critério na nota final.">Critérios de Avaliação</Tooltip></div>
                 <button style={{ background: 'transparent', color: 'var(--text-sub)', border: '1px solid var(--border)', borderRadius: 8, padding: '5px 12px', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'inherit' }}
                   onClick={() => setCriteria(prev => [...prev, { name: '', weight: 1 }])}>
                   <IconPlus /> Adicionar

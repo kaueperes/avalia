@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '../../components/AppLayout';
+import Tooltip from '../../components/Tooltip';
 
 const TrashIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -345,11 +346,16 @@ export default function OrgProfessoresPage() {
                           <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 8 }}>
                             <span style={{ fontSize: 13, color: 'var(--text-main)' }}>
                               {m.userName} — {m.disciplineName}
-                              {team.coordinatorId === m.userId && <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: '#eff6ff', color: '#0081f0', border: '1px solid #bfdbfe' }}>★ Coordenador</span>}
+                              {team.coordinatorId === m.userId && (
+                                <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: '#eff6ff', color: '#0081f0', border: '1px solid #bfdbfe' }}>
+                                  <Tooltip text="Coordenador vê o painel institucional e as avaliações/relatórios dos professores desta equipe — só da disciplina vinculada aqui, não de outras equipes.">★ Coordenador</Tooltip>
+                                </span>
+                              )}
                             </span>
                             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                               {team.coordinatorId !== m.userId && (
                                 <button onClick={() => setCoordinator(team.id, m.userId)}
+                                  title="Coordenador passa a ver o painel institucional e as avaliações/relatórios da equipe, restrito à disciplina vinculada aqui."
                                   style={{ padding: '3px 8px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 11, cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)' }}>
                                   Definir coordenador
                                 </button>

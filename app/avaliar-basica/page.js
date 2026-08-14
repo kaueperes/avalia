@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import AppLayout from '../components/AppLayout';
+import Tooltip from '../components/Tooltip';
 import { VideoTutorialLink } from '../components/VideoTutorial';
 import { findSimilarPairs } from '@/lib/textSimilarity';
 import { hashFile, findDuplicateFiles } from '@/lib/fileHash';
@@ -342,7 +343,7 @@ export default function AvaliarBasica() {
       <div style={{ maxWidth: 680 }}>
         <div style={{ ...card, marginBottom: 16 }}>
           <div style={sectionLast}>
-            <div style={secLabel}>Contexto ou gabarito (opcional)</div>
+            <div style={secLabel}><Tooltip text="Questões objetivas (cálculo, múltipla escolha) o Kriteria resolve sozinho, sem precisar de gabarito. Para questões que dependem do que foi ensinado em aula, sem gabarito o resultado vem como 'incerto' — cole aqui pra evitar isso.">Contexto ou gabarito (opcional)</Tooltip></div>
             <textarea value={context} onChange={e => setContext(e.target.value)} rows={3}
               placeholder="Ex: 7 questões sobre equação de 2º grau. Ou cole o gabarito, se tiver."
               style={{ ...inp, marginBottom: 10 }} />
