@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import AppLayout from '../components/AppLayout';
 import { VideoTutorialLink } from '../components/VideoTutorial';
 import { findSimilarPairs } from '@/lib/textSimilarity';
+import { hashFile, findDuplicateFiles } from '@/lib/fileHash';
 import mammoth from 'mammoth';
 
 // Compara as respostas dos alunos questão por questão (não o texto todo) —
@@ -25,6 +26,17 @@ function computeSimilarityWarnings(slots) {
   return warnings.sort((a, b) => b.score - a.score);
 }
 
+// Mesmo arquivo (foto, pdf etc) enviado por mais de um aluno — hash bate,
+// certeza absoluta, diferente da similaridade de texto que é probabilística.
+function computeDuplicateFileWarnings(slots) {
+  const entries = slots.map((slot, i) => ({
+    id: slot.id,
+    name: slot.studentName || `Aluno ${i + 1}`,
+    files: slot.fileUris,
+  }));
+  return findDuplicateFiles(entries);
+}
+
 // ── Extração de texto local: .docx (mammoth), .doc/.txt (leitura direta) ─────
 // Evita subir esses formatos como arquivo binário pro Gemini, que não os lê corretamente.
 async function extractTextFromFile(file) {
@@ -40,6 +52,8 @@ function token() { return typeof window !== 'undefined' ? localStorage.getItem('
 
 // ── Upload de arquivo: Supabase Storage → Gemini Files API ───────────────────
 async function uploadFileToGemini(file, label) {
+  const hash = await hashFile(file).catch(() => null);
+
   const urlRes = await fetch('/api/storage/signed-url', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
@@ -63,7 +77,7 @@ async function uploadFileToGemini(file, label) {
   const geminiData = await geminiRes.json();
   if (!geminiRes.ok) throw new Error(geminiData.error || 'Erro ao processar arquivo');
 
-  return { fileUri: geminiData.fileUri, mimeType: geminiData.mimeType, label, name: file.name };
+  return { fileUri: geminiData.fileUri, mimeType: geminiData.mimeType, label, name: file.name, hash };
 }
 
 let _slotId = 0;
@@ -310,6 +324,7 @@ export default function AvaliarBasica() {
   const canCorrect = readySlots.length > 0 && !anyProcessing && !correcting;
   const anyResult = slots.some(s => s.result);
   const similarityWarnings = useMemo(() => computeSimilarityWarnings(slots), [slots]);
+  const duplicateFileWarnings = useMemo(() => computeDuplicateFileWarnings(slots), [slots]);
 
   return (
     <AppLayout userName={userName}>
@@ -353,6 +368,25 @@ export default function AvaliarBasica() {
             )}
           </div>
         </div>
+
+        {duplicateFileWarnings.length > 0 && (
+          <div style={{ ...card, background: '#FFFBEB', border: '1px solid #d9770633', padding: '16px 18px', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <IconHelp />
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#d97706' }}>Mesmo arquivo enviado por mais de um aluno</span>
+            </div>
+            <p style={{ fontSize: 13, color: 'var(--text-main)', margin: '0 0 8px' }}>
+              Esses alunos enviaram um arquivo idêntico (mesmo conteúdo, byte a byte) — vale conferir:
+            </p>
+            <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {duplicateFileWarnings.map((w, i) => (
+                <li key={i} style={{ fontSize: 13, color: 'var(--text-main)' }}>
+                  <strong>{w.aName}</strong> e <strong>{w.bName}</strong> — {w.fileName}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {similarityWarnings.length > 0 && (
           <div style={{ ...card, background: '#FFFBEB', border: '1px solid #d9770633', padding: '16px 18px', marginBottom: 16 }}>
