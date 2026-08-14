@@ -210,6 +210,14 @@ export default function InstituicaoPage() {
             )}
           </Field>
 
+          {orgRole === 'admin' && (
+            <div style={{ padding: '12px 14px', background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 10, marginBottom: 8 }}>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+                Instituições criadas aqui ficam disponíveis para todos os professores da instituição escolherem.
+              </p>
+            </div>
+          )}
+
           <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
             <button onClick={save} disabled={loading}
               style={{ padding: '11px 24px', background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}>
