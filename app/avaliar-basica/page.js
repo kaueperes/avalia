@@ -1,8 +1,29 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AppLayout from '../components/AppLayout';
 import { VideoTutorialLink } from '../components/VideoTutorial';
+import { findSimilarPairs } from '@/lib/textSimilarity';
 import mammoth from 'mammoth';
+
+// Compara as respostas dos alunos questão por questão (não o texto todo) —
+// pega cola pontual numa questão específica sem comparar coisas sem relação.
+function computeSimilarityWarnings(slots) {
+  const byQuestion = {};
+  slots.forEach((slot, i) => {
+    if (!slot.result?.items) return;
+    const name = slot.studentName || `Aluno ${i + 1}`;
+    for (const item of slot.result.items) {
+      if (!item.answer) continue;
+      const q = item.question || '?';
+      (byQuestion[q] ||= []).push({ id: slot.id, name, text: item.answer });
+    }
+  });
+  const warnings = [];
+  for (const [question, entries] of Object.entries(byQuestion)) {
+    for (const pair of findSimilarPairs(entries)) warnings.push({ question, ...pair });
+  }
+  return warnings.sort((a, b) => b.score - a.score);
+}
 
 // ── Extração de texto local: .docx (mammoth), .doc/.txt (leitura direta) ─────
 // Evita subir esses formatos como arquivo binário pro Gemini, que não os lê corretamente.
@@ -288,6 +309,7 @@ export default function AvaliarBasica() {
   const readySlots = slots.filter(s => s.studentWork || s.fileUris.length > 0);
   const canCorrect = readySlots.length > 0 && !anyProcessing && !correcting;
   const anyResult = slots.some(s => s.result);
+  const similarityWarnings = useMemo(() => computeSimilarityWarnings(slots), [slots]);
 
   return (
     <AppLayout userName={userName}>
@@ -331,6 +353,25 @@ export default function AvaliarBasica() {
             )}
           </div>
         </div>
+
+        {similarityWarnings.length > 0 && (
+          <div style={{ ...card, background: '#FFFBEB', border: '1px solid #d9770633', padding: '16px 18px', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <IconHelp />
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#d97706' }}>Respostas parecidas encontradas</span>
+            </div>
+            <p style={{ fontSize: 13, color: 'var(--text-main)', margin: '0 0 8px' }}>
+              Vale conferir com mais atenção — pode ser coincidência (ex: mesma resposta objetiva certa) ou cola entre os alunos:
+            </p>
+            <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {similarityWarnings.map((w, i) => (
+                <li key={i} style={{ fontSize: 13, color: 'var(--text-main)' }}>
+                  Questão {w.question}: <strong>{w.aName}</strong> e <strong>{w.bName}</strong> ({Math.round(w.score * 100)}% parecido)
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {slots.map((slot, i) => (
           <SlotCard key={slot.id} slot={slot} index={i}

@@ -1,10 +1,22 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { TONES, scoreToGrade, scoreColor } from '@/lib/types';
 import AppLayout from '../components/AppLayout';
 import { VideoTutorialLink } from '../components/VideoTutorial';
+import { findSimilarPairs } from '@/lib/textSimilarity';
 import mammoth from 'mammoth';
+
+// Compara o trabalho completo de cada aluno contra os outros do mesmo lote —
+// só faz sentido pra trabalhos com conteúdo textual (a IA transcreve em submittedText).
+function computeSimilarityWarnings(slots) {
+  const entries = slots.map((s, i) => ({
+    id: s.id,
+    name: s.studentName || `Aluno ${i + 1}`,
+    text: s.result?.submittedText || '',
+  }));
+  return findSimilarPairs(entries);
+}
 
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') : null; }
 
@@ -626,6 +638,7 @@ export default function AvaliarV2() {
   const anyProcessing = slots.some(s => s.processing);
   const readySlots = slots.filter(s => s.textContent || s.fileUris?.length > 0 || s.linkUrl);
   const doneSlots = slots.filter(s => s.result);
+  const similarityWarnings = useMemo(() => computeSimilarityWarnings(slots), [slots]);
 
   // Design system
   const secLabel = { fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 };
@@ -899,6 +912,24 @@ export default function AvaliarV2() {
                 <button style={btnPrimary} onClick={reset}>Nova Avaliação</button>
               </div>
             </div>
+            {similarityWarnings.length > 0 && (
+              <div style={{ border: '1px solid #d9770633', borderRadius: 12, background: '#FFFBEB', padding: '16px 18px', marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#d97706' }}>Trabalhos parecidos encontrados</span>
+                </div>
+                <p style={{ fontSize: 13, color: 'var(--text-main)', margin: '0 0 8px' }}>
+                  Vale conferir com mais atenção antes de aprovar as notas:
+                </p>
+                <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {similarityWarnings.map((w, i) => (
+                    <li key={i} style={{ fontSize: 13, color: 'var(--text-main)' }}>
+                      <strong>{w.aName}</strong> e <strong>{w.bName}</strong> ({Math.round(w.score * 100)}% parecido)
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {slots.filter(s => s.result || s.error).map(slot => (
                 <div key={slot.id}>

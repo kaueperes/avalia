@@ -153,7 +153,8 @@ Avalie o trabalho e responda APENAS com JSON válido (sem markdown, sem texto fo
     {"name": "nome exato do critério", "score": 7.5, "weight": 2},
     ...
   ],
-  "feedback": "Texto completo do feedback em português, no tom especificado"
+  "feedback": "Texto completo do feedback em português, no tom especificado",
+  "submittedText": "transcrição literal do conteúdo textual do trabalho do aluno (o texto em si, ou o que está escrito/falado na mídia enviada), o mais completa possível — uso interno, nunca aparece pro aluno"
 }
 
 Contexto importante: este é um trabalho acadêmico de um aluno em formação. As notas devem refletir o desempenho esperado para o nível de aprendizado, não um padrão profissional.
@@ -223,7 +224,7 @@ ${referenceText}
     for (const candidate of candidates) {
       try { return JSON.parse(candidate); } catch {}
       // second attempt: strip control characters that sometimes appear in AI output
-      try { return JSON.parse(candidate.replace(/[ -]/g, ' ')); } catch {}
+      try { return JSON.parse(candidate.replace(/[\x00-\x1f\x7f]/g, ' ')); } catch {}
     }
     throw new Error('invalid_json');
   }
@@ -429,7 +430,7 @@ ${referenceText}
       }
     }
 
-    return NextResponse.json({ score, criteriaScores: parsed.criteriaScores, feedback: parsed.feedback });
+    return NextResponse.json({ score, criteriaScores: parsed.criteriaScores, feedback: parsed.feedback, submittedText: parsed.submittedText || '' });
   } catch (err) {
     Sentry.captureException(err);
     console.error('evaluate error:', err?.message || err, err?.status, err?.error);

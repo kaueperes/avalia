@@ -64,7 +64,7 @@ ${studentWork ? `Prova do aluno (texto):\n${studentWork}\n` : 'Prova do aluno: v
 Analise questão por questão e responda APENAS com JSON válido (sem markdown, sem texto fora do JSON):
 {
   "items": [
-    {"question": "identificação da questão (ex: '1', '2a')", "status": "certo" | "errado" | "incerto", "comment": "explicação curta e direta do que está certo, o que errou, ou por que você não tem certeza"}
+    {"question": "identificação da questão (ex: '1', '2a')", "status": "certo" | "errado" | "incerto", "comment": "explicação curta e direta do que está certo, o que errou, ou por que você não tem certeza", "answer": "transcrição literal da resposta do aluno para essa questão, o mais completa possível"}
   ],
   "summary": "resumo geral em 1-2 frases",
   "suggestedScore": "nota sugerida no formato 'X/10' ou null se não for possível calcular"
@@ -74,6 +74,7 @@ Regras importantes:
 - Para questões objetivas (cálculo, resposta numérica, múltipla escolha), você mesmo pode resolver e verificar a resposta do aluno — não precisa de gabarito para isso
 - Para questões que dependem do que foi especificamente ensinado em aula ou de um livro didático (datas, definições, interpretação de texto sem gabarito claro), e nenhum contexto/gabarito foi fornecido: marque "status": "incerto" e explique no comment que a resposta esperada depende do que foi ensinado em aula — não afirme com confiança total
 - Seja direto e objetivo nos comentários — o professor vai escrever isso rapidamente na prova
+- O campo "answer" é só uso interno (nunca aparece pro aluno) — transcreva fielmente o que o aluno escreveu ou marcou, mesmo se estiver errado
 - Responda em português brasileiro`;
 
   function parseJson(text) {
