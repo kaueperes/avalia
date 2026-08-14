@@ -302,8 +302,8 @@ export default function OrgProfessoresPage() {
 
           {/* Equipes */}
           <div style={{ marginTop: 24 }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Equipes</p>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.3px', marginBottom: 6 }}>Equipes</h2>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 14 }}>
               Uma equipe representa um curso — um professor pode estar em várias, cada uma com sua própria disciplina e coordenador.
             </p>
 
