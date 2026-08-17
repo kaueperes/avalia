@@ -196,7 +196,7 @@ export default function AvaliacaoAula() {
   return (
     <AppLayout userName={userName}>
       <div style={{ marginBottom: 28 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Beta</p>
+        <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Ferramenta (Beta)</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px', margin: 0 }}>Avaliação de Aula</h1>
         <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 0 }}>
           Grave o áudio da sua aula e receba um feedback privado sobre sua própria prática — didática, conteúdo ou dinâmica, do jeito que você escolher.
