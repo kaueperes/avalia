@@ -158,6 +158,9 @@ export default function Home() {
           .footer-grid { grid-template-columns: 1fr !important; }
           .cat-grid { grid-template-columns: repeat(2,1fr) !important; }
         }
+        @media (max-width: 480px) {
+          .mockup-stats-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: 'white', color: '#111827' }}>
@@ -606,7 +609,7 @@ export default function Home() {
                 </div>
                 <div style={{ padding: '16px 20px', borderBottom: '1px solid #F3F4F6' }}>
                   <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Resumo da turma</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                  <div className="mockup-stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
                     {[['7.4', 'Média geral', '#0081f0'], ['79%', 'Aprovação', '#10B981'], ['34', 'Avaliados', '#6B7280']].map(([val, label, color]) => (
                       <div key={label} style={{ textAlign: 'center', padding: '12px 8px', background: '#F9FAFB', borderRadius: 10, border: '1px solid #F3F4F6' }}>
                         <div style={{ fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{val}</div>

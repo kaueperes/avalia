@@ -168,6 +168,7 @@ export default function AdminUsuariosPage() {
 
       {!loading && users.length > 0 && (
         <div style={{ border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden', background: 'var(--bg-card)' }}>
+          <div className="table-scroll">
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-content)' }}>
@@ -264,6 +265,7 @@ export default function AdminUsuariosPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
@@ -307,6 +309,7 @@ export default function AdminUsuariosPage() {
                 <div style={{ textAlign: 'center', padding: 48, color: 'var(--text-muted)', fontSize: 14 }}>Nenhuma avaliação encontrada.</div>
               )}
               {!evalsLoading && evals.length > 0 && (
+                <div className="table-scroll">
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-content)' }}>
@@ -338,6 +341,7 @@ export default function AdminUsuariosPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           </div>

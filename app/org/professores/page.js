@@ -204,6 +204,7 @@ export default function OrgProfessoresPage() {
             {members.length === 0 ? (
               <div style={{ padding: '32px 24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>Nenhum professor na organização ainda.</div>
             ) : (
+              <div className="table-scroll">
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ background: 'var(--bg-content)' }}>
@@ -277,6 +278,7 @@ export default function OrgProfessoresPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
 

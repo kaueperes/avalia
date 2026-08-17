@@ -328,7 +328,7 @@ export default function InicioPage() {
       </div>
 
       {/* ── KPIs ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 20 }}>
+      <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 20 }}>
         {kpis.map((kpi, i) => (
           <div key={i} style={{ background: kpi.alert ? '#fff5f5' : 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: `1px solid ${kpi.alert ? '#fecaca' : 'var(--border-card)'}`, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -395,7 +395,7 @@ export default function InicioPage() {
           )}
 
           {/* ── Charts Row ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
 
             {/* Evolução da média */}
             <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '22px 24px' }}>
@@ -460,7 +460,7 @@ export default function InicioPage() {
           </div>
 
           {/* ── Atenção + Turmas ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: allTurmas.length > 0 ? '1fr 1fr' : '1fr', gap: 16, marginBottom: 16 }}>
+          <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: allTurmas.length > 0 ? '1fr 1fr' : '1fr', gap: 16, marginBottom: 16 }}>
 
             {/* Alunos em atenção */}
             <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '22px 24px' }}>

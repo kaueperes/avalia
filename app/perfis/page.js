@@ -104,7 +104,7 @@ export default function PerfisPage() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: profiles.length > 0 ? '1fr 1.2fr' : '1fr', gap: 24, alignItems: 'start', minWidth: 0, overflow: 'hidden' }}>
+      <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: profiles.length > 0 ? '1fr 1.2fr' : '1fr', gap: 24, alignItems: 'start', minWidth: 0, overflow: 'hidden' }}>
 
         {/* Lista de perfis */}
         {profiles.length > 0 && (

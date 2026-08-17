@@ -291,7 +291,7 @@ export default function OrgDashboardPage() {
       {!loading && (
         <>
           {isAdmin && orgInfo && (
-            <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1fr 1fr', gap: 14, marginBottom: 24 }}>
+            <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '0.8fr 1fr 1fr', gap: 14, marginBottom: 24 }}>
               <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 20px', border: '1px solid var(--border-card)' }}>
                 <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Professores cadastrados</p>
                 <p style={{ fontSize: 26, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1 }}>{orgInfo.memberCount}</p>
@@ -331,7 +331,7 @@ export default function OrgDashboardPage() {
             </div>
           ) : (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 20 }}>
+              <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 20 }}>
                 {kpis.map((kpi, i) => (
                   <div key={i} style={{ background: kpi.alert ? '#fff5f5' : 'var(--bg-card)', borderRadius: 14, padding: '18px 20px', border: `1px solid ${kpi.alert ? '#fecaca' : 'var(--border-card)'}`, display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{kpi.label}</span>
@@ -371,7 +371,7 @@ export default function OrgDashboardPage() {
                 </div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+              <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
                 <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '22px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                     <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>Evolução da média</h3>
@@ -392,7 +392,7 @@ export default function OrgDashboardPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: allTurmas.length > 0 ? '1fr 1fr' : '1fr', gap: 16, marginBottom: 16 }}>
+              <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: allTurmas.length > 0 ? '1fr 1fr' : '1fr', gap: 16, marginBottom: 16 }}>
                 <div style={{ background: 'var(--bg-card)', borderRadius: 14, border: '1px solid var(--border-card)', padding: '22px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444', flexShrink: 0 }} />

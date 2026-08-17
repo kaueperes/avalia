@@ -286,7 +286,7 @@ function ContaPageInner() {
 
       {/* ── Informações pessoais ── */}
       <Section title="Informações pessoais" subtitle="Seu nome e e-mail de acesso à plataforma.">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+        <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
           <Field label="Nome completo">
             <Input value={name} onChange={e => setName(e.target.value)} placeholder="Seu nome" />
           </Field>
@@ -302,7 +302,7 @@ function ContaPageInner() {
 
       {/* ── Segurança ── */}
       <Section title="Segurança" subtitle="Altere sua senha de acesso.">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
+        <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
           <Field label="Senha atual">
             <Input type="password" value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="••••••••" />
           </Field>
@@ -340,7 +340,7 @@ function ContaPageInner() {
 
         {/* Plan cards */}
         {!isOrgUser && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>
+        <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>
           {PLANS.map(plan => {
             const isCurrent = plan.id === userPlan;
             const isLoading = upgradeLoading === plan.id;
@@ -387,7 +387,7 @@ function ContaPageInner() {
         {isOrgUser && orgQuota && (
           <>
             <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Cota da instituição</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 28 }}>
+            <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 28 }}>
               <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
                 <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Avaliações do pool</p>
                 <p style={{ fontSize: 28, fontWeight: 800, color: (orgQuota.quota_pool - orgQuota.quota_used) <= 0 ? '#EF4444' : 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
@@ -424,7 +424,7 @@ function ContaPageInner() {
         {quotaCiclo !== null && !isOrgUser && (
           <>
             <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Suas cotas</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 28 }}>
+            <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 28 }}>
               <div style={{ padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
                 <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Avaliações do plano</p>
                 <p style={{ fontSize: 28, fontWeight: 800, color: quotaCiclo === 0 ? '#EF4444' : 'var(--text-main)', letterSpacing: '-1px', lineHeight: 1, marginBottom: 6 }}>
@@ -471,7 +471,7 @@ function ContaPageInner() {
         {userPlan !== 'gratuito' && !isOrgUser && (
           <>
             <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Comprar extras</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               {ADDONS.map(addon => (
                 <div key={addon.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-content)' }}>
                   <div>

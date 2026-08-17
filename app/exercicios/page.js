@@ -132,7 +132,7 @@ export default function ExerciciosPage() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: exercises.length > 0 ? '1fr 1.2fr' : '1fr', gap: 24, alignItems: 'start', minWidth: 0, overflow: 'hidden' }}>
+      <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: exercises.length > 0 ? '1fr 1.2fr' : '1fr', gap: 24, alignItems: 'start', minWidth: 0, overflow: 'hidden' }}>
 
         {/* Lista */}
         {exercises.length > 0 && (

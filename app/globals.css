@@ -57,3 +57,22 @@ body {
   }
   .quota-display { display: none !important; }
 }
+
+/* Grids inline de layout (KPIs, listas+detalhe, formulários) — empilha em coluna única no mobile */
+@media (max-width: 640px) {
+  .grid-collapse { grid-template-columns: 1fr !important; }
+}
+
+/* Tabelas largas — permite rolagem horizontal em vez de cortar/esmagar conteúdo */
+.table-scroll { overflow-x: auto; }
+
+/* ChatBot janela — largura fixa (360px) estoura em celular */
+@media (max-width: 480px) {
+  .chatbot-window {
+    width: calc(100vw - 24px) !important;
+    right: 12px !important;
+    bottom: 80px !important;
+    height: min(500px, 70vh) !important;
+    max-height: calc(100vh - 150px) !important;
+  }
+}

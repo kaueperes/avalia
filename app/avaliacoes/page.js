@@ -624,7 +624,7 @@ export default function AvaliacoesPage() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>
+      <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>
         {[
           { label: 'Total de avaliações', value: evaluations.length },
           { label: 'Média geral', value: avg },
@@ -691,6 +691,7 @@ export default function AvaliacoesPage() {
             )}
           </div>
         ) : (
+          <div className="table-scroll">
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ background: 'var(--bg-content)' }}>
@@ -746,6 +747,7 @@ export default function AvaliacoesPage() {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 
@@ -917,7 +919,7 @@ export default function AvaliacoesPage() {
                 </div>
 
                 {/* KPIs */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
+                <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
                   {[
                     { label: 'Média da turma', value: selectedEvals.length ? (selectedEvals.reduce((s,e)=>s+e.score,0)/selectedEvals.length).toFixed(1) : '—', color: '#0081f0' },
                     { label: 'Aprovados (≥5)', value: selectedEvals.filter(e=>e.score>=5).length, color: '#16a34a' },
@@ -946,7 +948,7 @@ export default function AvaliacoesPage() {
                   const cAvg = Object.entries(cMap).map(([name, d]) => ({ name, avg: parseFloat((d.total/d.n).toFixed(1)) })).sort((a,b) => b.avg - a.avg);
                   if (!cAvg.length) return null;
                   return (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+                    <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
                       <div style={{ background: 'var(--bg-content)', borderRadius: 10, padding: '14px 16px', border: '1px solid var(--border-card)' }}>
                         <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Distribuição de notas</p>
                         <div dangerouslySetInnerHTML={{ __html: _histSVG(dist) }} />

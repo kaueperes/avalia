@@ -123,7 +123,7 @@ export default function ChatBot({ darkMode }) {
     <>
       {/* Chat window */}
       {open && (
-        <div style={{
+        <div className="chatbot-window" style={{
           position: 'fixed', bottom: 88, right: 24, zIndex: 999,
           width: 360, height: 500,
           background: bg, border: `1px solid ${border}`,

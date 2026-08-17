@@ -497,7 +497,7 @@ export default function RelatoriosPage() {
       const pct = s.total > 0 ? Math.round((s.aprovados / s.total) * 100) : 0;
       return (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8 }}>
+          <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8 }}>
             {[
               { l: 'Média Inicial', v: s.mediaInicial?.toFixed(1), c: chartColor(s.mediaInicial || 0) },
               { l: 'Média Atual', v: s.mediaAtual?.toFixed(1), c: chartColor(s.mediaAtual || 0) },
@@ -570,7 +570,7 @@ export default function RelatoriosPage() {
     const pct = s.total > 0 ? Math.round((s.aprovados / s.total) * 100) : 0;
     return (
       <>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+        <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
           {[
             { l: 'Média', v: s.media?.toFixed(1), c: chartColor(s.media || 0) },
             { l: 'Aprovação', v: `${pct}%`, c: '#16a34a' },
@@ -584,7 +584,7 @@ export default function RelatoriosPage() {
           ))}
         </div>
         {(s.distribuicao || s.criteriaAverages?.length > 0) && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {s.distribuicao && <div><p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-sub)', marginBottom: 8 }}>Distribuição de notas</p><div dangerouslySetInnerHTML={{ __html: histSVG(s.distribuicao) }} /></div>}
             {s.criteriaAverages?.length > 0 && <div><p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-sub)', marginBottom: 8 }}>Média por critério</p><div dangerouslySetInnerHTML={{ __html: barsSVG(s.criteriaAverages, 270) }} /></div>}
           </div>
@@ -931,7 +931,7 @@ export default function RelatoriosPage() {
                       <p style={{ fontSize: 14, lineHeight: 1.8, color: 'var(--text-main)' }}>{detail.content.resumo}</p>
                     </div>
                   )}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                     {detail.content.pontosFortes?.length > 0 && (
                       <div style={{ padding: '16px', border: '1px solid #bbf7d0', borderRadius: 12, background: 'var(--bg-content)' }}>
                         <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#16a34a', marginBottom: 10 }}>Pontos Fortes</p>

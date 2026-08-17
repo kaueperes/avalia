@@ -146,6 +146,7 @@ export default function OrgAvaliacoesPage() {
               {evals.length === 0 ? 'Nenhuma avaliação ainda.' : 'Nenhum resultado para esse filtro.'}
             </div>
           ) : (
+            <div className="table-scroll">
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'var(--bg-content)' }}>
@@ -184,6 +185,7 @@ export default function OrgAvaliacoesPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       )}

@@ -84,7 +84,7 @@ export default function Contato() {
 
       {/* Main content */}
       <section style={{ padding: '80px 32px 96px', background: '#F9FAFB' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 48, alignItems: 'start' }}>
+        <div className="grid-collapse" style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 48, alignItems: 'start' }}>
 
           {/* Sidebar info */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -136,7 +136,7 @@ export default function Contato() {
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                     <div>
                       <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Nome</label>
                       <input

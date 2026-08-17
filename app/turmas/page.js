@@ -205,7 +205,7 @@ export default function TurmasPage() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: classes.length > 0 ? '1.4fr 1fr' : '1fr', gap: 24, alignItems: 'start' }}>
+      <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: classes.length > 0 ? '1.4fr 1fr' : '1fr', gap: 24, alignItems: 'start' }}>
 
         {/* Lista de turmas */}
         {classes.length > 0 && (

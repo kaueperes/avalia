@@ -453,7 +453,7 @@ export default function DisciplinasPage() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: disciplines.length > 0 ? '1.4fr 1fr' : '1fr', gap: 24, alignItems: 'start' }}>
+      <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: disciplines.length > 0 ? '1.4fr 1fr' : '1fr', gap: 24, alignItems: 'start' }}>
 
         {/* Lista de disciplinas */}
         {disciplines.length > 0 && (
