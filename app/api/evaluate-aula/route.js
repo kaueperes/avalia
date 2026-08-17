@@ -3,10 +3,9 @@ import * as Sentry from '@sentry/nextjs';
 import { getUserFromRequest } from '@/lib/auth';
 import { GoogleGenAI } from '@google/genai';
 import { supabase } from '@/lib/supabase';
+import { PLANS } from '@/lib/types';
 
 export const maxDuration = 60;
-
-const QUOTA_AULA_MENSAL = 10;
 
 const TEMA_LABELS = {
   didatica: 'Didática (clareza da explicação, ritmo, verificação de entendimento)',
@@ -62,10 +61,19 @@ export async function GET(request) {
   let query = supabase.from('class_evaluations').select('*').eq('user_id', user.userId).order('created_at', { ascending: false });
   if (tema) query = query.contains('temas', [tema]);
 
-  const { data, error } = await query;
+  const [{ data: history, error }, { data: dbUser }] = await Promise.all([
+    query,
+    supabase.from('users').select('plan, quota_aula, quota_aula_reset_date, aula_trial_used').eq('id', user.userId).single(),
+  ]);
   if (error) return NextResponse.json({ error: 'Erro ao buscar histórico.' }, { status: 500 });
 
-  return NextResponse.json(data || []);
+  const isGratuito = !dbUser?.plan || dbUser.plan === 'gratuito';
+  const limit = (PLANS[dbUser?.plan] || PLANS.gratuito).limits.avaliacaoAula ?? 0;
+  const quota = isGratuito
+    ? { isGratuito: true, trialUsed: !!dbUser?.aula_trial_used }
+    : { isGratuito: false, limit, remaining: typeof dbUser.quota_aula === 'number' ? dbUser.quota_aula : limit };
+
+  return NextResponse.json({ history: history || [], quota });
 }
 
 export async function POST(request) {
@@ -81,6 +89,7 @@ export async function POST(request) {
     .eq('id', user.userId).single();
 
   const isGratuito = !dbUser?.plan || dbUser.plan === 'gratuito';
+  const planQuotaAula = (PLANS[dbUser?.plan] || PLANS.gratuito).limits.avaliacaoAula ?? 0;
 
   if (isGratuito) {
     if (dbUser?.aula_trial_used) {
@@ -92,12 +101,12 @@ export async function POST(request) {
       const nextReset = new Date();
       nextReset.setMonth(nextReset.getMonth() + 1);
       await supabase.from('users').update({
-        quota_aula: QUOTA_AULA_MENSAL,
+        quota_aula: planQuotaAula,
         quota_aula_reset_date: nextReset.toISOString(),
       }).eq('id', user.userId);
-      dbUser.quota_aula = QUOTA_AULA_MENSAL;
+      dbUser.quota_aula = planQuotaAula;
     }
-    const restante = typeof dbUser.quota_aula === 'number' ? dbUser.quota_aula : QUOTA_AULA_MENSAL;
+    const restante = typeof dbUser.quota_aula === 'number' ? dbUser.quota_aula : planQuotaAula;
     if (restante <= 0) {
       return NextResponse.json({ error: 'Você esgotou suas Avaliações de Aula este mês. Renova no próximo ciclo.' }, { status: 402 });
     }
@@ -168,14 +177,17 @@ Regras importantes:
 
     if (saveErr) console.error('class_evaluations insert error:', saveErr.message);
 
+    let quota;
     if (isGratuito) {
       await supabase.from('users').update({ aula_trial_used: true }).eq('id', user.userId);
+      quota = { isGratuito: true, trialUsed: true };
     } else {
-      const restante = typeof dbUser.quota_aula === 'number' ? dbUser.quota_aula : QUOTA_AULA_MENSAL;
+      const restante = typeof dbUser.quota_aula === 'number' ? dbUser.quota_aula : planQuotaAula;
       await supabase.from('users').update({ quota_aula: restante - 1 }).eq('id', user.userId);
+      quota = { isGratuito: false, limit: planQuotaAula, remaining: Math.max(0, restante - 1) };
     }
 
-    return NextResponse.json(saved || { temas, contexto, tom, ...parsed });
+    return NextResponse.json({ ...(saved || { temas, contexto, tom, ...parsed }), _quota: quota });
   } catch (err) {
     Sentry.captureException(err);
     console.error('evaluate-aula error:', err?.message || err);

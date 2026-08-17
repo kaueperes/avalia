@@ -116,6 +116,7 @@ export default function AvaliacaoAula() {
   const [history, setHistory] = useState([]);
   const [historyFilter, setHistoryFilter] = useState('');
   const [historyLoading, setHistoryLoading] = useState(true);
+  const [quota, setQuota] = useState(null);
   const fileRef = useRef(null);
 
   useEffect(() => {
@@ -131,7 +132,7 @@ export default function AvaliacaoAula() {
     const qs = tema ? `?tema=${tema}` : '';
     fetch(`/api/evaluate-aula${qs}`, { headers: { Authorization: `Bearer ${token()}` } })
       .then(r => r.json())
-      .then(data => setHistory(Array.isArray(data) ? data : []))
+      .then(data => { setHistory(Array.isArray(data.history) ? data.history : []); if (data.quota) setQuota(data.quota); })
       .catch(() => setHistory([]))
       .finally(() => setHistoryLoading(false));
   }
@@ -168,15 +169,8 @@ export default function AvaliacaoAula() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao avaliar a aula');
       setResult(data);
+      if (data._quota) setQuota(data._quota);
       loadHistory(historyFilter);
-
-      try {
-        const u = JSON.parse(localStorage.getItem('user') || '{}');
-        if (!u.plan || u.plan === 'gratuito') u.aula_trial_used = true;
-        else if (typeof u.quota_aula === 'number') u.quota_aula = Math.max(0, u.quota_aula - 1);
-        localStorage.setItem('user', JSON.stringify(u));
-        window.dispatchEvent(new Event('storage'));
-      } catch {}
     } catch (e) {
       setError(e.message || 'Erro ao avaliar a aula');
     } finally {
@@ -188,7 +182,14 @@ export default function AvaliacaoAula() {
     setAudioFile(null); setUploadInfo(null); setTemas([]); setTemaOutro(''); setContexto(''); setTom('encorajador'); setResult(null); setError('');
   }
 
-  const canEvaluate = uploadInfo && temas.length > 0 && contexto.trim() && !evaluating && !uploading;
+  const quotaExhausted = quota ? (quota.isGratuito ? quota.trialUsed : quota.remaining <= 0) : false;
+  const canEvaluate = uploadInfo && temas.length > 0 && contexto.trim() && !evaluating && !uploading && !quotaExhausted;
+
+  const quotaLabel = !quota ? null
+    : quota.isGratuito
+      ? (quota.trialUsed ? 'Você já usou sua avaliação de aula gratuita — faça upgrade de plano para continuar.' : 'Você tem 1 avaliação de aula grátis (vitalícia) disponível.')
+      : `Você tem ${quota.remaining} de ${quota.limit} avaliações de aula disponíveis este mês.`;
+  const quotaColor = quotaExhausted ? '#dc2626' : 'var(--text-muted)';
 
   const inp = { width: '100%', padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 10, fontSize: 14, background: 'var(--bg-content)', color: 'var(--text-main)', fontFamily: 'inherit', boxSizing: 'border-box', resize: 'vertical' };
   const card = { background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 14, padding: '22px 24px' };
@@ -198,9 +199,14 @@ export default function AvaliacaoAula() {
       <div style={{ marginBottom: 28 }}>
         <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6 }}>Ferramenta (Beta)</p>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px', margin: 0 }}>Avaliação de Aula</h1>
-        <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 0 }}>
+        <p style={{ fontSize: 15, color: 'var(--text-muted)', marginTop: 6, marginBottom: 6 }}>
           Grave o áudio da sua aula e receba um feedback privado sobre sua própria prática — didática, conteúdo ou dinâmica, do jeito que você escolher.
         </p>
+        {quotaLabel && (
+          <p style={{ fontSize: 13, color: quotaColor, fontWeight: quotaExhausted ? 700 : 500, marginTop: 8 }}>
+            {quotaExhausted ? '⚠ ' : ''}{quotaLabel}
+          </p>
+        )}
       </div>
 
       <div style={{ maxWidth: 680 }}>
