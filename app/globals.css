@@ -66,6 +66,11 @@ body {
 /* Tabelas largas — permite rolagem horizontal em vez de cortar/esmagar conteúdo */
 .table-scroll { overflow-x: auto; }
 
+/* Campos de filtro com largura fixa — em celular, cada um ocupa a linha toda */
+@media (max-width: 480px) {
+  .filter-field { width: 100% !important; }
+}
+
 /* ChatBot janela — largura fixa (360px) estoura em celular */
 @media (max-width: 480px) {
   .chatbot-window {

@@ -466,7 +466,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
           </div>
         </header>
 
-        <div style={{ display: 'flex', flex: 1, paddingTop: 58 }}>
+        <div style={{ display: 'flex', flex: 1, paddingTop: 58, minWidth: 0 }}>
 
           {/* Backdrop (mobile only) */}
           {menuOpen && (
@@ -539,7 +539,7 @@ export default function AppLayout({ children, userName = 'Professor', userEmail 
           </aside>
 
           {/* ── MAIN CONTENT ── */}
-          <main className="main-area" style={{ marginLeft: 320, flex: 1, minHeight: '100%', padding: noPadding ? 0 : '32px 36px', overflow: noPadding ? 'hidden' : undefined }}>
+          <main className="main-area" style={{ marginLeft: 320, flex: 1, minWidth: 0, minHeight: '100%', padding: noPadding ? 0 : '32px 36px', overflow: noPadding ? 'hidden' : undefined }}>
             {children}
           </main>
         </div>

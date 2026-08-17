@@ -644,20 +644,20 @@ export default function AvaliacoesPage() {
           <Tooltip text="Filtre as avaliações por aluno, tipo de trabalho, turma, exercício ou faixa de nota.">Filtros</Tooltip>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <input style={{ ...inpStyle, width: 180 }} value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar aluno..." />
-          <select style={{ ...inpStyle, width: 170 }} value={disciplinaFilter} onChange={e => setDisciplinaFilter(e.target.value)}>
+          <input className="filter-field" style={{ ...inpStyle, width: 180 }} value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar aluno..." />
+          <select className="filter-field" style={{ ...inpStyle, width: 170 }} value={disciplinaFilter} onChange={e => setDisciplinaFilter(e.target.value)}>
             <option value="">Todas as disciplinas</option>
             {[...new Set(evaluations.map(e => e.disciplina).filter(Boolean))].sort().map(d => <option key={d} value={d}>{d}</option>)}
           </select>
-          <select style={{ ...inpStyle, width: 150 }} value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)}>
+          <select className="filter-field" style={{ ...inpStyle, width: 150 }} value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)}>
             <option value="">Todas as turmas</option>
             {turmas.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
-          <select style={{ ...inpStyle, width: 200 }} value={exerciseFilter} onChange={e => setExerciseFilter(e.target.value)}>
+          <select className="filter-field" style={{ ...inpStyle, width: 200 }} value={exerciseFilter} onChange={e => setExerciseFilter(e.target.value)}>
             <option value="">Todos os exercícios</option>
             {exercises.map(ex => <option key={ex} value={ex}>{ex}</option>)}
           </select>
-          <select style={{ ...inpStyle, width: 180 }} value={institutionFilter} onChange={e => setInstitutionFilter(e.target.value)}>
+          <select className="filter-field" style={{ ...inpStyle, width: 180 }} value={institutionFilter} onChange={e => setInstitutionFilter(e.target.value)}>
             <option value="">Todas as instituições</option>
             {institutions.map(inst => <option key={inst} value={inst}>{inst}</option>)}
           </select>

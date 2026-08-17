@@ -526,7 +526,7 @@ export default function RelatoriosPage() {
           {s.alunos?.length > 0 && (
             <div>
               <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-sub)', marginBottom: 8 }}>Ranking</p>
-              <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 10 }}>
+              <div className="table-scroll" style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 10 }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                   <thead><tr style={{ background: 'var(--bg-content)', borderBottom: '1px solid var(--border)' }}>
                     {['#', 'Aluno', '1ª Nota', 'Atual', 'Evo.'].map(h => <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: 'var(--text-muted)', fontWeight: 700 }}>{h}</th>)}
@@ -592,7 +592,7 @@ export default function RelatoriosPage() {
         {s.alunos?.length > 0 && (
           <div>
             <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-sub)', marginBottom: 8 }}>Ranking da turma</p>
-            <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 10 }}>
+            <div className="table-scroll" style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 10 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                 <thead><tr style={{ background: 'var(--bg-content)', borderBottom: '1px solid var(--border)' }}>
                   {['#', 'Aluno', 'Nota', 'Conceito'].map(h => <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: 'var(--text-muted)', fontWeight: 700 }}>{h}</th>)}
@@ -676,19 +676,19 @@ export default function RelatoriosPage() {
           {/* Filtros */}
           {reports.length > 0 && (
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20, alignItems: 'center' }}>
-              <select style={{ ...inpStyle, width: 160 }} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+              <select className="filter-field" style={{ ...inpStyle, width: 160 }} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
                 <option value="">Todos os tipos</option>
                 <option value="aluno">Aluno</option>
                 <option value="turma">Turma</option>
               </select>
               {turmas.length > 0 && (
-                <select style={{ ...inpStyle, width: 180 }} value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)}>
+                <select className="filter-field" style={{ ...inpStyle, width: 180 }} value={turmaFilter} onChange={e => setTurmaFilter(e.target.value)}>
                   <option value="">Todas as turmas</option>
                   {turmas.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               )}
               {institutions.length > 0 && (
-                <select style={{ ...inpStyle, width: 200 }} value={institutionFilter} onChange={e => setInstitutionFilter(e.target.value)}>
+                <select className="filter-field" style={{ ...inpStyle, width: 200 }} value={institutionFilter} onChange={e => setInstitutionFilter(e.target.value)}>
                   <option value="">Todas as instituições</option>
                   {institutions.map(i => <option key={i} value={i}>{i}</option>)}
                 </select>
@@ -726,6 +726,7 @@ export default function RelatoriosPage() {
 
           {!loading && filtered.length > 0 && (
             <div style={{ border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden', background: 'var(--bg-card)' }}>
+              <div className="table-scroll">
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-content)' }}>
@@ -786,6 +787,7 @@ export default function RelatoriosPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
 
