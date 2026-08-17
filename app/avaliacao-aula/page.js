@@ -240,7 +240,7 @@ export default function AvaliacaoAula() {
             style={{ ...inp, marginBottom: 20 }} />
 
           <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-sub)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Tom do feedback</p>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
             {[{ id: 'encorajador', label: 'Encorajador' }, { id: 'direto', label: 'Direto e crítico' }].map(o => (
               <button key={o.id} onClick={() => setTom(o.id)}
                 style={{ padding: '9px 18px', borderRadius: 10, fontSize: 13, cursor: 'pointer', border: `1px solid ${tom === o.id ? '#0081f0' : 'var(--border)'}`, background: tom === o.id ? '#0081f0' : 'var(--bg-content)', color: tom === o.id ? '#fff' : 'var(--text-main)', fontWeight: tom === o.id ? 700 : 400, fontFamily: 'inherit' }}>
@@ -253,7 +253,7 @@ export default function AvaliacaoAula() {
             <div style={{ marginBottom: 16, padding: '10px 14px', background: '#FEF2F2', border: '1px solid #dc262633', borderRadius: 10, color: '#991B1B', fontSize: 13 }}>{error}</div>
           )}
 
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <button onClick={handleEvaluate} disabled={!canEvaluate}
               style={{ background: 'linear-gradient(135deg, #0081f0, #0033ad)', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 26px', fontSize: 14, fontWeight: 700, cursor: canEvaluate ? 'pointer' : 'not-allowed', opacity: canEvaluate ? 1 : 0.5, fontFamily: 'inherit' }}>
               {evaluating ? 'Avaliando...' : 'Avaliar aula'}
@@ -265,7 +265,7 @@ export default function AvaliacaoAula() {
         {result && <ResultCard entry={result} />}
       </div>
 
-      <div style={{ marginTop: 40, maxWidth: 900 }}>
+      <div style={{ marginTop: 40, maxWidth: 680 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>Histórico</h2>
           <select className="filter-field" value={historyFilter} onChange={e => { setHistoryFilter(e.target.value); loadHistory(e.target.value); }}
@@ -275,12 +275,13 @@ export default function AvaliacaoAula() {
           </select>
         </div>
 
-        <div className="table-scroll" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 14, overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', borderRadius: 14, overflow: 'hidden' }}>
           {historyLoading ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>Carregando...</div>
           ) : history.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>Nenhuma avaliação de aula ainda.</div>
           ) : (
+            <div className="table-scroll">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: 'var(--bg-content)' }}>
@@ -308,6 +309,7 @@ export default function AvaliacaoAula() {
                 })}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

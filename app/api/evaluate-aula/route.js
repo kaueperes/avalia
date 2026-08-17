@@ -7,6 +7,22 @@ import { PLANS } from '@/lib/types';
 
 export const maxDuration = 60;
 
+// Reseta quota_aula pro valor cheio do plano se o ciclo mensal já virou (ou nunca foi setado).
+// Usado tanto no GET (exibir cota certa na página) quanto no POST (bloquear/consumir).
+async function ensureAulaQuota(dbUser, userId, planQuotaAula) {
+  const resetDate = dbUser.quota_aula_reset_date ? new Date(dbUser.quota_aula_reset_date) : null;
+  if (!dbUser.quota_aula_reset_date || (resetDate && resetDate < new Date())) {
+    const nextReset = new Date();
+    nextReset.setMonth(nextReset.getMonth() + 1);
+    await supabase.from('users').update({
+      quota_aula: planQuotaAula,
+      quota_aula_reset_date: nextReset.toISOString(),
+    }).eq('id', userId);
+    dbUser.quota_aula = planQuotaAula;
+  }
+  return typeof dbUser.quota_aula === 'number' ? dbUser.quota_aula : planQuotaAula;
+}
+
 const TEMA_LABELS = {
   didatica: 'Didática (clareza da explicação, ritmo, verificação de entendimento)',
   conteudo: 'Conteúdo da aula (correção e profundidade do que foi ensinado)',
@@ -71,7 +87,7 @@ export async function GET(request) {
   const limit = (PLANS[dbUser?.plan] || PLANS.gratuito).limits.avaliacaoAula ?? 0;
   const quota = isGratuito
     ? { isGratuito: true, trialUsed: !!dbUser?.aula_trial_used }
-    : { isGratuito: false, limit, remaining: typeof dbUser.quota_aula === 'number' ? dbUser.quota_aula : limit };
+    : { isGratuito: false, limit, remaining: await ensureAulaQuota(dbUser, user.userId, limit) };
 
   return NextResponse.json({ history: history || [], quota });
 }
@@ -96,17 +112,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Você já usou sua Avaliação de Aula gratuita. Faça upgrade de plano para continuar avaliando suas aulas.' }, { status: 402 });
     }
   } else {
-    const resetDate = dbUser.quota_aula_reset_date ? new Date(dbUser.quota_aula_reset_date) : null;
-    if (!dbUser.quota_aula_reset_date || (resetDate && resetDate < new Date())) {
-      const nextReset = new Date();
-      nextReset.setMonth(nextReset.getMonth() + 1);
-      await supabase.from('users').update({
-        quota_aula: planQuotaAula,
-        quota_aula_reset_date: nextReset.toISOString(),
-      }).eq('id', user.userId);
-      dbUser.quota_aula = planQuotaAula;
-    }
-    const restante = typeof dbUser.quota_aula === 'number' ? dbUser.quota_aula : planQuotaAula;
+    const restante = await ensureAulaQuota(dbUser, user.userId, planQuotaAula);
     if (restante <= 0) {
       return NextResponse.json({ error: 'Você esgotou suas Avaliações de Aula este mês. Renova no próximo ciclo.' }, { status: 402 });
     }
