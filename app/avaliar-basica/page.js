@@ -152,7 +152,7 @@ function SlotCard({ slot, index, onChange, onRemove, canRemove }) {
 
         {slot.mode === 'foto' ? (
           <div>
-            <input ref={fileRef} type="file" accept="image/*" multiple style={{ display: 'none' }}
+            <input ref={fileRef} type="file" accept="image/*,.pdf" multiple style={{ display: 'none' }}
               onChange={e => { if (e.target.files.length) handleFiles(e.target.files); e.target.value = ''; }} />
             <div onClick={() => !slot.processing && fileRef.current?.click()}
               style={{ border: `1.5px dashed ${slot.fileNames.length ? '#810cfa' : 'var(--border)'}`, borderRadius: 10, padding: slot.fileNames.length ? '10px 14px' : '20px', cursor: slot.processing ? 'wait' : 'pointer', background: slot.fileNames.length ? 'var(--bg-content)' : 'transparent' }}>
