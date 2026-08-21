@@ -2,6 +2,7 @@ import './globals.css';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import MetaPixelRouteTracker from './components/MetaPixel';
+import PostHogTracker from './components/PostHogTracker';
 import { PIXEL_ID } from '@/lib/pixel';
 
 export const metadata = {
@@ -34,6 +35,9 @@ export default function RootLayout({ children }) {
         </noscript>
         <Suspense fallback={null}>
           <MetaPixelRouteTracker />
+        </Suspense>
+        <Suspense fallback={null}>
+          <PostHogTracker />
         </Suspense>
         {children}
       </body>

@@ -39,6 +39,7 @@ Variáveis de ambiente necessárias (configuradas no Vercel):
 - `JWT_SECRET` — `lib/auth.js` lança erro no boot se não estiver definida (sem fallback inseguro)
 - `RESEND_API_KEY`
 - `NEXT_PUBLIC_APP_URL` — usada para montar links absolutos (redefinição de senha, convites, portal Stripe)
+- `NEXT_PUBLIC_POSTHOG_KEY` + `NEXT_PUBLIC_POSTHOG_HOST` — analytics de produto (PostHog). Sem `NEXT_PUBLIC_POSTHOG_KEY`, `lib/posthog.js` simplesmente não inicializa (sem erro) — funciona normalmente em dev/preview sem essas vars configuradas
 
 ---
 
@@ -198,6 +199,17 @@ Pixel do Meta (Facebook/Instagram Ads) instalado em `app/layout.js` pra otimizar
 - `app/layout.js` também tem a meta tag `facebook-domain-verification` (via `metadata.other`) — domínio `kriteria.education` já verificado no Business Manager, necessário pra priorização de eventos de conversão em iOS
 
 **Presença institucional:** Página do Facebook e Instagram profissional "Kriteria" criados e conectados entre si, dentro do mesmo Business Manager do Pixel. Ainda sem posts publicados (ver Pendências).
+
+---
+
+## PostHog — analytics de produto (`lib/posthog.js`, `app/components/PostHogTracker.js`)
+
+Diferente do Meta Pixel (que só mede conversão de anúncio, anônimo), o PostHog rastreia comportamento dentro do app, ligado à conta logada — pra entender onde professor cadastrado trava antes de avaliar algo. Instalado em 2026-08-21 depois de descobrir, checando cota consumida no banco, que nenhum dos cadastros Gratuito recentes tinha tentado avaliação nenhuma (nem Básica, nem Avançada, nem Modo Teste) — sem esse rastreio não dava pra saber se era abandono normal ou travamento de UX.
+
+- `initPostHog()` só inicializa se `NEXT_PUBLIC_POSTHOG_KEY` estiver definida — sem a env var, não quebra nada (dev/preview funcionam normalmente sem PostHog)
+- `PostHogTracker` (client component, montado em `app/layout.js` junto do Meta Pixel) identifica o usuário logado (`phIdentify`, via `localStorage.user`) e dispara `$pageview` a cada navegação (mesmo motivo do Meta Pixel: App Router é SPA)
+- Eventos customizados até agora: `signup_completed` (`app/signup/page.js`) e `evaluation_completed` com `flow: 'basica' | 'avancada' | 'teste'` (nos três pontos de sucesso — `avaliar-basica`, `avaliar-avancado`, Modo Teste em `disciplinas`) — o suficiente pra montar o funil cadastro → primeira avaliação
+- Autocapture de clique/pageview vem ligado por padrão do SDK — os eventos customizados acima são só os pontos que autocapture sozinho não detecta como "sucesso" (uma chamada de API que deu certo, não um clique)
 
 ---
 

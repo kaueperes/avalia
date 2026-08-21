@@ -3,6 +3,7 @@ import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { fbTrack } from '@/lib/pixel';
+import { phCapture, phIdentify } from '@/lib/posthog';
 
 function SignupPageInner() {
   const router = useRouter();
@@ -29,6 +30,8 @@ function SignupPageInner() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       fbTrack('CompleteRegistration', undefined, data.fbEventId);
+      phIdentify(data.user);
+      phCapture('signup_completed', { plan: data.user?.plan });
       router.push(redirect || '/onboarding');
     } catch (err) {
       setError(err.message || 'Erro ao criar conta');

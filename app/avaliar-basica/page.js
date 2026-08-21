@@ -6,6 +6,7 @@ import { VideoTutorialLink } from '../components/VideoTutorial';
 import { findSimilarPairs } from '@/lib/textSimilarity';
 import { hashFile, findDuplicateFiles } from '@/lib/fileHash';
 import mammoth from 'mammoth';
+import { phCapture } from '@/lib/posthog';
 
 // Compara as respostas dos alunos questão por questão (não o texto todo) —
 // pega cola pontual numa questão específica sem comparar coisas sem relação.
@@ -304,6 +305,7 @@ export default function AvaliarBasica() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Erro ao corrigir');
         updateSlot(slot.id, { result: data, evaluating: false });
+        phCapture('evaluation_completed', { flow: 'basica' });
 
         try {
           const u = JSON.parse(localStorage.getItem('user') || '{}');

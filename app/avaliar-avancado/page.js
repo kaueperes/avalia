@@ -8,6 +8,7 @@ import { VideoTutorialLink } from '../components/VideoTutorial';
 import { findSimilarPairs } from '@/lib/textSimilarity';
 import { hashFile, findDuplicateFiles } from '@/lib/fileHash';
 import mammoth from 'mammoth';
+import { phCapture } from '@/lib/posthog';
 
 // Compara o trabalho completo de cada aluno contra os outros do mesmo lote —
 // só faz sentido pra trabalhos com conteúdo textual (a IA transcreve em submittedText).
@@ -604,6 +605,7 @@ export default function AvaliarV2() {
         let evalData;
         try { evalData = await evalRes.json(); } catch { throw new Error('Arquivo muito grande ou erro de conexão. Tente um vídeo menor ou use um link.'); }
         if (!evalRes.ok) throw new Error(evalData.error || 'Erro ao avaliar');
+        phCapture('evaluation_completed', { flow: 'avancada' });
 
         try {
           const u = JSON.parse(localStorage.getItem('user') || '{}');

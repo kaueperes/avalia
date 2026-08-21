@@ -6,6 +6,7 @@ import AppLayout from '../components/AppLayout';
 import Tooltip from '../components/Tooltip';
 import { VideoTutorialLink } from '../components/VideoTutorial';
 import mammoth from 'mammoth';
+import { phCapture } from '@/lib/posthog';
 
 const inputStyle = {
   width: '100%', padding: '10px 12px',
@@ -419,6 +420,7 @@ export default function DisciplinasPage() {
       const data = await res.json();
       if (!res.ok) { setTestError(data.error || 'Erro ao processar o teste.'); return; }
       setTestResult(data);
+      phCapture('evaluation_completed', { flow: 'teste' });
       if (typeof data.quota_testes_restante === 'number') {
         setQuotaTestes(data.quota_testes_restante);
         try {
