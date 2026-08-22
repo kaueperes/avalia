@@ -1,12 +1,10 @@
 'use client';
 import { useEffect } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { initPostHog, phCapture, phIdentify } from '@/lib/posthog';
+import { initPostHog, phIdentify } from '@/lib/posthog';
 
+// Pageview/pageleave de SPA ficam a cargo do próprio SDK (capture_pageview:
+// 'history_change' em lib/posthog.js) — não precisa disparar manualmente aqui.
 export default function PostHogTracker() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
   useEffect(() => {
     initPostHog();
     try {
@@ -14,10 +12,6 @@ export default function PostHogTracker() {
       if (stored) phIdentify(JSON.parse(stored));
     } catch {}
   }, []);
-
-  useEffect(() => {
-    phCapture('$pageview', { path: pathname });
-  }, [pathname, searchParams]);
 
   return null;
 }
