@@ -39,7 +39,7 @@ Variáveis de ambiente necessárias (configuradas no Vercel):
 - `JWT_SECRET` — `lib/auth.js` lança erro no boot se não estiver definida (sem fallback inseguro)
 - `RESEND_API_KEY`
 - `NEXT_PUBLIC_APP_URL` — usada para montar links absolutos (redefinição de senha, convites, portal Stripe)
-- `NEXT_PUBLIC_POSTHOG_KEY` + `NEXT_PUBLIC_POSTHOG_HOST` — analytics de produto (PostHog). Sem `NEXT_PUBLIC_POSTHOG_KEY`, `lib/posthog.js` simplesmente não inicializa (sem erro) — funciona normalmente em dev/preview sem essas vars configuradas
+- `NEXT_PUBLIC_POSTHOG_KEY` — analytics de produto (PostHog). Sem ela, `lib/posthog.js` simplesmente não inicializa (sem erro) — funciona normalmente em dev/preview sem essa var configurada. `NEXT_PUBLIC_POSTHOG_HOST` não é mais usada (host fixo via reverse proxy, ver seção PostHog)
 
 ---
 
@@ -210,6 +210,7 @@ Diferente do Meta Pixel (que só mede conversão de anúncio, anônimo), o PostH
 - `PostHogTracker` (client component, montado em `app/layout.js` junto do Meta Pixel) identifica o usuário logado (`phIdentify`, via `localStorage.user`) e dispara `$pageview` a cada navegação (mesmo motivo do Meta Pixel: App Router é SPA)
 - Eventos customizados até agora: `signup_completed` (`app/signup/page.js`) e `evaluation_completed` com `flow: 'basica' | 'avancada' | 'teste'` (nos três pontos de sucesso — `avaliar-basica`, `avaliar-avancado`, Modo Teste em `disciplinas`) — o suficiente pra montar o funil cadastro → primeira avaliação
 - Autocapture de clique/pageview vem ligado por padrão do SDK — os eventos customizados acima são só os pontos que autocapture sozinho não detecta como "sucesso" (uma chamada de API que deu certo, não um clique)
+- **Reverse proxy** (2026-08-21): `next.config.js` faz rewrite de `/ingest/*` pra `us.i.posthog.com`/`us-assets.i.posthog.com` — o navegador fala com o próprio domínio do Kriteria em vez de um domínio de analytics conhecido, driblando bloqueador de anúncio. `api_host: '/ingest'` no init; `ui_host` separado aponta pro host real (`us.posthog.com`) pra links de dashboard/toolbar não quebrarem
 
 ---
 
