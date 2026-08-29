@@ -29,6 +29,20 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
 }
 
+// ── Semestre (1º: jan-jun, 2º: jul-dez) — mesmo corte simples do /inicio ────
+function semesterOf(dateStr) {
+  const d = new Date(dateStr);
+  return { year: d.getFullYear(), half: d.getMonth() + 1 <= 6 ? 1 : 2 };
+}
+function currentSemester() {
+  const now = new Date();
+  return { year: now.getFullYear(), half: now.getMonth() + 1 <= 6 ? 1 : 2 };
+}
+function previousSemester() {
+  const cur = currentSemester();
+  return cur.half === 1 ? { year: cur.year - 1, half: 2 } : { year: cur.year, half: 1 };
+}
+
 // ── SVG Charts ────────────────────────────────────────────────────────────────
 function EvolutionChart({ data, color = '#0081f0' }) {
   if (!data?.length) return (
@@ -131,6 +145,7 @@ export default function OrgDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [selectedTurma, setSelectedTurma] = useState('');
   const [selectedDisciplina, setSelectedDisciplina] = useState('');
+  const [selectedPeriod, setSelectedPeriod] = useState('atual'); // 'atual' | 'anterior' | 'todos'
 
   function token() { return localStorage.getItem('token'); }
 
@@ -179,33 +194,43 @@ export default function OrgDashboardPage() {
     load().catch(() => setLoading(false));
   }, [router]);
 
+  // Avaliações do período selecionado — mesmo escopo do /inicio individual
+  const periodEvals = useMemo(() => {
+    if (selectedPeriod === 'todos') return evaluations;
+    const target = selectedPeriod === 'anterior' ? previousSemester() : currentSemester();
+    return evaluations.filter(e => {
+      const s = semesterOf(e.createdAt);
+      return s.year === target.year && s.half === target.half;
+    });
+  }, [evaluations, selectedPeriod]);
+
   // Turma + disciplina lists
   const allTurmas = useMemo(
-    () => [...new Set(evaluations.map(e => e.turma).filter(Boolean))].sort(),
-    [evaluations]
+    () => [...new Set(periodEvals.map(e => e.turma).filter(Boolean))].sort(),
+    [periodEvals]
   );
   const allDisciplinas = useMemo(
-    () => [...new Set(evaluations.map(e => e.disciplina).filter(Boolean))].sort(),
-    [evaluations]
+    () => [...new Set(periodEvals.map(e => e.disciplina).filter(Boolean))].sort(),
+    [periodEvals]
   );
   const allTeachers = useMemo(
-    () => [...new Set(evaluations.map(e => e.teacherName).filter(Boolean))],
-    [evaluations]
+    () => [...new Set(periodEvals.map(e => e.teacherName).filter(Boolean))],
+    [periodEvals]
   );
 
   const filteredEvals = useMemo(
-    () => evaluations
+    () => periodEvals
       .filter(e => !selectedTurma || e.turma === selectedTurma)
       .filter(e => !selectedDisciplina || e.disciplina === selectedDisciplina),
-    [evaluations, selectedTurma, selectedDisciplina]
+    [periodEvals, selectedTurma, selectedDisciplina]
   );
 
-  const scores = evaluations.map(e => e.score).filter(s => typeof s === 'number');
+  const scores = periodEvals.map(e => e.score).filter(s => typeof s === 'number');
   const avg = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : null;
   const aprovados = scores.filter(s => s >= 6).length;
   const aprovPct = scores.length ? Math.round((aprovados / scores.length) * 100) : 0;
-  const uniqueStudents = new Set(evaluations.map(e => e.studentName)).size;
-  const emAtencao = evaluations.filter(e => e.score < 6).sort((a, b) => a.score - b.score);
+  const uniqueStudents = new Set(periodEvals.map(e => e.studentName)).size;
+  const emAtencao = periodEvals.filter(e => e.score < 6).sort((a, b) => a.score - b.score);
 
   const evoData = useMemo(() => {
     const byDate = {};
@@ -240,15 +265,15 @@ export default function OrgDashboardPage() {
 
   const turmaSummaries = useMemo(() => allTurmas.map(t => {
     const tc = getTurmaColor(t, allTurmas);
-    const evals = evaluations.filter(e => e.turma === t);
+    const evals = periodEvals.filter(e => e.turma === t);
     const tScores = evals.map(e => e.score).filter(s => typeof s === 'number');
     const tMedia = tScores.length ? parseFloat((tScores.reduce((s, v) => s + v, 0) / tScores.length).toFixed(1)) : 0;
     const tAprov = tScores.length ? Math.round((tScores.filter(s => s >= 6).length / tScores.length) * 100) : 0;
     return { name: t, total: evals.length, media: tMedia, aprovPct: tAprov, scores: tScores, ...tc };
-  }), [evaluations, allTurmas]);
+  }), [periodEvals, allTurmas]);
 
   const chartColor = selectedTurma ? (getTurmaColor(selectedTurma, allTurmas)?.color || '#0081f0') : '#0081f0';
-  const recent = evaluations.slice(0, 6);
+  const recent = periodEvals.slice(0, 6);
 
   const quotaLeft = orgInfo ? (orgInfo.org?.quota_pool || 0) - (orgInfo.org?.quota_used || 0) + (orgInfo.org?.quota_pool_extra || 0) : 0;
   const pct = orgInfo?.org?.quota_pool > 0 ? Math.round((orgInfo.org.quota_used / orgInfo.org.quota_pool) * 100) : 0;
@@ -290,6 +315,16 @@ export default function OrgDashboardPage() {
 
       {!loading && (
         <>
+          {/* ── Período ── */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-sub)', flexShrink: 0 }}>Período:</span>
+            <select value={selectedPeriod} onChange={e => setSelectedPeriod(e.target.value)} style={inpStyle}>
+              <option value="atual">Este semestre</option>
+              <option value="anterior">Semestre passado</option>
+              <option value="todos">Todo o período</option>
+            </select>
+          </div>
+
           {isAdmin && orgInfo && (
             <div className="grid-collapse" style={{ display: 'grid', gridTemplateColumns: '0.8fr 1fr 1fr', gap: 14, marginBottom: 24 }}>
               <div style={{ background: 'var(--bg-card)', borderRadius: 14, padding: '16px 20px', border: '1px solid var(--border-card)' }}>
