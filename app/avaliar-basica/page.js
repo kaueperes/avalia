@@ -229,6 +229,7 @@ export default function AvaliarBasica() {
   const [contextProcessing, setContextProcessing] = useState(false);
   const [slots, setSlots] = useState([newSlot()]);
   const [correcting, setCorrecting] = useState(false);
+  const [showGabarito, setShowGabarito] = useState(false);
   const contextFileRef = useRef(null);
 
   useEffect(() => {
@@ -343,34 +344,43 @@ export default function AvaliarBasica() {
       </div>
 
       <div style={{ maxWidth: 680 }}>
-        <div style={{ ...card, marginBottom: 16 }}>
-          <div style={sectionLast}>
-            <div style={secLabel}><Tooltip text="Questões objetivas (cálculo, múltipla escolha) o Kriteria resolve sozinho, sem precisar de gabarito. Para questões que dependem do que foi ensinado em aula, sem gabarito o resultado vem como 'incerto' — cole aqui pra evitar isso.">Contexto ou gabarito (opcional)</Tooltip></div>
-            <textarea value={context} onChange={e => setContext(e.target.value)} rows={3}
-              placeholder="Ex: 7 questões sobre equação de 2º grau. Ou cole o gabarito, se tiver."
-              style={{ ...inp, marginBottom: 10 }} />
-
-            <input ref={contextFileRef} type="file" accept="image/*,.pdf,.docx,.doc,.txt" multiple style={{ display: 'none' }}
-              onChange={e => { if (e.target.files.length) handleContextFiles(e.target.files); e.target.value = ''; }} />
-            {contextFileNames.length > 0 ? (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
-                {contextFileNames.map((n, i) => (
-                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 8px', fontSize: 12, color: 'var(--text-main)' }}>
-                    {n}
-                    <span onClick={() => removeContextFile(i)} style={{ display: 'flex', color: 'var(--text-sub)', cursor: 'pointer' }}><IconTrash /></span>
-                  </span>
-                ))}
-                <button onClick={() => contextFileRef.current?.click()} disabled={contextProcessing} style={{ ...btnSecondary, padding: '4px 10px', fontSize: 12 }}>
-                  {contextProcessing ? <><IconSpinner /> Processando...</> : '+ adicionar arquivo'}
-                </button>
+        {showGabarito ? (
+          <div style={{ ...card, marginBottom: 16 }}>
+            <div style={sectionLast}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                <div style={{ ...secLabel, marginBottom: 0 }}><Tooltip text="Questões objetivas (cálculo, múltipla escolha) o Kriteria resolve sozinho, sem precisar de gabarito. Para questões que dependem do que foi ensinado em aula, sem gabarito o resultado vem como 'incerto' — cole aqui pra evitar isso.">Contexto ou gabarito (opcional)</Tooltip></div>
+                <button onClick={() => setShowGabarito(false)} style={{ background: 'none', border: 'none', color: 'var(--text-sub)', cursor: 'pointer', fontSize: 12, fontFamily: 'inherit' }}>Ocultar</button>
               </div>
-            ) : (
-              <button onClick={() => contextFileRef.current?.click()} disabled={contextProcessing} style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}>
-                {contextProcessing ? <><IconSpinner /> Processando...</> : <><IconUpload /> Anexar foto ou arquivo do gabarito</>}
-              </button>
-            )}
+              <textarea value={context} onChange={e => setContext(e.target.value)} rows={3}
+                placeholder="Ex: 7 questões sobre equação de 2º grau. Ou cole o gabarito, se tiver."
+                style={{ ...inp, marginBottom: 10 }} />
+
+              <input ref={contextFileRef} type="file" accept="image/*,.pdf,.docx,.doc,.txt" multiple style={{ display: 'none' }}
+                onChange={e => { if (e.target.files.length) handleContextFiles(e.target.files); e.target.value = ''; }} />
+              {contextFileNames.length > 0 ? (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                  {contextFileNames.map((n, i) => (
+                    <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--bg-content)', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 8px', fontSize: 12, color: 'var(--text-main)' }}>
+                      {n}
+                      <span onClick={() => removeContextFile(i)} style={{ display: 'flex', color: 'var(--text-sub)', cursor: 'pointer' }}><IconTrash /></span>
+                    </span>
+                  ))}
+                  <button onClick={() => contextFileRef.current?.click()} disabled={contextProcessing} style={{ ...btnSecondary, padding: '4px 10px', fontSize: 12 }}>
+                    {contextProcessing ? <><IconSpinner /> Processando...</> : '+ adicionar arquivo'}
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => contextFileRef.current?.click()} disabled={contextProcessing} style={{ ...btnSecondary, padding: '6px 12px', fontSize: 12 }}>
+                  {contextProcessing ? <><IconSpinner /> Processando...</> : <><IconUpload /> Anexar foto ou arquivo do gabarito</>}
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <button onClick={() => setShowGabarito(true)} style={{ ...btnSecondary, marginBottom: 16, padding: '8px 14px', fontSize: 13 }}>
+            <IconPlus /> Adicionar gabarito (opcional)
+          </button>
+        )}
 
         {duplicateFileWarnings.length > 0 && (
           <div style={{ ...card, background: '#FFFBEB', border: '1px solid #d9770633', padding: '16px 18px', marginBottom: 16 }}>
