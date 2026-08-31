@@ -25,6 +25,14 @@
 
 html { scroll-behavior: smooth; }
 
+/* Rede de segurança contra scroll horizontal: elementos decorativos absolutos,
+   grids largos ou algum estilo inline que estoure a viewport não geram mais
+   barra horizontal na página inteira. `clip` (e não `hidden`) não cria contexto
+   de scroll, então não quebra `position: sticky` nos descendentes.
+   Conteúdo que é legitimamente largo (tabelas de relatório) deve viver dentro
+   de um container com `overflow-x: auto` pra rolar localmente. */
+html, body { overflow-x: clip; }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {

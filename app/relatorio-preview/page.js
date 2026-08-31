@@ -150,7 +150,7 @@ export function EvaluationReport({ data }) {
 
         {/* ── Student identity ── */}
         <div style={{ padding: '32px 40px 28px', borderBottom: '1px solid #f1f5f9' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          <div className="rpt-ident-row" style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
               {/* Info */}
             <div style={{ flex: 1 }}>
               <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0f172a', margin: '0 0 10px', letterSpacing: '-0.5px' }}>
@@ -186,7 +186,7 @@ export function EvaluationReport({ data }) {
             <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: '0 0 24px', letterSpacing: '-0.2px' }}>
               Desempenho por Critério
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 40px' }}>
+            <div className="rpt-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 40px' }}>
               {d.criteria.map((c, i) => (
                 <CriteriaBar key={i} name={c.name} score={c.score} />
               ))}
@@ -223,7 +223,7 @@ export function EvaluationReport({ data }) {
 
         {/* ── Pontos fortes + a desenvolver ── */}
         {(d.pontosFortes?.length > 0 || d.pontosDesenvolver?.length > 0) && (
-          <div style={{ padding: '28px 40px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, borderBottom: '1px solid #f1f5f9' }}>
+          <div className="rpt-grid-2" style={{ padding: '28px 40px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, borderBottom: '1px solid #f1f5f9' }}>
             {/* Pontos fortes */}
             {d.pontosFortes?.length > 0 && (
               <div style={{ background: '#f0fdf4', borderRadius: 14, padding: '20px 22px', border: '1px solid #bbf7d0' }}>
@@ -292,6 +292,13 @@ export function EvaluationReport({ data }) {
 
       <style>{`
         @page { margin: 0; }
+        @media (max-width: 640px) {
+          .rpt-outer { padding: 16px 10px !important; }
+          .rpt-card > div { padding-left: 18px !important; padding-right: 18px !important; }
+          .rpt-ident-row { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+          .rpt-grid-2 { grid-template-columns: 1fr !important; }
+          .rpt-card h1 { font-size: 21px !important; }
+        }
         @media print {
           .no-print { display: none !important; }
           body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }

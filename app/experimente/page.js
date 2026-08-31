@@ -1,6 +1,17 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { phCapture } from '@/lib/posthog';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Landing /experimente — hero com teste sem cadastro (estilo Lovable) + vídeo
+// de funcionalidades avançadas (estilo Gamma) + seções institucionais da home.
+// NÃO usa useAuthGuard (é página pública).
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Troque por um ID do YouTube quando o vídeo estiver pronto (ex: 'AbC123xyz').
+// Vazio = mostra um placeholder "em breve" sem player.
+const DEMO_VIDEO_ID = '';
 
 // ── Lucide-style SVG icons ────────────────────────────────────────────────────
 const Icon = ({ d, size = 20 }) => (
@@ -21,7 +32,6 @@ const DownloadIcon = () => <Icon d={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 
 const CheckIcon    = () => <Icon d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3" />;
 const ArrowRight   = () => <Icon d="M5 12h14M12 5l7 7-7 7" size={16} />;
 
-// ── Check mark small ─────────────────────────────────────────────────────────
 const CheckMark = ({ color = '#0081f0' }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color}
     strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -29,22 +39,121 @@ const CheckMark = ({ color = '#0081f0' }) => (
   </svg>
 );
 
-// ── Star ─────────────────────────────────────────────────────────────────────
 const Star = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="none">
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
 );
 
+const IconSpinner = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>;
+const IconUpload  = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>;
+const IconResCheck = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
+const IconResX     = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+const IconResHelp  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
+const IconPlay = ({ size = 22 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>;
+
+const STATUS_META = {
+  certo:   { Icon: IconResCheck, bg: '#F0FDF4', border: '#16a34a33', label: 'Certo' },
+  errado:  { Icon: IconResX,     bg: '#FEF2F2', border: '#dc262633', label: 'Errado' },
+  incerto: { Icon: IconResHelp,  bg: '#FFFBEB', border: '#d9770633', label: 'Confirme' },
+};
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 // ═════════════════════════════════════════════════════════════════════════════
-export default function Home() {
+export default function Experimente() {
   const router = useRouter();
   const [planTab, setPlanTab] = useState('individual');
+  const [videoOpen, setVideoOpen] = useState(false);
+
+  // ── Estado do teste ──────────────────────────────────────────────────────
+  const [mode, setMode] = useState('texto'); // 'texto' | 'foto'
+  const [studentWork, setStudentWork] = useState('');
+  const [context, setContext] = useState('');
+  const [showContext, setShowContext] = useState(false);
+  const [image, setImage] = useState(null); // { data, mediaType, name }
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [rateLimited, setRateLimited] = useState(false);
+  const [result, setResult] = useState(null);
+  const fileRef = useRef(null);
 
   useEffect(() => {
+    // ?preview=1 na URL pula o redirecionamento — permite revisar a página já logado
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('preview')) return;
     if (!localStorage.getItem('token')) return;
     router.replace('/inicio');
   }, [router]);
+
+  async function pickFile(file) {
+    if (!file) return;
+    setError('');
+    if (!file.type.startsWith('image/')) { setError('Envie um arquivo de imagem (JPG, PNG...).'); return; }
+    if (file.size > 4 * 1024 * 1024) { setError('A imagem é muito grande. Envie uma foto de até 4 MB.'); return; }
+    try {
+      const data = await fileToBase64(file);
+      setImage({ data, mediaType: file.type, name: file.name });
+    } catch {
+      setError('Não consegui ler a imagem. Tente outra foto.');
+    }
+  }
+
+  async function handleSubmit() {
+    const hasInput = mode === 'texto' ? studentWork.trim() : !!image;
+    if (!hasInput || loading) return;
+
+    setLoading(true);
+    setError('');
+    setRateLimited(false);
+    setResult(null);
+    phCapture('demo_try_started', { input: mode });
+
+    try {
+      const res = await fetch('/api/try-basica', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          context: context.trim() || undefined,
+          studentWork: mode === 'texto' ? studentWork.trim() : undefined,
+          image: mode === 'foto' && image ? { data: image.data, mediaType: image.mediaType } : undefined,
+        }),
+      });
+      const data = await res.json();
+
+      if (res.status === 429 || data.error === 'rate_limit') {
+        setRateLimited(true);
+        setError(data.message || 'Você atingiu o limite de testes por hoje.');
+        return;
+      }
+      if (!res.ok) throw new Error(data.error || 'Erro ao corrigir');
+
+      setResult(data);
+      phCapture('demo_try_completed', { input: mode, questions: (data.items || []).length });
+    } catch (e) {
+      setError(e.message || 'Ocorreu um erro. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function resetDemo() {
+    setStudentWork('');
+    setContext('');
+    setShowContext(false);
+    setImage(null);
+    setResult(null);
+    setError('');
+    setRateLimited(false);
+  }
+
+  const canSubmit = (mode === 'texto' ? studentWork.trim() : !!image) && !loading;
 
   return (
     <>
@@ -53,14 +162,9 @@ export default function Home() {
         html { scroll-behavior: smooth; }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(28px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes subtlePulse {
           0%, 100% { box-shadow: 0 0 0 0 rgba(42,127,212,0.3); }
           50%       { box-shadow: 0 0 0 8px rgba(42,127,212,0); }
@@ -68,9 +172,8 @@ export default function Home() {
 
         .hero-headline { animation: fadeUp .7s ease both; }
         .hero-sub      { animation: fadeUp .7s .12s ease both; }
-        .hero-ctas     { animation: fadeUp .7s .22s ease both; }
+        .hero-demo     { animation: fadeUp .9s .22s ease both; }
         .hero-badge    { animation: fadeIn .5s ease both; }
-        .hero-mockup   { animation: fadeUp .9s .3s ease both; }
 
         .btn-primary {
           display: inline-flex; align-items: center; gap: 8px;
@@ -79,72 +182,46 @@ export default function Home() {
           font-weight: 600; font-size: 15px; cursor: pointer;
           transition: background .2s, transform .2s, box-shadow .2s;
         }
-        .btn-primary:hover {
-          background: #0033ad;
-          transform: translateY(-1px);
-          box-shadow: 0 8px 24px rgba(42,127,212,0.35);
-        }
+        .btn-primary:hover { background: #0033ad; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(42,127,212,0.35); }
+        .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-secondary {
           display: inline-flex; align-items: center; gap: 8px;
-          background: white; color: #374151;
-          border: 1.5px solid #E5E7EB;
+          background: white; color: #374151; border: 1.5px solid #E5E7EB;
           padding: 14px 28px; border-radius: 10px;
           font-weight: 500; font-size: 15px; cursor: pointer;
           transition: border-color .2s, background .2s, transform .2s;
         }
-        .btn-secondary:hover {
-          border-color: #9CA3AF; background: #F9FAFB;
-          transform: translateY(-1px);
-        }
+        .btn-secondary:hover { border-color: #9CA3AF; background: #F9FAFB; transform: translateY(-1px); }
 
-        .nav-link {
-          text-decoration: none;
-          font-size: 15px; font-weight: 450;
-          transition: color .15s;
-        }
-        .nav-link-dark  { color: rgba(255,255,255,0.75); }
-        .nav-link-dark:hover  { color: white; }
+        .nav-link { text-decoration: none; font-size: 15px; font-weight: 450; transition: color .15s; }
         .nav-link-light { color: #6B7280; }
         .nav-link-light:hover { color: #111827; }
 
         .benefit-card { transition: transform .25s; }
         .benefit-card:hover { transform: translateY(-4px); }
-        .benefit-card:hover .icon-box {
-          background: #0081f0 !important;
-          color: white !important;
-        }
+        .benefit-card:hover .icon-box { background: #0081f0 !important; color: white !important; }
         .icon-box { transition: background .2s, color .2s; }
 
-        .feature-card {
-          padding: 28px; border-radius: 16px;
-          border: 1px solid #F3F4F6; background: white;
-          transition: transform .25s, box-shadow .25s, border-color .25s;
-        }
-        .feature-card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 12px 36px rgba(42,127,212,0.09);
-          border-color: #cad0dd;
-        }
+        .feature-card { padding: 28px; border-radius: 16px; border: 1px solid #F3F4F6; background: white; transition: transform .25s, box-shadow .25s, border-color .25s; }
+        .feature-card:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(42,127,212,0.09); border-color: #cad0dd; }
 
-        .testimonial-card {
-          padding: 32px; border-radius: 16px;
-          border: 1px solid #F3F4F6; background: white;
-          transition: transform .25s, box-shadow .25s;
-        }
-        .testimonial-card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 12px 36px rgba(0,0,0,0.07);
-        }
+        .testimonial-card { padding: 32px; border-radius: 16px; border: 1px solid #F3F4F6; background: white; transition: transform .25s, box-shadow .25s; }
+        .testimonial-card:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(0,0,0,0.07); }
 
-        .plan-card {
-          padding: 36px 32px; border-radius: 20px;
-          transition: transform .25s, box-shadow .25s;
-        }
+        .plan-card { padding: 36px 32px; border-radius: 20px; transition: transform .25s, box-shadow .25s; }
         .plan-card:hover { transform: translateY(-4px); }
 
+        .demo-toggle-btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #E5E7EB; background: #F9FAFB; color: #6B7280; font-family: inherit; }
+        .demo-toggle-btn.active { background: #0081f0; border-color: #0081f0; color: white; }
+
+        .video-poster { position: relative; border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: 0 30px 80px rgba(0,0,0,0.12); }
+        .video-poster.disabled { cursor: default; }
+        .video-poster .play-circle { transition: transform .2s; }
+        .video-poster:not(.disabled):hover .play-circle { transform: scale(1.08); }
+
         @media (max-width: 900px) {
-          .hero-h1 { font-size: 44px !important; letter-spacing: -1px !important; }
-          .hero-mockup-grid { grid-template-columns: 1fr !important; }
+          .hero-h1 { font-size: 40px !important; letter-spacing: -1px !important; }
+          .hero-split { grid-template-columns: 1fr !important; gap: 28px !important; }
           .grid-4  { grid-template-columns: repeat(2,1fr) !important; }
           .grid-3  { grid-template-columns: 1fr !important; }
           .grid-2  { grid-template-columns: 1fr !important; }
@@ -153,27 +230,18 @@ export default function Home() {
           .footer-grid { grid-template-columns: 1fr !important; }
           .cat-grid { grid-template-columns: repeat(2,1fr) !important; }
         }
-        @media (max-width: 480px) {
-          .mockup-stats-grid { grid-template-columns: 1fr !important; }
-        }
       `}</style>
 
       <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: 'white', color: '#111827' }}>
 
         {/* ── NAVBAR ─────────────────────────────────────────────────────────── */}
-        <nav style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-          background: 'rgba(255,255,255,0.95)',
-          backdropFilter: 'blur(14px)',
-          borderBottom: '1px solid rgba(0,0,0,0.07)',
-          padding: '0 32px',
-        }}>
+        <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(14px)', borderBottom: '1px solid rgba(0,0,0,0.07)', padding: '0 32px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <img src="/imagens/logo_kriteria.svg" alt="Kriteria" style={{ height: 36, width: 'auto' }} />
             </div>
             <div className="nav-links" style={{ display: 'flex', gap: 32 }}>
-              <a href="#funcionalidades" className="nav-link nav-link-light">Funcionalidades</a>
+              <a href="#como-funciona" className="nav-link nav-link-light">Como funciona</a>
               <a href="#disciplinas" className="nav-link nav-link-light">Tipos de Trabalho</a>
               <a href="#coordenadores" className="nav-link nav-link-light">Para Coordenadores</a>
               <a href="#planos" className="nav-link nav-link-light">Planos</a>
@@ -192,96 +260,181 @@ export default function Home() {
           </div>
         </nav>
 
-        {/* ── HERO ───────────────────────────────────────────────────────────── */}
-        <section style={{ padding: '174px 32px 80px', background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 55%, #1a0530 100%)', textAlign: 'center', overflow: 'hidden', position: 'relative' }}>
-          {/* Glow effects */}
+        {/* ── HERO + TESTE ───────────────────────────────────────────────────── */}
+        <section style={{ padding: '128px 32px 88px', background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 55%, #1a0530 100%)', textAlign: 'center', overflow: 'hidden', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: 800, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,129,240,0.14) 0%, rgba(129,12,250,0.08) 45%, transparent 70%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', bottom: '0', right: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(129,12,250,0.1) 0%, transparent 65%)', pointerEvents: 'none' }} />
 
-          <div style={{ maxWidth: 820, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-
-            <div className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(0,129,240,0.12)', color: '#60a5fa', padding: '6px 14px', borderRadius: 100, fontSize: 13, fontWeight: 500, marginBottom: 36, border: '1px solid rgba(0,129,240,0.25)' }}>
+          <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+            <div className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(0,129,240,0.12)', color: '#60a5fa', padding: '6px 14px', borderRadius: 100, fontSize: 13, fontWeight: 500, marginBottom: 30, border: '1px solid rgba(0,129,240,0.25)' }}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#60a5fa', display: 'inline-block', animation: 'subtlePulse 2.4s ease infinite' }} />
-              Professores economizam até 8h por semana
+              Teste agora — sem criar conta
             </div>
 
-            <h1 className="hero-headline hero-h1" style={{ fontSize: 70, fontWeight: 800, color: 'white', lineHeight: 1.05, letterSpacing: '-2.5px', marginBottom: 24 }}>
-              Chega de perder horas<br />
-              <span style={{ background: 'linear-gradient(135deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>corrigindo trabalho por trabalho</span>
+            <h1 className="hero-headline hero-h1" style={{ fontSize: 58, fontWeight: 800, color: 'white', lineHeight: 1.07, letterSpacing: '-2px', marginBottom: 20 }}>
+              Corrija uma prova agora,<br />
+              <span style={{ background: 'linear-gradient(135deg, #60a5fa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>em poucos passos</span>
             </h1>
 
-            <p className="hero-sub" style={{ fontSize: 20, color: '#94A3B8', lineHeight: 1.65, maxWidth: 560, margin: '0 auto 44px', fontWeight: 400 }}>
-              Você gasta horas avaliando redações, vídeos, projetos e códigos — e ainda se pergunta se está sendo consistente. O Kriteria corrige mais rápido, com seus critérios e no seu estilo. Você continua no controle — revisa e ajusta o que for preciso antes de entregar.
-            </p>
-
-            <div className="hero-ctas" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
-              <button onClick={() => router.push('/signup')} className="btn-primary" style={{ fontSize: 16, padding: '15px 32px', background: 'linear-gradient(135deg, #0081f0, #810cfa)', boxShadow: '0 4px 24px rgba(0,129,240,0.3)' }}>
-                Começar gratuitamente <ArrowRight />
-              </button>
-              <button onClick={() => router.push('/login')} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 16, padding: '15px 32px', background: 'rgba(255,255,255,0.08)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10, fontWeight: 500, cursor: 'pointer', backdropFilter: 'blur(8px)' }}>
-                Já tenho conta
-              </button>
-            </div>
-
-            <p style={{ fontSize: 13, color: '#64748B', animation: 'fadeIn .7s .35s ease both' }}>
-              Sem cartão de crédito · Grátis para começar
+            <p className="hero-sub" style={{ fontSize: 18, color: '#94A3B8', lineHeight: 1.6, maxWidth: 600, margin: '0 auto 8px', fontWeight: 400 }}>
+              Cole as respostas de um aluno ou envie uma foto da prova. Em segundos você vê o que está certo, errado e o que pede sua conferência. Se gostar, é só criar sua conta grátis.
             </p>
           </div>
 
-          {/* Product mockup */}
-          <div className="hero-mockup" style={{ maxWidth: 940, margin: '72px auto 0', borderRadius: 20, overflow: 'hidden', boxShadow: '0 40px 100px rgba(0,0,0,0.11), 0 0 0 1px rgba(0,0,0,0.06)' }}>
-            {/* Browser chrome */}
-            <div style={{ background: '#F5F5F5', borderBottom: '1px solid #E5E5E5', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ display: 'flex', gap: 6 }}>
-                {['#FF5F57','#FEBC2E','#28C840'].map(c => <div key={c} style={{ width: 11, height: 11, borderRadius: '50%', background: c }} />)}
-              </div>
-              <div style={{ flex: 1, background: 'white', borderRadius: 6, height: 26, maxWidth: 280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #E5E5E5' }}>
-                <span style={{ fontSize: 11, color: '#9CA3AF', fontFamily: 'monospace' }}>kriteria.education/avaliar</span>
-              </div>
+          <div className="hero-split" style={{ maxWidth: 1160, margin: '40px auto 0', position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1fr 1.02fr', gap: 48, alignItems: 'stretch', textAlign: 'left' }}>
+
+          {/* ── Card de teste (esquerda) ── */}
+          <div className="hero-demo" style={{ background: 'white', borderRadius: 20, textAlign: 'left', boxShadow: '0 40px 100px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+            <div style={{ padding: '22px 24px', borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Teste grátis, sem cadastro</span>
+              <span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>3 correções grátis</span>
             </div>
-            {/* App interface */}
-            <div className="hero-mockup-grid" style={{ padding: '28px', background: '#FAFAFA', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              {/* Left panel */}
-              <div style={{ background: 'white', borderRadius: 12, padding: 24, border: '1px solid #F0F0F0' }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 16 }}>Trabalho do aluno</div>
-                {[90, 70, 85, 60, 78, 55].map((w, i) => (
-                  <div key={i} style={{ height: 10, background: '#F3F4F6', borderRadius: 5, marginBottom: 8, width: `${w}%` }} />
-                ))}
-                <div style={{ marginTop: 20, display: 'flex', gap: 8 }}>
-                  <div style={{ flex: 1, height: 9, background: '#F3F4F6', borderRadius: 4 }} />
-                  <div style={{ flex: 1, height: 9, background: '#F3F4F6', borderRadius: 4 }} />
-                </div>
-                <button className="btn-primary" style={{ marginTop: 20, width: '100%', justifyContent: 'center', fontSize: 13, padding: '11px 0' }}>
-                  Gerar avaliação <ArrowRight />
-                </button>
-              </div>
-              {/* Right panel */}
-              <div style={{ background: 'white', borderRadius: 12, padding: 24, border: '1px solid #F0F0F0' }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 16 }}>Resultado da avaliação</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, padding: '14px 16px', background: '#E6F3FF', borderRadius: 10, border: '1px solid #cad0dd' }}>
-                  <div style={{ fontSize: 28, fontWeight: 800, color: '#0081f0', lineHeight: 1 }}>8.5</div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>Nota final</div>
-                    <div style={{ fontSize: 12, color: '#10B981', fontWeight: 500, marginTop: 2 }}>Bom desempenho</div>
+
+            <div style={{ padding: '20px 24px' }}>
+              {!result && (
+                <>
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                    <button className={`demo-toggle-btn ${mode === 'texto' ? 'active' : ''}`} onClick={() => { setMode('texto'); setError(''); }}>Colar texto</button>
+                    <button className={`demo-toggle-btn ${mode === 'foto' ? 'active' : ''}`} onClick={() => { setMode('foto'); setError(''); }}>Enviar foto</button>
                   </div>
-                </div>
-                {[['Coerência textual', 92], ['Argumentação', 76], ['Gramática', 88]].map(([label, val]) => (
-                  <div key={label} style={{ marginBottom: 12 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6B7280', marginBottom: 4 }}>
-                      <span>{label}</span><span style={{ fontWeight: 600, color: '#374151' }}>{val}%</span>
+
+                  {mode === 'texto' ? (
+                    <textarea
+                      value={studentWork}
+                      onChange={e => setStudentWork(e.target.value)}
+                      rows={6}
+                      placeholder={'Cole aqui as respostas do aluno. Ex:\n1) 2x + 4 = 10, então x = 3\n2) A capital da França é Paris\n3) ...'}
+                      style={{ width: '100%', padding: '12px 14px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 14, fontFamily: 'inherit', resize: 'vertical', color: '#111827', background: '#FAFAFA' }}
+                    />
+                  ) : (
+                    <div>
+                      <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}
+                        onChange={e => { pickFile(e.target.files?.[0]); e.target.value = ''; }} />
+                      <div onClick={() => fileRef.current?.click()}
+                        style={{ border: `1.5px dashed ${image ? '#0081f0' : '#E5E7EB'}`, borderRadius: 10, padding: image ? '12px 14px' : '28px 20px', cursor: 'pointer', background: image ? '#F0F7FF' : '#FAFAFA', textAlign: 'center' }}>
+                        {image ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', fontSize: 13, color: '#111827' }}>
+                            <span style={{ fontWeight: 600 }}>{image.name}</span>
+                            <span onClick={e => { e.stopPropagation(); setImage(null); }} style={{ color: '#9CA3AF', cursor: 'pointer', fontSize: 12 }}>trocar</span>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#6B7280', justifyContent: 'center' }}>
+                            <IconUpload />
+                            <span style={{ fontSize: 13, fontWeight: 500, color: '#374151' }}>Clique para enviar uma foto da prova</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ height: 5, background: '#F3F4F6', borderRadius: 3 }}>
-                      <div style={{ height: '100%', width: `${val}%`, background: 'linear-gradient(90deg, #0081f0, #66b3ff)', borderRadius: 3, transition: 'width 1s ease' }} />
+                  )}
+
+                  {showContext ? (
+                    <textarea
+                      value={context}
+                      onChange={e => setContext(e.target.value)}
+                      rows={2}
+                      placeholder="Contexto ou gabarito (opcional). Ex: 5 questões sobre equação de 2º grau."
+                      style={{ width: '100%', marginTop: 10, padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', color: '#111827', background: '#FAFAFA' }}
+                    />
+                  ) : (
+                    <button onClick={() => setShowContext(true)} style={{ marginTop: 10, background: 'none', border: 'none', color: '#0081f0', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>
+                      + Adicionar contexto ou gabarito (opcional)
+                    </button>
+                  )}
+
+                  {error && (
+                    <div style={{ marginTop: 12, padding: '10px 14px', background: '#FEF2F2', border: '1px solid #dc262633', borderRadius: 10, color: '#991B1B', fontSize: 13 }}>
+                      {error}
+                      {rateLimited && (
+                        <div style={{ marginTop: 8 }}>
+                          <button onClick={() => router.push('/signup')} className="btn-primary" style={{ padding: '8px 16px', fontSize: 13 }}>
+                            Criar conta grátis <ArrowRight />
+                          </button>
+                        </div>
+                      )}
                     </div>
+                  )}
+
+                  <button onClick={handleSubmit} disabled={!canSubmit} className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 16, padding: '13px 0' }}>
+                    {loading ? <><IconSpinner /> Corrigindo...</> : <>Corrigir agora <ArrowRight /></>}
+                  </button>
+                  <p style={{ fontSize: 11.5, color: '#9CA3AF', textAlign: 'center', marginTop: 10 }}>
+                    O trabalho não é salvo. É só uma amostra do Kriteria em ação.
+                  </p>
+                </>
+              )}
+
+              {result && (
+                <div>
+                  {result.summary && <p style={{ fontSize: 14, color: '#111827', margin: '0 0 12px', lineHeight: 1.55 }}>{result.summary}</p>}
+                  {result.suggestedScore && (
+                    <div style={{ marginBottom: 14, display: 'inline-block', padding: '5px 14px', borderRadius: 20, background: '#E6F3FF', border: '1px solid #cad0dd', fontSize: 13, fontWeight: 700, color: '#0033ad' }}>
+                      Nota sugerida: {result.suggestedScore}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {(result.items || []).map((item, i) => {
+                      const meta = STATUS_META[item.status] || STATUS_META.incerto;
+                      const RIcon = meta.Icon;
+                      return (
+                        <div key={i} style={{ display: 'flex', gap: 10, padding: '12px 14px', background: meta.bg, border: `1px solid ${meta.border}`, borderRadius: 10 }}>
+                          <div style={{ flexShrink: 0, marginTop: 1 }}><RIcon /></div>
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Questão {item.question} · {meta.label}</div>
+                            <div style={{ fontSize: 13, color: '#374151', marginTop: 2, lineHeight: 1.5 }}>{item.comment}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                ))}
-              </div>
+
+                  <div style={{ marginTop: 18, padding: '18px', background: 'linear-gradient(135deg, #0033ad, #0081f0)', borderRadius: 14, textAlign: 'center' }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: 'white', marginBottom: 6 }}>Gostou do resultado?</div>
+                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 1.55, marginBottom: 14 }}>
+                      Crie sua conta grátis para corrigir a turma inteira de uma vez, salvar o histórico, gerar PDF e usar seus próprios critérios.
+                    </p>
+                    <button onClick={() => router.push('/signup')} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: 'white', color: '#0033ad', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                      Criar conta grátis <ArrowRight />
+                    </button>
+                  </div>
+                  <button onClick={resetDemo} style={{ width: '100%', marginTop: 10, background: 'none', border: 'none', color: '#6B7280', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', padding: '6px 0' }}>
+                    Testar outra prova
+                  </button>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* ── Vídeo + copy (direita) ── */}
+          <div className="hero-video" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 12 }}>Veja em ação</p>
+            <h2 style={{ fontSize: 27, fontWeight: 800, color: 'white', lineHeight: 1.2, letterSpacing: '-0.5px', marginBottom: 12 }}>
+              A correção grátis é só a ponta do iceberg
+            </h2>
+            <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.6, marginBottom: 20 }}>
+              No vídeo: uma <strong style={{ color: '#CBD5E1', fontWeight: 600 }}>correção avançada</strong> com os seus critérios e o seu tom, e os <strong style={{ color: '#CBD5E1', fontWeight: 600 }}>relatórios de turma</strong> que mostram, na hora, quem precisa de atenção.
+            </p>
+            <div
+              className={`video-poster ${DEMO_VIDEO_ID ? '' : 'disabled'}`}
+              onClick={() => DEMO_VIDEO_ID && setVideoOpen(true)}
+              style={{ background: 'linear-gradient(145deg, #10131f 0%, #141a3a 55%, #1f0838 100%)', flex: 1, minHeight: 260, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 30px 80px rgba(0,0,0,0.35), 0 0 60px rgba(0,129,240,0.1)' }}
+            >
+              <div className="play-circle" style={{ width: 68, height: 68, borderRadius: '50%', background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', backdropFilter: 'blur(6px)' }}>
+                <IconPlay size={28} />
+              </div>
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>
+                {DEMO_VIDEO_ID ? 'Assistir ao vídeo (2 min)' : 'Vídeo em breve'}
+              </span>
+            </div>
+          </div>
+
+          </div>{/* /hero-split */}
+
+          <p style={{ fontSize: 13, color: '#64748B', marginTop: 24, position: 'relative', zIndex: 1 }}>
+            Sem cartão de crédito · Grátis para começar
+          </p>
         </section>
 
         {/* ── BENEFITS ───────────────────────────────────────────────────────── */}
-        <section id="funcionalidades" style={{ padding: '96px 32px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
+        <section id="funcionalidades" style={{ padding: '96px 32px', background: 'white' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 64 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Por que Kriteria</p>
@@ -290,11 +443,11 @@ export default function Home() {
             </div>
             <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
               {[
-                { Icon: ZapIcon, title: 'Horas de volta', desc: 'Professores relatam economizar de 4 a 8 horas por semana. Tempo que volta para você ensinar, planejar e descansar.' },
-                { Icon: UserIcon, title: 'Seu estilo, sempre', desc: 'Configure uma vez como você avalia. O Kriteria replica seu padrão, seu tom e seus critérios em todas as avaliações.' },
-                { Icon: BarChartIcon, title: 'Veja quem precisa de você', desc: 'Identifique rapidamente quais alunos estão lutando e quais critérios a turma toda está errando.' },
-                { Icon: ShieldIcon, title: 'Justo para todos', desc: 'Sem mais a dúvida "fui mais rigoroso nesse aluno?" O padrão é o mesmo do 1º ao último trabalho.' },
-              ].map(({ Icon: Ic, title, desc }) => (
+                { Ic: ZapIcon, title: 'Horas de volta', desc: 'Professores relatam economizar de 4 a 8 horas por semana. Tempo que volta para você ensinar, planejar e descansar.' },
+                { Ic: UserIcon, title: 'Seu estilo, sempre', desc: 'Configure uma vez como você avalia. O Kriteria replica seu padrão, seu tom e seus critérios em todas as avaliações.' },
+                { Ic: BarChartIcon, title: 'Veja quem precisa de você', desc: 'Identifique rapidamente quais alunos estão lutando e quais critérios a turma toda está errando.' },
+                { Ic: ShieldIcon, title: 'Justo para todos', desc: 'Sem mais a dúvida "fui mais rigoroso nesse aluno?" O padrão é o mesmo do 1º ao último trabalho.' },
+              ].map(({ Ic, title, desc }) => (
                 <div key={title} className="benefit-card" style={{ padding: '36px 24px', textAlign: 'center', borderRadius: 16 }}>
                   <div className="icon-box" style={{ width: 52, height: 52, borderRadius: 14, background: '#E6F3FF', color: '#0081f0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                     <Ic />
@@ -308,7 +461,7 @@ export default function Home() {
         </section>
 
         {/* ── PRODUCT EXPLANATION ────────────────────────────────────────────── */}
-        <section id="como-funciona" style={{ padding: '96px 32px', background: 'white' }}>
+        <section id="como-funciona" style={{ padding: '96px 32px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 72 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Como funciona</p>
@@ -353,12 +506,6 @@ export default function Home() {
                         </div>
                       ))}
                     </div>
-                    <div style={{ marginTop: 18, padding: '10px 14px', background: '#F9FAFB', borderRadius: 10, border: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#0081f0' }} />
-                      <span style={{ fontSize: 12, color: '#6B7280' }}>Exercícios salvos: <strong style={{ color: '#111827' }}>12</strong></span>
-                      <span style={{ fontSize: 12, color: '#D1D5DB', marginLeft: 'auto' }}>·</span>
-                      <span style={{ fontSize: 12, color: '#6B7280' }}>Avaliações: <strong style={{ color: '#111827' }}>84</strong></span>
-                    </div>
                   </div>
                 ),
               },
@@ -394,7 +541,6 @@ export default function Home() {
                           <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>Bom desempenho</div>
                           <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>Acima da média da turma</div>
                         </div>
-                        <div style={{ marginLeft: 'auto', background: '#F0FDF4', color: '#16A34A', fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 100, border: '1px solid #D1FAE5' }}>✓ Concluído</div>
                       </div>
                       {[['Coerência textual', 90, '#0081f0'], ['Argumentação', 78, '#810cfa'], ['Gramática', 88, '#10B981']].map(([label, val, color]) => (
                         <div key={label} style={{ marginBottom: 10 }}>
@@ -604,7 +750,7 @@ export default function Home() {
                 </div>
                 <div style={{ padding: '16px 20px', borderBottom: '1px solid #F3F4F6' }}>
                   <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Resumo da turma</div>
-                  <div className="mockup-stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
                     {[['7.4', 'Média geral', '#0081f0'], ['79%', 'Aprovação', '#10B981'], ['34', 'Avaliados', '#6B7280']].map(([val, label, color]) => (
                       <div key={label} style={{ textAlign: 'center', padding: '12px 8px', background: '#F9FAFB', borderRadius: 10, border: '1px solid #F3F4F6' }}>
                         <div style={{ fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{val}</div>
@@ -715,7 +861,6 @@ export default function Home() {
               <p style={{ fontSize: 12, fontWeight: 700, color: '#0081f0', textTransform: 'uppercase', letterSpacing: 2.5, marginBottom: 14 }}>Planos</p>
               <h2 style={{ fontSize: 44, fontWeight: 800, color: '#00173f', letterSpacing: '-1px', marginBottom: 14 }}>Simples e transparente</h2>
               <p style={{ fontSize: 17, color: '#6B7280', marginBottom: 32 }}>Comece grátis. Faça upgrade quando precisar.</p>
-              {/* Toggle pill */}
               <div style={{ display: 'inline-flex', background: '#E5E7EB', borderRadius: 100, padding: 4, gap: 4 }}>
                 <button onClick={() => setPlanTab('individual')} style={{ padding: '8px 24px', borderRadius: 100, border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', transition: 'all .2s', background: planTab === 'individual' ? '#00173f' : 'transparent', color: planTab === 'individual' ? 'white' : '#6B7280' }}>
                   Planos Individuais
@@ -726,11 +871,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* PLANOS INDIVIDUAIS */}
             {planTab === 'individual' && (
               <div className="grid-plans" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, alignItems: 'start' }}>
-
-                {/* GRATUITO */}
                 <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
                   <p style={{ fontSize: 12, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Gratuito</p>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
@@ -749,7 +891,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* ESSENCIAL */}
                 <div className="plan-card" style={{ background: '#00173f', border: '1px solid #00173f', position: 'relative', transform: 'scale(1.03)' }}>
                   <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#810cfa', color: 'white', padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: 0.5 }}>
                     MAIS POPULAR
@@ -772,7 +913,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* PRO */}
                 <div className="plan-card" style={{ background: 'white', border: '1px solid #E5E7EB' }}>
                   <p style={{ fontSize: 12, fontWeight: 700, color: '#810cfa', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Pro</p>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
@@ -792,7 +932,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* PREMIUM */}
                 <div className="plan-card" style={{ background: 'white', border: '2px solid #d97706' }}>
                   <p style={{ fontSize: 12, fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Premium</p>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
@@ -814,14 +953,12 @@ export default function Home() {
               </div>
             )}
 
-            {/* PLANOS INSTITUCIONAIS */}
             {planTab === 'institucional' && (
               <>
                 <p style={{ textAlign: 'center', fontSize: 14, color: '#6B7280', marginBottom: 40 }}>
                   Gerencie toda a sua equipe em um só lugar. Um coordenador distribui avaliações, relatórios e permissões para cada usuário.
                 </p>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  {/* INSTITUCIONAL */}
                   <div className="plan-card" style={{ background: 'white', border: '2px solid #d97706', maxWidth: 340, width: '100%' }}>
                     <p style={{ fontSize: 12, fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12 }}>Institucional</p>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
@@ -854,7 +991,7 @@ export default function Home() {
               Seu próximo fim de semana pode ser seu de volta
             </h2>
             <p style={{ fontSize: 19, color: 'rgba(255,255,255,0.8)', lineHeight: 1.65, marginBottom: 44 }}>
-              Crie sua conta grátis agora. Sem cartão de crédito. Em 5 minutos você já consegue avaliar seu primeiro trabalho com o Kriteria.
+              Você já testou aqui em cima. Crie sua conta grátis agora — sem cartão de crédito — e corrija sua turma inteira, salve o histórico e gere PDF.
             </p>
             <button onClick={() => router.push('/signup')} style={{
               display: 'inline-flex', alignItems: 'center', gap: 10,
@@ -889,7 +1026,7 @@ export default function Home() {
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 18 }}>Produto</div>
                 {[
-                  { label: 'Funcionalidades', href: '#funcionalidades' },
+                  { label: 'Como funciona', href: '#como-funciona' },
                   { label: 'Tipos de Trabalho', href: '#disciplinas' },
                   { label: 'Para Coordenadores', href: '#coordenadores' },
                   { label: 'Planos', href: '#planos' },
@@ -922,6 +1059,23 @@ export default function Home() {
         </footer>
 
       </div>
+
+      {/* ── Modal do vídeo ── */}
+      {videoOpen && DEMO_VIDEO_ID && (
+        <div onClick={() => setVideoOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#000', borderRadius: 16, width: '100%', maxWidth: 880, overflow: 'hidden', boxShadow: '0 24px 64px rgba(0,0,0,0.4)' }}>
+            <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${DEMO_VIDEO_ID}?autoplay=1`}
+                title="Kriteria em ação"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

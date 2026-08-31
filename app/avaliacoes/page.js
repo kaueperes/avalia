@@ -215,10 +215,12 @@ export default function AvaliacoesPage() {
     }).join('');
 
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Avaliação — ${_esc(e.studentName)}</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 740px; margin: 0 auto; }
+      @media (max-width: 640px) { body { padding: 20px 16px; } }
       @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }
     </style></head><body>
       <!-- Header -->
@@ -325,10 +327,12 @@ export default function AvaliacoesPage() {
     const weakItems = (report.pontosAtencao || []).map(p => `<li style="margin-bottom:4px;color:#374151;font-size:13px">${_esc(p)}</li>`).join('');
 
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Relatório da Turma — ${turmaTitle}</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 760px; margin: 0 auto; }
+      @media (max-width: 640px) { body { padding: 20px 16px; } }
       @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }
     </style></head><body>
       <div style="border-bottom:2px solid #e5e7eb;padding-bottom:24px;margin-bottom:32px">
@@ -417,8 +421,9 @@ export default function AvaliacoesPage() {
 
     const avgScore = evalsForQuick.length ? (evalsForQuick.reduce((s,e)=>s+e.score,0)/evalsForQuick.length).toFixed(1) : '—';
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Notas — ${date}</title>
-    <style>* { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; } @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }</style>
+    <style>* { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; } @media (max-width: 640px) { body { padding: 20px 16px; } } @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }</style>
     </head><body>
       <div style="border-bottom:2px solid #e5e7eb;padding-bottom:20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-end">
         <div>
@@ -491,8 +496,9 @@ export default function AvaliacoesPage() {
     ).join('<br>');
 
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Parecer Individual — ${_esc(studentName)}</title>
-    <style>* { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 720px; margin: 0 auto; } @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }</style>
+    <style>* { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 720px; margin: 0 auto; } @media (max-width: 640px) { body { padding: 20px 16px; } } @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }</style>
     </head><body>
       <div style="border-bottom:2px solid #e5e7eb;padding-bottom:24px;margin-bottom:32px">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-weight:600;margin-bottom:6px">Parecer Individual do Aluno</div>

@@ -216,8 +216,8 @@ export default function RelatoriosPage() {
   }
 
   function openPDF(title, body) {
-    const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${title}</title>
-      <style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 40px 48px; max-width: 780px; margin: 0 auto; } @media print { body { padding: 24px; } @page { margin: 1.5cm; } }</style>
+    const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title>
+      <style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 40px 48px; max-width: 780px; margin: 0 auto; } @media (max-width: 640px) { body { padding: 20px 16px; } } @media print { body { padding: 24px; } @page { margin: 1.5cm; } }</style>
       </head><body>${body}</body></html>`;
     const w = window.open('', '_blank');
     w.document.write(html);

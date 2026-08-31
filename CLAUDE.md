@@ -221,12 +221,13 @@ Diferente do Meta Pixel (que só mede conversão de anúncio, anônimo), o PostH
 | `evaluate/` | Avaliação Avançada (Claude ou Gemini) |
 | `evaluate-basica/` | Correção rápida sem cadastro, mesma cota de `evaluate/`, sem persistência |
 | `evaluate-test/` | Modo Teste — cota própria, sem consumir cota de avaliação |
+| `try-basica/` | **Público, sem auth** — teste da landing `/experimente`. Mesmo prompt/cascata da Básica, 1 aluno (texto + 1 foto inline base64), sem persistir nada. Rate limit leve por IP: tabela `demo_trials` (3 testes/24h), fail-open se o banco falhar |
 | `generate-exam/` | Gerador de Provas — cota própria, só planos pagos |
 | `generate-criteria/` | Sugere critérios de avaliação via IA para um exercício |
 | `chat/` | Chatbot Luca (Claude Haiku por padrão) |
 | `analyze-class/` | Relatório de turma com IA |
 | `analyze-student/` | Relatório individual de aluno |
-| `auth/` | Login, signup, refresh JWT, esqueci/redefinir senha |
+| `auth/` | Login, signup, esqueci/redefinir senha. JWT `expiresIn: '30d'` (`lib/auth.js`), sem refresh e sem revogação server-side — logout só limpa o `localStorage` |
 | `institutions/` | CRUD de instituições (nome + logo) |
 | `disciplines/` | CRUD de disciplinas |
 | `exercises/` | CRUD de exercícios |
@@ -242,7 +243,6 @@ Diferente do Meta Pixel (que só mede conversão de anúncio, anônimo), o PostH
 | `org/` | Organizações institucionais: convites, membros, dashboard |
 | `admin/` | Painel administrativo (restrito, `is_admin` reconfirmado no backend) |
 | `chatbot-config/` | Configurações do chatbot (admin) |
-| `onboarding/` | Fluxo de primeiro acesso |
 
 ---
 
@@ -271,7 +271,8 @@ Diferente do Meta Pixel (que só mede conversão de anúncio, anônimo), o PostH
 ## Estrutura de páginas públicas
 
 Páginas sem autenticação (landing + suporte):
-- `/` — landing page (app/page.js). Se já houver token válido no `localStorage`, redireciona automaticamente para `/inicio` (ou `/onboarding`)
+- `/` — landing page (app/page.js). Se já houver token válido no `localStorage`, redireciona automaticamente para `/inicio`
+- `/experimente` — landing alternativa (app/experimente/page.js) com **teste sem cadastro no hero** (estilo Lovable): o visitante cola/fotografa uma prova e recebe a correção na hora via `api/try-basica` (público), seguida de CTA pra criar conta. Logo abaixo, seção de **vídeo** (`DEMO_VIDEO_ID` no topo do arquivo — vazio = placeholder "em breve"; trocar pelo ID do YouTube quando gravado) e as mesmas seções institucionais da `/`. Rota separada de propósito (não substitui a `/`) pra comparar conversão / servir de destino de anúncio. Mesmo redirect automático se já houver sessão
 - `/login` — mesmo redirecionamento automático se já houver sessão válida
 - `/central-de-ajuda` — FAQ, guia de uso e galeria dos 10 vídeos tutoriais (ver seção "Vídeos tutoriais")
 - `/contato` — formulário envia via Resend (`api/contact`) para `contato@kriteria.education`
@@ -325,6 +326,9 @@ Todas têm o mesmo navbar com 5 links: Funcionalidades · Tipos de Trabalho · P
 - **Grid inline sem `className` não é responsivo**: `app/page.js` (home) tem um bloco `<style>` com `@media (max-width: 900px)` que empilha os grids por classe (`.grid-4`, `.grid-plans` etc.), mas um `gridTemplateColumns` inline sem classe correspondente não é pego por essa media query. Já aconteceu no mockup do hero (coluna direita cortada no mobile, texto ilegível) — corrigido dando `className="hero-mockup-grid"` ao grid e adicionando a regra no bloco de media query. Ao criar um grid novo na home, sempre checar se existe contraparte mobile
 - **`<main className="main-area">` no `AppLayout.js` precisa de `minWidth: 0`**: é um flex item (`flex: 1`) dentro de um flex row (sidebar fixa + main). Sem `minWidth: 0`, um flex item nunca encolhe abaixo do conteúdo mais largo lá dentro (tabela, gráfico SVG, filtro com largura fixa) — então em vez de esse conteúdo específico estourar, a página *inteira* fica mais larga que a tela e ganha rolagem horizontal, mesmo em telas que já têm grid/tabela tratados corretamente por dentro. Foi a causa raiz de várias páginas (`/inicio`, `/avaliacoes`, `/relatorios`) aparentando estar "meio fora" no mobile mesmo depois de corrigir os grids/tabelas de cada uma individualmente — só resolveu de vez ao corrigir esse `minWidth: 0` no componente compartilhado. Se algo parecer cortado/com scroll horizontal em mobile de novo, checar esse ponto primeiro antes de sair caçando página por página
 - **Padrão de responsividade mobile no app autenticado**: `className="grid-collapse"` (empilha grid em 1 coluna abaixo de 640px), `className="table-scroll"` (scroll horizontal em tabelas abaixo de 640px) e `className="filter-field"` (largura 100% abaixo de 480px, pra campos de filtro com largura fixa em px) — regras centralizadas em `app/globals.css`. Usar essas classes em vez de inventar media query nova a cada página
+- **Login/cadastro** (`app/login`, `app/signup`): layout de 2 painéis (marca + formulário). Abaixo de 900px o painel de marca some (`.auth-brand`), o formulário vira largura total (`.auth-form`) e aparece um logo só-mobile (`.auth-logo-mobile`) — media query num `<style>` inline em cada página. Sem isso dava scroll horizontal + texto espremido no celular
+- **Previews de relatório** (`app/relatorio-preview` `EvaluationReport`, `relatorio-turma-preview` `TurmaReport`, `relatorio-turma-evolucao-preview`, `relatorio-aluno-evolucao-preview` — componentes reusados pelas rotas reais `/relatorio-individual`, `/relatorio-turma`, etc.): cada um tem `@media (max-width: 640px)` no `<style>` que reduz padding das seções (`.rpt-card > div`), empilha os grids (`.rpt-grid-2`, `.rpt-kpi-grid` → menos colunas) e diminui o `h1`. O `-multi-preview` é só mock de design, não recebeu o tratamento
+- **HTML de PDF/impressão** (templates via `document.write` em `avaliacoes/`, `relatorios/`, `avaliacao-aula/`): sempre incluir `<meta name="viewport" content="width=device-width, initial-scale=1">` e um `@media (max-width: 640px) { body { padding: 20px 16px } }` — sem o viewport meta o mobile renderiza a 980px e corta tudo
 
 ---
 

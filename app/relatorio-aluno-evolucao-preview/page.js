@@ -195,7 +195,7 @@ export function AlunoEvolucaoReport({ data }) {
   const section = { padding: '28px 40px', borderBottom: '1px solid #f1f5f9' };
 
   return (
-    <div style={{ fontFamily: "'Inter', sans-serif", background: '#f1f5f9', minHeight: '100vh', padding: '40px 20px' }}>
+    <div className="rpt-outer" style={{ fontFamily: "'Inter', sans-serif", background: '#f1f5f9', minHeight: '100vh', padding: '40px 20px' }}>
       <div className="rpt-card" style={{ maxWidth: 820, margin: '0 auto', background: '#fff', borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 40px rgba(0,0,0,0.10)' }}>
 
         {/* ── Header ── */}
@@ -263,7 +263,7 @@ export function AlunoEvolucaoReport({ data }) {
         {/* ── KPIs ── */}
         <div style={{ ...section }}>
           <SectionTitle>Visão Geral do Período</SectionTitle>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+          <div className="rpt-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
             <KpiCard label="Média do Período" value={mediaGeral.toFixed(1)}     color={scoreColor(mediaGeral)} />
             <KpiCard label="Evolução Geral"   value={`${deltaGeral >= 0 ? '+' : ''}${deltaGeral.toFixed(1)}`} color={deltaGeral >= 0 ? '#16a34a' : '#ef4444'} sub="1ª → última ativ." />
             <KpiCard label="Nota Inicial"     value={scoreInicial.toFixed(1)}   color={scoreColor(scoreInicial)} sub={d.atividades[0].name.substring(0, 14) + '…'} />
@@ -280,7 +280,7 @@ export function AlunoEvolucaoReport({ data }) {
 
         {/* ── Critérios da última atividade ── */}
         <div style={{ ...section }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+          <div className="rpt-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             <div>
               <SectionTitle>Critérios — Atividade Mais Recente</SectionTitle>
               <p style={{ fontSize: 12, color: '#94a3b8', margin: '-12px 0 16px', fontStyle: 'italic' }}>{d.atividades[n - 1].name}</p>
@@ -320,7 +320,7 @@ export function AlunoEvolucaoReport({ data }) {
             <p style={{ fontSize: 14, lineHeight: 1.85, color: '#374151', margin: 0, fontStyle: 'italic' }}>"{d.resumo}"</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div className="rpt-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
             <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 14, padding: '18px 20px' }}>
               <span style={{ fontSize: 11, fontWeight: 800, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 12 }}>Pontos Fortes</span>
               <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -360,7 +360,7 @@ export function AlunoEvolucaoReport({ data }) {
       </div>
 
       <div className="print-pg" />
-      <style>{`@page { margin: 0; } @media print { .no-print { display: none !important; } body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .rpt-card { overflow: visible !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding-top: 24px; padding-bottom: 24px; } } .print-pg { display: none; position: fixed; bottom: 12px; right: 16px; font-size: 10px; color: #94a3b8; font-family: sans-serif; } .print-pg::after { content: counter(page); } @media print { .print-pg { display: block; } }`}</style>
+      <style>{`@page { margin: 0; } @media (max-width: 640px) { .rpt-outer { padding: 16px 10px !important; } .rpt-card > div { padding-left: 16px !important; padding-right: 16px !important; } .rpt-card h1 { font-size: 22px !important; } .rpt-kpi-grid { grid-template-columns: repeat(2, 1fr) !important; } .rpt-grid-2 { grid-template-columns: 1fr !important; } } @media print { .no-print { display: none !important; } body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .rpt-card { overflow: visible !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding-top: 24px; padding-bottom: 24px; } } .print-pg { display: none; position: fixed; bottom: 12px; right: 16px; font-size: 10px; color: #94a3b8; font-family: sans-serif; } .print-pg::after { content: counter(page); } @media print { .print-pg { display: block; } }`}</style>
     </div>
   );
 }

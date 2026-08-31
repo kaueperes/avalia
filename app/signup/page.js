@@ -32,7 +32,7 @@ function SignupPageInner() {
       fbTrack('CompleteRegistration', undefined, data.fbEventId);
       phIdentify(data.user);
       phCapture('signup_completed', { plan: data.user?.plan });
-      router.push(redirect || '/onboarding');
+      router.push(redirect || '/inicio');
     } catch (err) {
       setError(err.message || 'Erro ao criar conta');
     } finally {
@@ -48,8 +48,15 @@ function SignupPageInner() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex' }}>
+      <style>{`
+        @media (max-width: 900px) {
+          .auth-brand { display: none !important; }
+          .auth-form { width: 100% !important; padding: 40px 22px !important; }
+          .auth-logo-mobile { display: block !important; }
+        }
+      `}</style>
       {/* Left — branding */}
-      <div style={{
+      <div className="auth-brand" style={{
         flex: 1, background: 'linear-gradient(145deg, #0a0c18 0%, #0d1230 50%, #1a0530 100%)',
         display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '60px 56px',
         position: 'relative', overflow: 'hidden',
@@ -80,8 +87,9 @@ function SignupPageInner() {
       </div>
 
       {/* Right — form */}
-      <div style={{ width: 440, background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 48px' }}>
+      <div className="auth-form" style={{ width: 440, background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 48px' }}>
         <div style={{ width: '100%' }}>
+          <img src="/imagens/logo_kriteria.svg" alt="Kriteria" className="auth-logo-mobile" style={{ display: 'none', height: 30, marginBottom: 28 }} />
           <h2 style={{ fontSize: 24, fontWeight: 800, color: '#111827', marginBottom: 6, letterSpacing: '-0.3px' }}>Criar conta grátis</h2>
           <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 28 }}>Preencha os dados para começar</p>
 

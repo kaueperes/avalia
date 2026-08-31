@@ -203,7 +203,7 @@ export function TurmaReport({ data }) {
   };
 
   return (
-    <div style={{ fontFamily: "'Inter', sans-serif", background: '#f1f5f9', minHeight: '100vh', padding: '40px 20px' }}>
+    <div className="rpt-outer" style={{ fontFamily: "'Inter', sans-serif", background: '#f1f5f9', minHeight: '100vh', padding: '40px 20px' }}>
       <div className="rpt-card" style={{ maxWidth: 820, margin: '0 auto', background: '#fff', borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 40px rgba(0,0,0,0.10)' }}>
 
         {/* ── Header ── */}
@@ -252,7 +252,7 @@ export function TurmaReport({ data }) {
         {/* ── KPIs ── */}
         <div style={{ ...section }}>
           <SectionTitle>Visão Geral da Turma</SectionTitle>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+          <div className="rpt-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
             <KpiCard label="Média Geral"    value={stats.media.toFixed(1)}    color={scoreColor(stats.media)} />
             <KpiCard label="Aprovação"      value={`${pct}%`}                 color="#16a34a" sub={`${stats.aprovados} de ${stats.total}`} />
             <KpiCard label="Total de Alunos" value={stats.total}              color="#0081f0" />
@@ -263,7 +263,7 @@ export function TurmaReport({ data }) {
 
         {/* ── Distribuição + Critérios ── */}
         <div style={{ ...section }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+          <div className="rpt-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             <div>
               <SectionTitle>Distribuição de Desempenho</SectionTitle>
               <DistributionChart data={stats.distribuicao} total={stats.total} />
@@ -281,7 +281,7 @@ export function TurmaReport({ data }) {
         <div style={{ ...section }}>
           <SectionTitle>Ranking da Turma</SectionTitle>
           <div style={{ border: '1px solid #f1f5f9', borderRadius: 12, overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 80px 100px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '10px 16px' }}>
+            <div className="rpt-rank-row" style={{ display: 'grid', gridTemplateColumns: '40px 1fr 80px 100px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '10px 16px' }}>
               {['#', 'Aluno', 'Nota', 'Conceito'].map(h => (
                 <span key={h} style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{h}</span>
               ))}
@@ -292,6 +292,7 @@ export function TurmaReport({ data }) {
               return (
                 <div
                   key={i}
+                  className="rpt-rank-row"
                   style={{ display: 'grid', gridTemplateColumns: '40px 1fr 80px 100px', padding: '11px 16px', borderBottom: i < rankingOrdenado.length - 1 ? '1px solid #f8fafc' : 'none', background: isAtencao ? '#fff9f9' : i % 2 === 0 ? '#fff' : '#fafafa', alignItems: 'center' }}
                 >
                   <span style={{ fontSize: 12, fontWeight: 700, color: i < 3 ? '#f59e0b' : '#94a3b8' }}>
@@ -350,7 +351,7 @@ export function TurmaReport({ data }) {
             <p style={{ fontSize: 14, lineHeight: 1.85, color: '#374151', margin: 0, fontStyle: 'italic' }}>"{d.resumo}"</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div className="rpt-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 14, padding: '18px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
@@ -424,6 +425,14 @@ export function TurmaReport({ data }) {
       <div className="print-pg" />
       <style>{`
         @page { margin: 0; }
+        @media (max-width: 640px) {
+          .rpt-outer { padding: 16px 10px !important; }
+          .rpt-card > div { padding-left: 16px !important; padding-right: 16px !important; }
+          .rpt-card h1 { font-size: 22px !important; }
+          .rpt-kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .rpt-grid-2 { grid-template-columns: 1fr !important; }
+          .rpt-rank-row { grid-template-columns: 26px 1fr 44px 62px !important; padding-left: 12px !important; padding-right: 12px !important; }
+        }
         @media print {
           .no-print { display: none !important; }
           body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }

@@ -47,8 +47,8 @@ function generatePDF(entry) {
   const fortesRows = (entry.pontos_fortes || []).map(p => `<li style="margin-bottom:6px">${esc(p)}</li>`).join('');
   const desenvolverRows = (entry.pontos_desenvolver || []).map(p => `<li style="margin-bottom:6px">${esc(p)}</li>`).join('');
 
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Avaliação de Aula</title>
-    <style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 720px; margin: 0 auto; } @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }</style>
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Avaliação de Aula</title>
+    <style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #111; padding: 48px; max-width: 720px; margin: 0 auto; } @media (max-width: 640px) { body { padding: 20px 16px; } } @media print { body { padding: 32px 48px; } @page { margin: 0; size: A4; } }</style>
     </head><body>
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#810cfa;margin-bottom:6px">Avaliação de Aula</div>
     <h1 style="font-size:24px;margin-bottom:6px">${esc(temaLabels)}</h1>

@@ -277,7 +277,7 @@ export function TurmaEvolucaoReport({ data }) {
   const section = { padding: '28px 40px', borderBottom: '1px solid #f1f5f9' };
 
   return (
-    <div style={{ fontFamily: "'Inter', sans-serif", background: '#f1f5f9', minHeight: '100vh', padding: '40px 20px' }}>
+    <div className="rpt-outer" style={{ fontFamily: "'Inter', sans-serif", background: '#f1f5f9', minHeight: '100vh', padding: '40px 20px' }}>
       <div className="rpt-card" style={{ maxWidth: 860, margin: '0 auto', background: '#fff', borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 40px rgba(0,0,0,0.10)' }}>
 
         {/* ── Header ── */}
@@ -332,7 +332,7 @@ export function TurmaEvolucaoReport({ data }) {
         {/* ── KPIs ── */}
         <div style={{ ...section }}>
           <SectionTitle>Visão Geral do Período</SectionTitle>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+          <div className="rpt-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
             <KpiCard label="Média Atual"     value={mediaAtual.toFixed(1)}   color={scoreColor(mediaAtual)} sub={`Início: ${mediaInicial.toFixed(1)}`} />
             <KpiCard label="Evolução"        value={`${deltaMedia >= 0 ? '+' : ''}${deltaMedia.toFixed(1)}`} color={deltaMedia >= 0 ? '#16a34a' : '#ef4444'} sub="1ª → última ativ." />
             <KpiCard label="Aprovação"       value={`${Math.round((aprovados / total) * 100)}%`} color="#16a34a" sub={`${aprovados} de ${total}`} />
@@ -349,7 +349,7 @@ export function TurmaEvolucaoReport({ data }) {
 
         {/* ── Critérios da atividade mais recente + distribuição ── */}
         <div style={{ ...section }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+          <div className="rpt-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             <div>
               <SectionTitle>Critérios — Atividade Mais Recente</SectionTitle>
               <p style={{ fontSize: 12, color: '#94a3b8', margin: '-12px 0 16px', fontStyle: 'italic' }}>{d.atividades[n - 1]}</p>
@@ -396,7 +396,7 @@ export function TurmaEvolucaoReport({ data }) {
 
         {/* ── Destaques ── */}
         <div style={{ ...section }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div className="rpt-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
             {/* Maiores evoluções */}
             <div>
               <SectionTitle>Maior Evolução no Período</SectionTitle>
@@ -438,8 +438,8 @@ export function TurmaEvolucaoReport({ data }) {
         {/* ── Ranking ── */}
         <div style={{ ...section }}>
           <SectionTitle>Ranking da Turma</SectionTitle>
-          <div style={{ border: '1px solid #f1f5f9', borderRadius: 12, overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '36px 1fr 60px 60px 64px 60px 100px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '10px 16px', gap: 8, alignItems: 'center' }}>
+          <div style={{ border: '1px solid #f1f5f9', borderRadius: 12, overflowX: 'auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '36px 1fr 60px 60px 64px 60px 100px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '10px 16px', gap: 8, alignItems: 'center', minWidth: 520 }}>
               {['#', 'Aluno', '1ª Ativ.', 'Atual', 'Evolução', 'Tendência', 'Conceito'].map(h => (
                 <span key={h} style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</span>
               ))}
@@ -448,7 +448,7 @@ export function TurmaEvolucaoReport({ data }) {
               const isAtencao = a.scoreAtual < 6;
               const color = scoreColor(a.scoreAtual);
               return (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: '36px 1fr 60px 60px 64px 60px 100px', padding: '11px 16px', gap: 8, borderBottom: i < rankingOrdenado.length - 1 ? '1px solid #f8fafc' : 'none', background: isAtencao ? '#fff9f9' : i % 2 === 0 ? '#fff' : '#fafafa', alignItems: 'center' }}>
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: '36px 1fr 60px 60px 64px 60px 100px', padding: '11px 16px', gap: 8, borderBottom: i < rankingOrdenado.length - 1 ? '1px solid #f8fafc' : 'none', background: isAtencao ? '#fff9f9' : i % 2 === 0 ? '#fff' : '#fafafa', alignItems: 'center', minWidth: 520 }}>
                   <span style={{ fontSize: 12, fontWeight: 700, color: i < 3 ? '#f59e0b' : '#94a3b8' }}>
                     {i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}
                   </span>
@@ -502,7 +502,7 @@ export function TurmaEvolucaoReport({ data }) {
             <span style={{ fontSize: 11, fontWeight: 800, color: '#0081f0', textTransform: 'uppercase', letterSpacing: '0.12em', display: 'block', marginBottom: 10 }}>Resumo do Período</span>
             <p style={{ fontSize: 14, lineHeight: 1.85, color: '#374151', margin: 0, fontStyle: 'italic' }}>"{d.resumo}"</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div className="rpt-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 14, padding: '18px 20px' }}>
               <span style={{ fontSize: 11, fontWeight: 800, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 12 }}>Pontos Fortes</span>
               <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -555,7 +555,7 @@ export function TurmaEvolucaoReport({ data }) {
       </div>
 
       <div className="print-pg" />
-      <style>{`@page { margin: 0; } @media print { .no-print { display: none !important; } body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .rpt-card { overflow: visible !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding-top: 24px; padding-bottom: 24px; } } .print-pg { display: none; position: fixed; bottom: 12px; right: 16px; font-size: 10px; color: #94a3b8; font-family: sans-serif; } .print-pg::after { content: counter(page); } @media print { .print-pg { display: block; } }`}</style>
+      <style>{`@page { margin: 0; } @media (max-width: 640px) { .rpt-outer { padding: 16px 10px !important; } .rpt-card > div { padding-left: 16px !important; padding-right: 16px !important; } .rpt-card h1 { font-size: 22px !important; } .rpt-kpi-grid { grid-template-columns: repeat(2, 1fr) !important; } .rpt-grid-2 { grid-template-columns: 1fr !important; } } @media print { .no-print { display: none !important; } body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .rpt-card { overflow: visible !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding-top: 24px; padding-bottom: 24px; } } .print-pg { display: none; position: fixed; bottom: 12px; right: 16px; font-size: 10px; color: #94a3b8; font-family: sans-serif; } .print-pg::after { content: counter(page); } @media print { .print-pg { display: block; } }`}</style>
     </div>
   );
 }

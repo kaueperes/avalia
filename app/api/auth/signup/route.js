@@ -65,7 +65,7 @@ export async function POST(request) {
           <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 28px;">
             <tr>
               <td>
-                <a href="${appUrl}/avaliar-avancado" target="_self" style="display: inline-block; padding: 13px 28px; background-color: #0081f0; color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; border-radius: 10px; font-family: Arial, sans-serif;">
+                <a href="${appUrl}/avaliar-basica" target="_self" style="display: inline-block; padding: 13px 28px; background-color: #0081f0; color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; border-radius: 10px; font-family: Arial, sans-serif;">
                   Fazer minha primeira avaliação
                 </a>
               </td>
@@ -79,7 +79,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       token,
-      user: { id: user.id, name: user.name, email: user.email, plan: user.plan, onboarding_done: false },
+      user: { id: user.id, name: user.name, email: user.email, plan: user.plan },
       fbEventId,
     }, { status: 201 });
   } catch {
